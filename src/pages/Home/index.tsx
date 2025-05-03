@@ -1,5 +1,6 @@
 import NavBar from '../../common/NavBar'
-import image from '../../assets/pulido.jpg'
+import image from '../../assets/pulido.png'
+import { FaFacebook, FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa'
 
 function Homepage() {
   return (
@@ -14,7 +15,7 @@ function Homepage() {
             src={image}
             alt="Pulido"
             className="img-fluid w-100 rounded shadow"
-            style={{ maxHeight: '350px', width: '90%', objectFit: 'cover' }}
+            style={{ maxHeight: '350px', width: '110%', objectFit: 'cover' }}
           />
         </div>
 
@@ -48,6 +49,47 @@ function Homepage() {
             <button className="carousel-control-next" type="button" data-bs-target="#carouselPlaceholder" data-bs-slide="next">
               <span className="carousel-control-next-icon"></span>
             </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Sección de Contacto - NUEVA VERSIÓN */}
+      <div className="bg-dark text-white py-5">
+        <div className="container">
+          <h3 className="text-center fw-bold mb-4">Contáctenos</h3>
+          <div className="row row-cols-1 row-cols-md-2 g-4">
+            <div className="d-flex align-items-start gap-3">
+              <FaMapMarkerAlt className="fs-3 text-danger" />
+              <div>
+                <p className="mb-1 fw-semibold">Ubicación</p>
+                <p className="text-decoration-none text-white">Quesada, San Carlos, Costa Rica</p>
+              </div>
+            </div>
+            <div className="d-flex align-items-start gap-3">
+              <FaPhone className="fs-3 text-success" />
+              <div>
+                <p className="mb-1 fw-semibold">Teléfono</p>
+                <p className="text-decoration-none text-white">8358 2929</p>
+              </div>
+            </div>
+            <div className="d-flex align-items-start gap-3">
+              <FaEnvelope className="fs-3 text-primary" />
+              <div>
+                <p className="mb-1 fw-semibold">Correo</p>
+                <a href="mailto:agenda@redpolishcr.com" className="text-decoration-none text-white">
+                  agenda@redpolishcr.com
+                </a>
+              </div>
+            </div>
+            <div className="d-flex align-items-start gap-3">
+              <FaFacebook className="fs-3 text-info" />
+              <div>
+                <p className="mb-1 fw-semibold">Facebook</p>
+                <a href="https://www.facebook.com/share/19EaKxAE8s/" target="_blank" rel="noopener noreferrer" className="text-decoration-none text-white">
+                  Red Polish Costa Rica
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
