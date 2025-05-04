@@ -13,7 +13,6 @@ function App() {
       <Route path="/user" element={<UserManagement />} />
       <Route path="/recover" element={<Recover />} />
       <Route path="/new_password" element={<New_Password />} />
-      <Route path="/user" element={<UserManagement />} />
     </Routes>
   )
 }
