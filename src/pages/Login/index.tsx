@@ -97,6 +97,19 @@ const Login = () => {
               Ir al inicio
             </span>
           </p>
+          
+          {/* Opción para recuperar contraseña */}
+          <p className="text-dark" style={{ fontSize: '0.9rem' }}>
+            ¿Olvidaste tu contraseña?{' '}
+            <span
+              className="text-primary"
+              role="button"
+              style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
+              onClick={() => navigate('/recover')}
+            >
+              Recupera tu contraseña aquí
+            </span>
+          </p>
         </div>
       </div>
     </div>
