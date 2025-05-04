@@ -4,6 +4,7 @@ import Login from './pages/Login/index'
 import Register from './pages/Register/index'
 import Recover from './pages/Recover_password/index'
 import New_Password from './pages/New_password/index'
+import UserManagement from './pages/UserManagment/index'
 
 function App() {
   return (
@@ -13,6 +14,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/recover" element={<Recover />} />
       <Route path="/new_password" element={<New_Password />} />
+      <Route path="/user" element={<UserManagement />} />
     </Routes>
   )
 }
