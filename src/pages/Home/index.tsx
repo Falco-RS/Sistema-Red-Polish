@@ -33,7 +33,6 @@ function Homepage() {
           </p>
         </div>
 
-        {/* Carrusel placeholder */}
         <div className="mb-5">
           <div id="carouselPlaceholder" className="carousel slide" data-bs-ride="carousel">
             <div className="carousel-inner">
@@ -53,7 +52,6 @@ function Homepage() {
         </div>
       </div>
 
-      {/* Sección de Contacto - NUEVA VERSIÓN */}
       <div className="bg-dark text-white py-5">
         <div className="container">
           <h3 className="text-center fw-bold mb-4">Contáctenos</h3>

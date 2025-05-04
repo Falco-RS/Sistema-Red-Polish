@@ -12,15 +12,23 @@ const Register = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-
+  
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
       setError('Todos los campos son obligatorios.')
       return
     }
-
-    console.log({ firstName, lastName, email, password, role })
-
-    // Aquí podrías hacer la verificación real del registro
+  
+    // Construcción del objeto JSON que se enviará al backend
+    const userData = {
+      nombre: `${firstName}`,
+      apellido:`${lastName}`,
+      email: email,
+      password: password,
+    }
+  
+    //Por ahora solo se imprime 
+    console.log('Datos listos para enviar al backend:', JSON.stringify(userData, null, 2))
+  
     setError('')
     setFirstName('')
     setLastName('')
@@ -29,6 +37,7 @@ const Register = () => {
     setRole('cliente')
     navigate('/') // Redirige al home
   }
+  
 
   return (
     <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
@@ -85,20 +94,6 @@ const Register = () => {
               onChange={(e) => setPassword(e.target.value)}
               style={{ borderRadius: '20px', padding: '12px 16px', fontSize: '1rem', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', transition: 'all 0.3s' }}
             />
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="role" className="form-label fw-medium" style={{ fontSize: '1.1rem', color: '#555' }}>Rol</label>
-            <select
-              id="role"
-              className="form-select border-0 shadow-sm"
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              style={{ borderRadius: '20px', padding: '12px 16px', fontSize: '1rem', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', transition: 'all 0.3s' }}
-            >
-              <option value="cliente">Cliente</option>
-              <option value="administrador">Administrador</option>
-            </select>
           </div>
 
           {error && (
