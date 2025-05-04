@@ -4,11 +4,6 @@ import Login from './pages/Login/index'
 import Register from './pages/Register/index'
 import UserManagement from './pages/UserManagment/index'
 
-
-import Recover from './pages/Recover_password/index'
-import New_Password from './pages/New_password/index'
-import UserManagement from './pages/UserManagment/index'
-
 function App() {
   return (
     <Routes>
