@@ -17,17 +17,16 @@ const Login = () => {
 
     console.log({ email, password })
 
-    // Aquí podrías hacer la verificación real del login
     setError('')
     setEmail('')
     setPassword('')
-    navigate('/') // redirige al home
+    navigate('/')
   }
 
   return (
     <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
       <div className="bg-white rounded-4 shadow-lg p-5 w-100" style={{ maxWidth: '400px', boxShadow: '0px 8px 30px rgba(0, 0, 0, 0.1)' }}>
-        <h2 className="text-center mb-4 text-primary fw-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>Iniciar Sesión</h2>
+        <h2 className="text-center mb-4 text-danger fw-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>Iniciar Sesión</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="form-label fw-medium" style={{ fontSize: '1.1rem', color: '#555' }}>Correo electrónico</label>
@@ -62,23 +61,22 @@ const Login = () => {
           )}
 
           <button type="submit" className="btn btn-gradient w-100 py-3 fw-bold" style={{
-            background: 'linear-gradient(to right, #4facfe 0%, #00f2fe 100%)', 
-            borderRadius: '50px', 
-            color: '#fff', 
-            fontSize: '1.1rem', 
-            transition: 'transform 0.2s ease-in-out', 
+            background: 'linear-gradient(to right, #ff416c 0%, #ff4b2b 100%)',
+            borderRadius: '50px',
+            color: '#fff',
+            fontSize: '1.1rem',
+            transition: 'transform 0.2s ease-in-out',
             boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.15)',
           }}>
             Ingresar
           </button>
         </form>
 
-        {/* Enlaces debajo del formulario */}
         <div className="mt-4 text-center">
           <p className="text-dark" style={{ fontSize: '0.9rem' }}>
             ¿No tienes una cuenta aún?{' '}
             <span
-              className="text-primary"
+              className="text-danger"
               role="button"
               style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
               onClick={() => navigate('/register')}
@@ -89,7 +87,7 @@ const Login = () => {
           <p className="text-dark" style={{ fontSize: '0.9rem' }}>
             ¿Deseas volver al home?{' '}
             <span
-              className="text-primary"
+              className="text-danger"
               role="button"
               style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
               onClick={() => navigate('/')}
@@ -97,12 +95,10 @@ const Login = () => {
               Ir al inicio
             </span>
           </p>
-          
-          {/* Opción para recuperar contraseña */}
           <p className="text-dark" style={{ fontSize: '0.9rem' }}>
             ¿Olvidaste tu contraseña?{' '}
             <span
-              className="text-primary"
+              className="text-danger"
               role="button"
               style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
               onClick={() => navigate('/recover')}

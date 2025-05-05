@@ -25,9 +25,8 @@ const UserManagement = () => {
     }
 
     const updatedUser = {
-      nombre: `${firstName}`,
-      apellido: `${lastName}`,
-      email: email,
+      name: `${firstName}`,
+      last_name: `${lastName}`,
       password: password,
     }
 
