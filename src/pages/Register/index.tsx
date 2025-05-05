@@ -35,7 +35,7 @@ const Register = () => {
     console.log('Datos listos para enviar al backend:', JSON.stringify(userData, null, 2))
 
     try {
-      const response = await fetch('http://localhost:8080/api/register', {
+      const response = await fetch('http://localhost:8080/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,21 +158,20 @@ const Register = () => {
               {error}
             </div>
           )}
-
-          <button
-            type="submit"
-            className="btn w-100 py-3 fw-bold"
-            style={{
-              background: 'linear-gradient(to right, #ff416c 0%, #ff4b2b 100%)',
-              borderRadius: '50px',
-              color: '#fff',
-              fontSize: '1.1rem',
-              transition: 'transform 0.2s ease-in-out',
-              boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.15)',
-            }}
-          >
-            Registrar
-          </button>
+              <button
+                type="submit"
+                className="btn w-100 py-3 fw-bold"
+                style={{
+                  background: 'linear-gradient(to right, #ff416c 0%, #ff4b2b 100%)',
+                  borderRadius: '50px',
+                  color: '#fff',
+                  fontSize: '1.1rem',
+                  transition: 'transform 0.2s ease-in-out',
+                  boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.15)',
+                }}
+              >
+                Registrar
+              </button>
         </form>
 
         <div className="mt-4 text-center">
