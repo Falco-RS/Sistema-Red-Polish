@@ -8,9 +8,9 @@ const UserManagement = () => {
 
   const [firstName, setFirstName] = useState('Juan')
   const [lastName, setLastName] = useState('Pérez')
-  const [email, setEmail] = useState('juanperez@example.com')
+  const [email, setEmail] = useState('juanperez@gmail.com')
   const [role, setRole] = useState('cliente')
-  const [password, setPassword] = useState('miContraseñaActual123')
+  const [password, setPassword] = useState('12345678')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
