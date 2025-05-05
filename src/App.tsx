@@ -3,6 +3,8 @@ import Home from './pages/Home/index'
 import Login from './pages/Login/index'
 import Register from './pages/Register/index'
 import UserManagement from './pages/UserManagment/index'
+import Recover from './pages/Recover_password/index'
+import New_Password from './pages/New_password/index'
 
 function App() {
   return (
