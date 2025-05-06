@@ -28,7 +28,6 @@ const Register = () => {
       last_name: lastName,
       email: email,
       password: password,
-      rol: role,
     }
 
 
