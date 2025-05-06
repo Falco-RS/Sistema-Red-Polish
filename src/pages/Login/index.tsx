@@ -7,21 +7,48 @@ const Login = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
     if (!email.trim() || !password.trim()) {
-      setError('Todos los campos son obligatorios.')
-      return
+      setError('Todos los campos son obligatorios.');
+      return;
     }
-
-    console.log({ email, password })
-
-    setError('')
-    setEmail('')
-    setPassword('')
-    navigate('/')
-  }
+  
+    const loginData = {
+      email,
+      password,
+    };
+  
+    try {
+      const response = await fetch('http://localhost:8080/api/users/sign_in', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        setError(errorData.message || 'Error al iniciar sesion.')
+        return;
+      }
+  
+      const data = await response.json();
+      console.log('Usuario autenticado:', data);
+  
+      // Aquí puedes guardar el token en localStorage o en el contexto global si lo necesitas
+      // localStorage.setItem('token', data.token);
+  
+      setError('');
+      setEmail('');
+      setPassword('');
+      navigate('/');
+    } catch (err) {
+      setError('Error de conexión con el servidor.');
+    }
+  };  
 
   return (
     <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
