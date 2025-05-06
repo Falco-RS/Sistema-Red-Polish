@@ -69,7 +69,7 @@ function Recover_Password() {
                 ></button>
               </div>
               <div className="modal-body">
-                <p>Si el correo existe en nuestra base de datos, se enviará un enlace para restablecer la contraseña.</p>
+                <p>Se enviará un codigo a tu correo para verificarlo.</p>
               </div>
               <div className="modal-footer">
                 <button

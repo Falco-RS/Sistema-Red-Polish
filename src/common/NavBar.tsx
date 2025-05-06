@@ -1,7 +1,11 @@
-import { Link } from 'react-router-dom'
-import logo from '../assets/logo.png' // asegúrate de que este archivo exista en src/assets/
+// src/common/navbar.tsx
+import { Link } from 'react-router-dom';
+import { useAuth } from '../common/AuthContext'; 
+import logo from '../assets/logo.png';
 
 const NavBar = () => {
+  const { user, logout } = useAuth();
+
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
       <div className="container">
@@ -23,20 +27,30 @@ const NavBar = () => {
             </li>
           </ul>
           <ul className="navbar-nav">
-            <li className="nav-item">
-              <Link to="/login" className="nav-link">Login</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/register" className="nav-link">Register</Link>
-            </li>
-            <li className="nav-item">
-              <Link to="/user" className="nav-link">Usuario</Link>
-            </li>
+            {!user ? (
+              <>
+                <li className="nav-item">
+                  <Link to="/login" className="nav-link">Login</Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/register" className="nav-link">Register</Link>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link to="/user" className="nav-link">Usuario</Link>
+                </li>
+                <li className="nav-item">
+                  <button className="nav-link btn" onClick={logout}>Cerrar sesión</button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
-export default NavBar
+export default NavBar;

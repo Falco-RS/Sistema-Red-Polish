@@ -1,11 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '../../common/AuthContext'
+
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
+  const { login } = useAuth();
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,7 +25,7 @@ const Login = () => {
     };
   
     try {
-      const response = await fetch('http://localhost:8080/api/users/sign_in', {
+      const response = await fetch('http://3.138.178.244:8080/api/users/sign_in', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,8 +42,8 @@ const Login = () => {
       const data = await response.json();
       console.log('Usuario autenticado:', data);
   
-      // Aquí puedes guardar el token en localStorage o en el contexto global si lo necesitas
-      // localStorage.setItem('token', data.token);
+      login(data);         
+      navigate('/');        
   
       setError('');
       setEmail('');
