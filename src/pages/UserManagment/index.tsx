@@ -15,44 +15,46 @@ const UserManagement = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
+  const apiUrl = import.meta.env.VITE_IP_API;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
   
     const userEmail = user?.user?.email
     const userToken = user?.token
   
-    // Debug
-    console.log('🔎 Usuario completo desde AuthContext:', user)
-    console.log('📧 Email del usuario:', userEmail)
-    console.log('🔐 Token del usuario:', userToken)
-  
-    if (!firstName.trim() || !lastName.trim() || !userEmail) {
-      setError('Por favor, complete todos los campos obligatorios.')
+    if (!firstName.trim() || !lastName.trim() || password.trim())  {
+      setError('Por favor, complete los campos que desea cambiar en su perfil')
       setSuccess(false)
       return
     }
   
     const updatedUser = {
-      name: firstName,
-      last_name: lastName,
+      name: firstName || user?.user?.name,
+      last_name: lastName || user?.user?.last_name,
       password: password || user?.user?.password
+    }
+
+    const updateddUser = {
+      id: user?.user?.id,
+      name: firstName || user?.user?.name,
+      last_name: lastName || user?.user?.last_name,
+      email: userEmail,
+      password: password || user?.user?.password, 
+      rol: user?.user?.rol,
     }
   
     console.log('📦 Datos listos para enviar al backend:', updatedUser)
 
-
-
     try {
-      const response = await fetch(`http://localhost:8080/api/users/update/cristopheralberto07@gmail.com`, {
+      const response = await fetch(`${apiUrl}/api/users/update/${userEmail}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${userToken}`,
         },
         body: JSON.stringify({
-          name: firstName,
-          last_name: lastName,
-          password: password
+          updatedUser
         }),
       })
   
@@ -63,10 +65,9 @@ const UserManagement = () => {
         return
       }
   
-      // 🔄 Actualizamos el usuario en el AuthContext
       login({
         token: userToken,
-        user: updatedUser,
+        user: updateddUser,
       })
   
       setError('')
@@ -78,7 +79,6 @@ const UserManagement = () => {
     }
   }
     
-
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
@@ -130,16 +130,6 @@ const UserManagement = () => {
               />
             </div>
 
-            <div className="mb-3">
-              <label className="form-label text-dark fw-semibold">Correo electrónico</label>
-              <input
-                type="email"
-                className="form-control border-dark-subtle"
-                value={user?.email || ''}
-                readOnly
-              />
-            </div>
-
             <div className="mb-4">
               <label className="form-label text-dark fw-semibold">Nueva contraseña (opcional)</label>
               <div className="input-group">
@@ -172,3 +162,4 @@ const UserManagement = () => {
 }
 
 export default UserManagement
+
