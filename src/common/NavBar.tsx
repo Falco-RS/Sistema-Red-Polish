@@ -1,10 +1,15 @@
-// src/common/navbar.tsx
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../common/AuthContext'; 
 import logo from '../assets/logo.png';
 
 const NavBar = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/'); // Redirige al Home
+  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
@@ -42,7 +47,7 @@ const NavBar = () => {
                   <Link to="/user" className="nav-link">Usuario</Link>
                 </li>
                 <li className="nav-item">
-                  <button className="nav-link btn" onClick={logout}>Cerrar sesión</button>
+                  <button className="nav-link btn" onClick={handleLogout}>Cerrar sesión</button>
                 </li>
               </>
             )}
