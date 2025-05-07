@@ -11,6 +11,7 @@ const Register = () => {
   const [role, setRole] = useState('Usuario')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const apiUrl = import.meta.env.VITE_IP_API;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,7 +35,7 @@ const Register = () => {
     console.log('Datos listos para enviar al backend:', JSON.stringify(userData, null, 2))
 
     try {
-      const response = await fetch('http://3.138.178.244:8080/api/users/register', {
+      const response = await fetch(`${apiUrl}/api/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
