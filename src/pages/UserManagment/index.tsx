@@ -1,45 +1,82 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import NavBar from '../../common/NavBar'
 import { Eye, EyeOff } from 'lucide-react'
+import NavBar from '../../common/NavBar'
+import { useAuth } from '../../common/AuthContext'
 
 const UserManagement = () => {
   const navigate = useNavigate()
+  const { user, login } = useAuth()
 
-  const [firstName, setFirstName] = useState('Juan')
-  const [lastName, setLastName] = useState('Pérez')
-  const [email, setEmail] = useState('juanperez@gmail.com')
-  const [role, setRole] = useState('cliente')
-  const [password, setPassword] = useState('12345678')
+  const [firstName, setFirstName] = useState(user?.name || '')
+  const [lastName, setLastName] = useState(user?.last_name || '')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+  
+    const userEmail = user?.user?.email
+    const userToken = user?.token
+  
+    // Debug
+    console.log('🔎 Usuario completo desde AuthContext:', user)
+    console.log('📧 Email del usuario:', userEmail)
+    console.log('🔐 Token del usuario:', userToken)
+  
+    if (!firstName.trim() || !lastName.trim() || !userEmail) {
       setError('Por favor, complete todos los campos obligatorios.')
       setSuccess(false)
       return
     }
-
+  
     const updatedUser = {
-      name: `${firstName}`,
-      last_name: `${lastName}`,
-      password: password,
+      name: firstName,
+      last_name: lastName,
+      password: password || user?.user?.password
     }
-
-    console.log('Datos enviados:', JSON.stringify(updatedUser, null, 2))
-
-    setError('')
-    setSuccess(true)
+  
+    console.log('📦 Datos listos para enviar al backend:', updatedUser)
+  
+    try {
+      const response = await fetch(`http://3.138.178.244:8080/api/users/update/cristopheralberto07@gmail.com`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`,
+        },
+        body: JSON.stringify(firstName, lastName, password || user?.user?.password ),
+      })
+  
+      if (!response.ok) {
+        const errorData = await response.json()
+        setError(errorData.message || 'Error al actualizar los datos.')
+        setSuccess(false)
+        return
+      }
+  
+      // 🔄 Actualizamos el usuario en el AuthContext
+      login({
+        token: userToken,
+        user: updatedUser,
+      })
+  
+      setError('')
+      setSuccess(true)
+    } catch (err) {
+      console.error('❌ Error al hacer la petición:', err)
+      setError('Error de conexión con el servidor.')
+      setSuccess(false)
+    }
   }
+    
 
   useEffect(() => {
     if (success) {
       const timer = setTimeout(() => {
-        navigate('/') 
+        navigate('/')
       }, 3000)
       return () => clearTimeout(timer)
     }
@@ -68,40 +105,44 @@ const UserManagement = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="form-label">Nombre</label>
+              <label className="form-label text-dark fw-semibold">Nombre</label>
               <input
                 type="text"
-                className="form-control border-dark-subtle"
+                className="form-control bg-white text-dark border-dark-subtle"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
             </div>
+
             <div className="mb-3">
-              <label className="form-label">Apellidos</label>
+              <label className="form-label text-dark fw-semibold">Apellidos</label>
               <input
                 type="text"
-                className="form-control border-dark-subtle"
+                className="form-control bg-white text-dark border-dark-subtle"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
             </div>
+
             <div className="mb-3">
-              <label className="form-label">Correo electrónico</label>
+              <label className="form-label text-dark fw-semibold">Correo electrónico</label>
               <input
                 type="email"
                 className="form-control border-dark-subtle"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={user?.email || ''}
+                readOnly
               />
             </div>
+
             <div className="mb-4">
-              <label className="form-label">Contraseña actual</label>
+              <label className="form-label text-dark fw-semibold">Nueva contraseña (opcional)</label>
               <div className="input-group">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   className="form-control border-dark-subtle"
                   value={password}
-                  readOnly
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Cree una nueva contraseña"
                 />
                 <button
                   type="button"
@@ -112,17 +153,8 @@ const UserManagement = () => {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              <div className="form-text">Presiona el ojo para ver tu contraseña actual.</div>
             </div>
-            <div className="mb-4">
-              <label className="form-label">Cambiar contraseña (opcional)</label>
-              <input
-                type="password"
-                className="form-control border-dark-subtle"
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Nueva contraseña"
-              />
-            </div>
+
             <button type="submit" className="btn btn-danger w-100 fw-bold">
               Guardar Cambios
             </button>

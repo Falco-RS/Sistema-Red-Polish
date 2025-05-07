@@ -27,14 +27,14 @@ const Register = () => {
       name: firstName,
       last_name: lastName,
       email: email,
-      password: password,
+      password: password
     }
 
 
     console.log('Datos listos para enviar al backend:', JSON.stringify(userData, null, 2))
 
     try {
-      const response = await fetch('http://localhost:8080/api/users/register', {
+      const response = await fetch('http://3.138.178.244:8080/api/users/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
