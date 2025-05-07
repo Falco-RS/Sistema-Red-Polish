@@ -7,38 +7,30 @@ function New_Password() {
   const [error, setError] = useState<string>('')
   const [successMessage, setSuccessMessage] = useState<string>('')
   const [email, setEmail] = useState<string>('')
-  const [emailError, setEmailError] = useState<string>('') 
   const navigate = useNavigate()
   const location = useLocation()
 
-  //Nota importante: el correo al usuario para restaurar la contraseña y poder ingresar aca, debe de ser con este formato: http://localhost:5173/new_password?email=usuario@dominio.com
-  // Extraer el correo desde la URL (suponiendo que el correo se pasa como un parámetro en la URL)
   useEffect(() => {
-    const params = new URLSearchParams(location.search)
-    const emailFromUrl = params.get('email')
-    if (emailFromUrl) {
-      setEmail(emailFromUrl)
-      setEmailError('') // Limpiar error si se encuentra el correo
+    const emailFromState = location.state?.email
+    if (emailFromState) {
+      setEmail(emailFromState)
     } else {
-      setEmailError('No se consiguió el correo, por favor intenta ingresar de nuevo.')
+      setError('No se consiguió el correo, por favor intenta ingresar de nuevo.')
     }
   }, [location])
 
   const validatePassword = (password: string): boolean => {
-    // Validación para asegurarse de que la contraseña tenga al menos 8 caracteres
     return password.length >= 8
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
-    // Verificar si se encontró el correo antes de proceder
     if (!email) {
-      setEmailError('No se consiguió el correo, por favor intenta ingresar de nuevo.')
+      setError('No se consiguió el correo, por favor intenta ingresar de nuevo.')
       return
     }
 
-    // Validación de las contraseñas
     if (!validatePassword(newPassword)) {
       setError('La contraseña debe tener al menos 8 caracteres.')
       return
@@ -49,25 +41,44 @@ function New_Password() {
       return
     }
 
-    setError('')
-    setSuccessMessage('Contraseña cambiada con éxito.')
+    try {
+      const loginData = {
+        password: newPassword,
+        repeatPassword: confirmPassword
+      }
 
-    // Aquí, se enviaría el email y la nueva contraseña a la API para realizar el cambio.
-    console.log('Correo:', email)
-    console.log('Contraseña nueva:', newPassword)
+      const response = await fetch(`http://3.138.178.244:8080/api/forgotPassword/changePassword/${email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      })
 
-    // Limpiar los campos después de enviar
-    setNewPassword('')
-    setConfirmPassword('')
+      if (!response.ok) {
+        throw new Error('Error al cambiar la contraseña. Intenta nuevamente.')
+      }
+
+      setSuccessMessage('Contraseña cambiada con éxito.')
+      setError('')
+      setNewPassword('')
+      setConfirmPassword('')
+
+      // Redirigir al login después de unos segundos (opcional)
+      setTimeout(() => {
+        navigate('/login')
+      }, 2000)
+
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message || 'Ocurrió un error inesperado.')
+    }
   }
 
   return (
     <div className="container mt-5">
       <h2 className="text-center mb-4">{`Cambio de Contraseña - ${email || 'Correo no encontrado'}`}</h2>
-      
-      {/* Mostrar error si no se consiguió el correo */}
-      {emailError && <div className="alert alert-danger">{emailError}</div>}
-      
+
       <form onSubmit={handleSubmit} className="mx-auto" style={{ maxWidth: '400px' }}>
         <div className="mb-3">
           <label htmlFor="newPassword" className="form-label">Nueva Contraseña</label>
@@ -93,15 +104,14 @@ function New_Password() {
         </div>
 
         {error && <div className="alert alert-danger">{error}</div>}
-        {successMessage && !emailError && <div className="alert alert-success">{successMessage}</div>}
+        {successMessage && <div className="alert alert-success">{successMessage}</div>}
 
         <button type="submit" className="btn btn-primary w-100">Cambiar Contraseña</button>
       </form>
 
-      {/* Opción para ir al login */}
       <div className="mt-4 text-center">
         <p className="text-white" style={{ fontSize: '0.9rem' }}>
-            ¿Ya cambiaste tu contraseña?{' '}
+          ¿Ya cambiaste tu contraseña?{' '}
           <span
             className="text-primary"
             role="button"

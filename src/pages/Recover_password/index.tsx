@@ -4,14 +4,13 @@ import { useNavigate } from 'react-router-dom'
 function Recover_Password() {
   const [email, setEmail] = useState<string>('')
   const [error, setError] = useState<string>('')
-  const [showModal, setShowModal] = useState<boolean>(false)
   const navigate = useNavigate()
 
   const validateEmail = (email: string): boolean => {
     return email.includes('@') && email.endsWith('.com')
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!validateEmail(email)) {
@@ -19,16 +18,27 @@ function Recover_Password() {
       return
     }
 
-    setError('')
-    setShowModal(true)
+    setError('') // limpiar errores previos
 
-    // Aquí puedes guardar el correo para usarlo después:
-    const correoRecuperacion = email
-    console.log('Correo ingresado:', correoRecuperacion)
+    try {
+      const loginData = { email }
 
-    // En el futuro aquí iría el código para enviar el correo
-    //Nota importante: el correo al usuario para restaurar la contraseña y poder ingresar aca, debe de ser con este formato: http://localhost:5173/new_password?email=usuario@dominio.com
+      const response = await fetch(`http://3.138.178.244:8080/api/forgotPassword/verifyMail/${email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      })
 
+
+      // Redirigir a authenticate_mail y pasar el email por estado
+      navigate('/authenticate_mail', { state: { email } })
+
+    } catch (err: any) {
+      console.error('Error:', err)
+      setError(err.message || 'Ocurrió un error inesperado.')
+    }
   }
 
   return (
@@ -50,42 +60,6 @@ function Recover_Password() {
         <button type="submit" className="btn btn-primary w-100">Enviar</button>
       </form>
 
-      {/* Modal */}
-      {showModal && (
-        <div
-          className="modal fade show"
-          style={{ display: 'block', backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
-          tabIndex={0}
-          role="dialog"
-        >
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Correo Enviado</h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={() => setShowModal(false)}
-                ></button>
-              </div>
-              <div className="modal-body">
-                <p>Se enviará un codigo a tu correo para verificarlo.</p>
-              </div>
-              <div className="modal-footer">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowModal(false)}
-                >
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Opción para volver al login */}
       <div className="mt-4 text-center">
         <p className="text-white" style={{ fontSize: '0.9rem' }}>
           ¿Ya recuerdas tu contraseña?{' '}
