@@ -39,15 +39,21 @@ const UserManagement = () => {
     }
   
     console.log('📦 Datos listos para enviar al backend:', updatedUser)
-  
+
+
+
     try {
-      const response = await fetch(`http://3.138.178.244:8080/api/users/update/cristopheralberto07@gmail.com`, {
-        method: 'PUT',
+      const response = await fetch(`http://localhost:8080/api/users/update/cristopheralberto07@gmail.com`, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${userToken}`,
         },
-        body: JSON.stringify(firstName, lastName, password || user?.user?.password ),
+        body: JSON.stringify({
+          name: firstName,
+          last_name: lastName,
+          password: password
+        }),
       })
   
       if (!response.ok) {
