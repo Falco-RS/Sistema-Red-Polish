@@ -6,6 +6,7 @@ function Authenticate_mail() {
   const [error, setError] = useState<string>('')
   const navigate = useNavigate()
   const location = useLocation()
+  const apiUrl = import.meta.env.VITE_IP_API;
 
   // Extraer el correo desde el state (enviado desde Recover_Password)
   const email = location.state?.email
@@ -19,18 +20,21 @@ function Authenticate_mail() {
     }
 
     try {
-      const response = await fetch(`http://3.138.178.244:8080/api/forgotPassword/verifyOtp/${otp}/${email}`, {
+      const response = await fetch(`${apiUrl}/api/forgotPassword/verifyOtp/${otp}/${email}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
       })
-
-      if (!response.ok) {
-        throw new Error('Código inválido o expirado. Intenta nuevamente.')
+      
+      const text = await response.text()
+      console.log('Respuesta de la API:', text)
+      
+      if (text !== 'Clave dinamica verificada') {
+        throw new Error('Código inválido o no verificado correctamente.')
+      } else {
+        navigate('/new_password', { state: { email } })
       }
-
-      navigate('/new_password', { state: { email } })
 
     } catch (err: any) {
       console.error(err)

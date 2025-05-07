@@ -5,6 +5,7 @@ function Recover_Password() {
   const [email, setEmail] = useState<string>('')
   const [error, setError] = useState<string>('')
   const navigate = useNavigate()
+  const apiUrl = import.meta.env.VITE_IP_API;
 
   const validateEmail = (email: string): boolean => {
     return email.includes('@') && email.endsWith('.com')
@@ -23,7 +24,7 @@ function Recover_Password() {
     try {
       const loginData = { email }
 
-      const response = await fetch(`http://3.138.178.244:8080/api/forgotPassword/verifyMail/${email}`, {
+      const response = await fetch(`${apiUrl}/api/forgotPassword/verifyMail/${email}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -31,9 +32,12 @@ function Recover_Password() {
         body: JSON.stringify(loginData),
       })
 
-
-      // Redirigir a authenticate_mail y pasar el email por estado
-      navigate('/authenticate_mail', { state: { email } })
+      const text = await response.text()
+      if (text !== 'Se ha enviado el email de verifycacion') {
+        throw new Error('Algo ocurrió mal, no se pudo enviar el email')
+      } else {
+        navigate('/authenticate_mail', { state: { email } })
+      }      
 
     } catch (err: any) {
       console.error('Error:', err)

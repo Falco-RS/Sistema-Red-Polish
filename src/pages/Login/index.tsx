@@ -9,6 +9,8 @@ const Login = () => {
   const [error, setError] = useState('')
   const navigate = useNavigate()
   const { login } = useAuth();
+  const apiUrl = import.meta.env.VITE_IP_API;
+
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -25,7 +27,7 @@ const Login = () => {
     };
   
     try {
-      const response = await fetch('http://3.138.178.244:8080/api/users/sign_in', {
+      const response = await fetch(`${apiUrl}/api/users/sign_in`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

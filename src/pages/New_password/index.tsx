@@ -9,6 +9,7 @@ function New_Password() {
   const [email, setEmail] = useState<string>('')
   const navigate = useNavigate()
   const location = useLocation()
+  const apiUrl = import.meta.env.VITE_IP_API;
 
   useEffect(() => {
     const emailFromState = location.state?.email
@@ -47,7 +48,7 @@ function New_Password() {
         repeatPassword: confirmPassword
       }
 
-      const response = await fetch(`http://3.138.178.244:8080/api/forgotPassword/changePassword/${email}`, {
+      const response = await fetch(`${apiUrl}/api/forgotPassword/changePassword/${email}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -55,8 +56,12 @@ function New_Password() {
         body: JSON.stringify(loginData),
       })
 
-      if (!response.ok) {
-        throw new Error('Error al cambiar la contraseña. Intenta nuevamente.')
+      const text = await response.text()
+      
+      if (text !== 'Clave actualizada correctamente!') {
+        throw new Error('Algo ocurrió mal, no se pudo actualizar la contraseña')
+      } else {
+        navigate('/login')
       }
 
       setSuccessMessage('Contraseña cambiada con éxito.')
