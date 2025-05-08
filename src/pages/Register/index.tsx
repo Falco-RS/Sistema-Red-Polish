@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import {useAuth} from "../../common/AuthContext.tsx";
 
 const Register = () => {
   const navigate = useNavigate()
@@ -8,14 +9,13 @@ const Register = () => {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [role, setRole] = useState('Usuario')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const apiUrl = import.meta.env.VITE_IP_API;
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
 
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
       setError('Todos los campos son obligatorios.')
@@ -23,14 +23,12 @@ const Register = () => {
       return
     }
 
-
     const userData = {
       name: firstName,
       last_name: lastName,
       email: email,
       password: password
     }
-
 
     console.log('Datos listos para enviar al backend:', JSON.stringify(userData, null, 2))
 
@@ -52,6 +50,30 @@ const Register = () => {
 
       setError('')
       setSuccess(true)
+
+      const loginData = {
+        email,
+        password,
+      };
+
+      const responselog = await fetch(`${apiUrl}/api/users/sign_in`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      });
+
+      if (!responselog.ok) {
+        const errorData = await responselog.json();
+        setError(errorData.message || 'Error al iniciar sesion.')
+        return;
+      }
+
+      const data = await responselog.json();
+      console.log('Usuario autenticado:', data);
+
+      login(data);
 
       setTimeout(() => {
         navigate('/')
