@@ -1,15 +1,25 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 function Authenticate_mail() {
   const [otp, setOtp] = useState<string>('')
   const [error, setError] = useState<string>('')
+  const [resendTimer, setResendTimer] = useState<number>(120)
+  const [isResending, setIsResending] = useState<boolean>(false)
   const navigate = useNavigate()
   const location = useLocation()
   const apiUrl = import.meta.env.VITE_IP_API;
+  const [success, setSuccess] = useState<string>('')
 
-  // Extraer el correo desde el state (enviado desde Recover_Password)
+
   const email = location.state?.email
+
+  useEffect(() => {
+    if (resendTimer > 0) {
+      const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000)
+      return () => clearTimeout(timer)
+    }
+  }, [resendTimer])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -26,10 +36,10 @@ function Authenticate_mail() {
           'Content-Type': 'application/json',
         },
       })
-      
+
       const text = await response.text()
       console.log('Respuesta de la API:', text)
-      
+
       if (text !== 'Clave dinamica verificada') {
         throw new Error('Código inválido o no verificado correctamente.')
       } else {
@@ -39,6 +49,41 @@ function Authenticate_mail() {
     } catch (err: any) {
       console.error(err)
       setError(err.message || 'Ocurrió un error al verificar el código.')
+    }
+  }
+
+  const handleResendCode = async () => {
+    if (!email) return
+
+    setIsResending(true)
+
+    try {
+      const loginData = { email }
+
+      const response = await fetch(`${apiUrl}/api/forgotPassword/verifyMail/${email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(loginData),
+      })
+
+      const text = await response.text()
+      console.log('Respuesta al reenviar código:', text)
+      if (text !== 'Se ha enviado el email de verifycacion') {
+        setResendTimer(120)
+        throw new Error('Algo ocurrió mal, no se pudo reenviar el codigo')
+      } else {
+        setSuccess('Código reenviado con éxito')
+        setError('') 
+        setResendTimer(120)
+      }
+
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message || 'Error al reenviar el código.')
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -57,8 +102,21 @@ function Authenticate_mail() {
             required
           />
         </div>
+
         {error && <div className="alert alert-danger">{error}</div>}
-        <button type="submit" className="btn btn-success w-100">Verificar</button>
+
+        <button type="submit" className="btn btn-success w-100 mb-2">Verificar</button>
+
+        <button
+          type="button"
+          className="btn btn-secondary w-100"
+          onClick={handleResendCode}
+          disabled={resendTimer > 0 || isResending}
+        >
+          {resendTimer > 0
+            ? `Reenviar código (${resendTimer}s)`
+            : 'Reenviar código'}
+        </button>
       </form>
     </div>
   )

@@ -62,6 +62,9 @@ function Recover_Password() {
         </div>
         {error && <div className="alert alert-danger">{error}</div>}
         <button type="submit" className="btn btn-primary w-100">Enviar</button>
+        <p className="text-white text-center mt-2" style={{ fontSize: '0.9rem' }}>
+          Cuando el código se envíe, tendrás 2 minutos antes de que expire.
+        </p>
       </form>
 
       <div className="mt-4 text-center">
