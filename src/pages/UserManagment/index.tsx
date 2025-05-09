@@ -51,7 +51,7 @@ const UserManagement = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${userToken}`,
         },
-        body: JSON.stringify({ updatedUser }),
+        body: JSON.stringify(updatedUser),
       })
 
       if (!response.ok) {
@@ -191,3 +191,4 @@ const UserManagement = () => {
 }
 
 export default UserManagement
+
