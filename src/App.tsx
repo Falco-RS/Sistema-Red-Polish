@@ -6,6 +6,7 @@ import UserManagement from './pages/UserManagment/index'
 import Recover from './pages/Recover_password/index'
 import New_Password from './pages/New_password/index'
 import Authenticate_mail from './pages/Authenticate_mail/index'
+import Catalog from './pages/Catalog'
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
       <Route path="/recover" element={<Recover />} />
       <Route path="/new_password" element={<New_Password />} />
       <Route path="/authenticate_mail" element={<Authenticate_mail/>} />
+      <Route path="/catalog" element={<Catalog/>} />
     </Routes>
   )
 }
