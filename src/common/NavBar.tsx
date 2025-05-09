@@ -1,15 +1,9 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../common/AuthContext'; 
 import logo from '../assets/logo.png';
 
 const NavBar = () => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/'); // Redirige al Home
-  };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
@@ -25,7 +19,7 @@ const NavBar = () => {
         <div className="collapse navbar-collapse justify-content-between">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <a className="nav-link" href="#">Productos</a>
+            <Link to="/catalog" className="nav-link">Productos</Link>
             </li>
             <li className="nav-item">
               <a className="nav-link" href="#">Servicios</a>
@@ -47,7 +41,7 @@ const NavBar = () => {
                   <Link to="/user" className="nav-link">Usuario</Link>
                 </li>
                 <li className="nav-item">
-                  <button className="nav-link btn" onClick={handleLogout}>Cerrar sesión</button>
+                  <button className="nav-link btn" onClick={logout}>Cerrar sesión</button>
                 </li>
               </>
             )}
@@ -59,3 +53,4 @@ const NavBar = () => {
 };
 
 export default NavBar;
+
