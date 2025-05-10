@@ -9,8 +9,7 @@ import Authenticate_mail from './pages/Authenticate_mail/index'
 import Catalog from './pages/Catalog'
 import Services from './pages/Services'
 import Appointment from './pages/Appointment'
-
-
+import AddProduct from './pages/AddProduct'
 
 function App() {
   return (
@@ -25,6 +24,7 @@ function App() {
       <Route path="/catalog" element={<Catalog/>} />
       <Route path="/services" element={<Services/>} />
       <Route path="/appointment" element={<Appointment/>} />
+      <Route path="/add-product" element={<AddProduct />} />
     </Routes>
   )
 }
