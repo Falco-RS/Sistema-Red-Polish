@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState,useEffect  } from 'react'
 import NavBar from '../../common/NavBar'
 import image from '../../assets/pulido.png'
 import { FaFacebook, FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa'
@@ -15,6 +15,9 @@ const recommendedProducts = Array.from({ length: 12 }).map((_, i) => ({
 
 function Homepage() {
   const [startIndex, setStartIndex] = useState(0)
+  useEffect(() => {
+    document.body.style.backgroundColor = '#e0e0e0';
+  }, []);
 
   const nextSlide = () => {
     if (startIndex + 6 < recommendedProducts.length) {
@@ -34,20 +37,31 @@ function Homepage() {
     <>
       <NavBar />
 
-      <div className="container my-5">
-        {/* Banner */}
-        <div className="mb-5">
-          <img
-            src={image}
-            alt="Pulido"
-            className="img-fluid w-100 rounded shadow"
-            style={{ maxHeight: '350px', objectFit: 'cover' }}
-          />
+      {/* Sección con fondo difuminado */}
+      <div
+        className="position-relative text-white d-flex justify-content-center align-items-center"
+        style={{
+          height: '350px',
+          backgroundImage: `url(${image})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          fontFamily: "'Montserrat', 'Open Sans', Arial, sans-serif",
+        }}
+      >
+        <div className="position-absolute top-0 start-0 w-100 h-100" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} />
+        <div className="position-relative text-center px-3">
+          <h1 className="display-4 fw-bold mb-3" style={{ zIndex: 2,  }}>RED POLISH</h1>
+          <p className="fs-5" style={{ maxWidth: '800px', margin: '0 auto' }}>
+            Servicio profesional de detallado automotriz. Calidad, dedicación y brillo para tu vehículo.
+          </p>
         </div>
+      </div>
 
+      <div className="container my-5">
+        
         {/* Bienvenida */}
+        
         <div className="text-center mb-5">
-          <h2 className="fw-bold mb-4">Bienvenido a <span style={{ color: '#d63384' }}>Red Polish</span></h2>
           <p className="fs-5 text-secondary">
             Nos especializamos en el cuidado y embellecimiento de tu vehículo. Ofrecemos un servicio profesional
             de abrillantado y detallado automotriz, asegurando que tu auto luzca impecable en todo momento.
@@ -61,7 +75,7 @@ function Homepage() {
 
         {/* Carrusel */}
         <div className="mb-5">
-          <h3 className="fw-bold text-center mb-4 text-white">Productos Recomendados</h3>
+          <h3 className="fw-bold text-center mb-4 text-dark">Productos Recomendados</h3>
           <div className="d-flex align-items-center justify-content-between">
             <button className="btn btn-outline-light me-2" onClick={prevSlide}>&lt;</button>
             <div className="d-flex overflow-hidden" style={{ gap: '1rem', flex: 1 }}>

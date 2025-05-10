@@ -7,6 +7,9 @@ import Recover from './pages/Recover_password/index'
 import New_Password from './pages/New_password/index'
 import Authenticate_mail from './pages/Authenticate_mail/index'
 import Catalog from './pages/Catalog'
+import Services from './pages/Services'
+import Appointment from './pages/Appointment'
+
 
 
 function App() {
@@ -20,6 +23,8 @@ function App() {
       <Route path="/new_password" element={<New_Password />} />
       <Route path="/authenticate_mail" element={<Authenticate_mail/>} />
       <Route path="/catalog" element={<Catalog/>} />
+      <Route path="/services" element={<Services/>} />
+      <Route path="/appointment" element={<Appointment/>} />
     </Routes>
   )
 }
