@@ -1,5 +1,4 @@
-// src/pages/AddProduct/index.tsx
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 
@@ -8,40 +7,71 @@ const AddProduct = () => {
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
   const [quantity, setQuantity] = useState('')
-  const [category, setCategory] = useState('')
-  const [image, setImage] = useState<File | null>(null)
+  const [categoryId, setCategoryId] = useState('')
+  const [imageUrl, setImageUrl] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [showNewCategory, setShowNewCategory] = useState(false)
+  const [newCategory, setNewCategory] = useState('')
+  const [categories, setCategories] = useState<{ id: number, name: string }[]>([])
+
+  const apiUrl = import.meta.env.VITE_IP_API
   const navigate = useNavigate()
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setImage(e.target.files[0])
-    }
-  }
+  useEffect(() => {
+    fetch(`${apiUrl}/api/categories/get_categories`)
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(() => setCategories([]))
+  }, [apiUrl])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!name || !description || !price || !quantity || !category || !image) {
+    if (!name || !description || !price || !quantity || !categoryId || !imageUrl) {
       setError('Todos los campos son obligatorios.')
       return
     }
 
-    const formData = new FormData()
-    formData.append('name', name)
-    formData.append('description', description)
-    formData.append('price', price)
-    formData.append('quantity', quantity)
-    formData.append('category', category)
-    formData.append('image', image)
+    const productData = {
+      name,
+      description,
+      price: parseFloat(price),
+      stock: parseInt(quantity),
+      image: imageUrl,
+      categoryId: parseInt(categoryId)
+    }
+    console.log('Producto a enviar:', productData);
 
     try {
-      // Aquí iría el fetch real
+      const res = await fetch(`${apiUrl}/api/products/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData)
+      })
+      if (!res.ok) throw new Error('Error en la petición')
       setSuccess(true)
       setTimeout(() => navigate('/catalog'), 3000)
     } catch (err) {
       setError('Error al subir el producto.')
+    }
+  }
+
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return
+    try {
+      const res = await fetch(`${apiUrl}/api/categories/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newCategory })
+      })
+      if (!res.ok) throw new Error('Error al crear categoría')
+      const updated = await fetch(`${apiUrl}/api/categories/get_categories`).then(res => res.json())
+      setCategories(updated)
+      setNewCategory('')
+      setShowNewCategory(false)
+    } catch {
+      setError('Error al crear la categoría.')
     }
   }
 
@@ -77,19 +107,59 @@ const AddProduct = () => {
             </div>
 
             <div className="mb-3">
-              <label className="text-danger fw-bold">Categoría</label>
-              <select className="form-select" value={category} onChange={(e) => setCategory(e.target.value)} required>
-                <option value="">Seleccione una categoría</option>
-                <option value="Abrillantador">Abrillantador</option>
-                <option value="Ceras">Ceras</option>
-                <option value="Ventanas">Ventanas</option>
-                <option value="etc">etc</option>
-              </select>
+              <label className="text-danger fw-bold d-block">Categoría</label>
+              <div className="d-flex gap-2">
+                <select
+                  className="form-select"
+                  style={{ flex: 1 }}
+                  value={categoryId}
+                  onChange={(e) => setCategoryId(e.target.value)}
+                  required
+                >
+                  <option value="">Seleccione una categoría</option>
+                  {categories.map((cat) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="btn btn-danger btn-sm"
+                  onClick={() => setShowNewCategory(!showNewCategory)}
+                >
+                  Agregar categoría
+                </button>
+              </div>
+
+              {showNewCategory && (
+                <div className="mt-2 d-flex gap-2">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Nueva categoría"
+                    value={newCategory}
+                    onChange={(e) => setNewCategory(e.target.value)}
+                  />
+                  <button
+                    type="button"
+                    className="btn btn-outline-danger"
+                    onClick={handleAddCategory}
+                  >
+                    Guardar
+                  </button>
+                </div>
+              )}
             </div>
 
             <div className="mb-4">
-              <label className="text-danger fw-bold">Imagen</label>
-              <input type="file" className="form-control" onChange={handleImageChange} required />
+              <label className="text-danger fw-bold">URL de Imagen</label>
+              <input
+                type="text"
+                className="form-control"
+                placeholder="https://..."
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                required
+              />
             </div>
 
             <button type="submit" className="btn btn-danger w-100 fw-bold">Agregar Producto</button>
@@ -104,4 +174,4 @@ const AddProduct = () => {
   )
 }
 
-export default AddProduct
+export default AddProduct;

@@ -10,6 +10,7 @@ import Catalog from './pages/Catalog'
 import Services from './pages/Services'
 import Appointment from './pages/Appointment'
 import AddProduct from './pages/AddProduct'
+import ProductView from './pages/ProductView'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
       <Route path="/services" element={<Services/>} />
       <Route path="/appointment" element={<Appointment/>} />
       <Route path="/add-product" element={<AddProduct />} />
+      <Route path="/product/:id" element={<ProductView />} />
     </Routes>
   )
 }
