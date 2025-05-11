@@ -1,4 +1,3 @@
-// src/pages/ProductView/index.tsx
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
@@ -8,6 +7,7 @@ import image from '../../assets/pulido.png'
 const ProductView = () => {
   const { user } = useAuth()
   const [product, setProduct] = useState<any>(null)
+  const [relatedProducts, setRelatedProducts] = useState<any[]>([])
   const [isAdmin, setIsAdmin] = useState(false)
   const { id } = useParams()
   const navigate = useNavigate()
@@ -27,19 +27,38 @@ const ProductView = () => {
         setProduct(data)
       } catch (err) {
         console.warn('⚠️ Mostrando producto quemado por fallback.')
-        // Producto quemado por defecto
         setProduct({
           id: 0,
           name: 'Cera Premium',
           description: 'Cera especial, rojo, 150ml. Ideal para dar brillo profundo y proteger la pintura.',
           price: 2500,
           image: image,
+          categoryId: 1,
         })
       }
     }
 
     fetchProduct()
   }, [id, user])
+
+  // Obtener productos relacionados una vez que se carga el producto
+  useEffect(() => {
+    const fetchRelatedProducts = async () => {
+      if (!product?.categoryId) return
+
+      try {
+        const res = await fetch(`${apiUrl}/api/products/get_all`)
+        const data = await res.json()
+
+        const related = data.filter((p: any) => p.categoryId === product.categoryId && p.id !== product.id)
+        setRelatedProducts(related)
+      } catch (err) {
+        console.error('❌ Error al obtener productos relacionados:', err)
+      }
+    }
+
+    fetchRelatedProducts()
+  }, [product])
 
   if (!product) {
     return (
@@ -76,13 +95,13 @@ const ProductView = () => {
             {isAdmin && (
               <div className="d-flex flex-column gap-2">
                 <button
-                  className="btn btn-outline-warning"
+                  className="btn btn-primary w-100 fw-bold mb-3"
                   onClick={() => navigate(`/edit-product/${product.id}`)}
                 >
                   ✏ Editar Producto
                 </button>
                 <button
-                  className="btn btn-outline-danger"
+                  className="btn btn-danger w-100 fw-bold"
                   onClick={() => {
                     const confirmDelete = window.confirm('¿Estás seguro de eliminar este producto?')
                     if (confirmDelete) {
@@ -96,6 +115,33 @@ const ProductView = () => {
             )}
           </div>
         </div>
+
+        {/* 🔁 Productos relacionados */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-5">
+            <h4 className="fw-bold mb-4 text-danger">Productos Relacionados</h4>
+            <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+              {relatedProducts.map((prod) => (
+                <div key={prod.id} className="col">
+                  <div
+                    className="card shadow-sm h-100"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => navigate(`/product/${prod.id}`)}
+                  >
+                    <div className="card-img-top bg-light d-flex justify-content-center align-items-center" style={{ height: '180px' }}>
+                      <img src={prod.image} alt={prod.name} className="img-fluid" style={{ maxHeight: '100%' }} />
+                    </div>
+                    <div className="card-body">
+                      <h6 className="card-title fw-bold">{prod.name}</h6>
+                      <p className="text-muted mb-1">{prod.description}</p>
+                      <p className="mb-0 fw-bold">₡{prod.price.toLocaleString()}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </>
   )

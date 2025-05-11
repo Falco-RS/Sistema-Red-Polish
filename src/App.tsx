@@ -11,6 +11,7 @@ import Services from './pages/Services'
 import Appointment from './pages/Appointment'
 import AddProduct from './pages/AddProduct'
 import ProductView from './pages/ProductView'
+import EditProduct from './pages/EditProduct'
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
       <Route path="/appointment" element={<Appointment/>} />
       <Route path="/add-product" element={<AddProduct />} />
       <Route path="/product/:id" element={<ProductView />} />
+      <Route path="/edit-product/:id" element={<EditProduct />} />
     </Routes>
   )
 }
