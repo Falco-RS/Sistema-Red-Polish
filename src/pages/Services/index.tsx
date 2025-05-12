@@ -3,28 +3,7 @@ import NavBar from '../../common/NavBar'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Dropdown } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-
-
-type Servicio = {
-  id: number
-  nombre: string
-  id_categoria: number
-  descripcion: string
-  duracion: string
-  precio: number
-  id_promocion?: number
-  imagen?: string
-}
-
-type Categoria = {
-  id: number
-  nombre: string
-}
-
-type ServicioConPrecio = Servicio & {
-  precioFinal?: number
-  porcentajeDescuento?: number
-}
+import { Servicio, Categoria, ServicioConPrecio } from '../../common/Interfaces'
 
 const mockServicios: Servicio[] = [
   {
@@ -32,29 +11,29 @@ const mockServicios: Servicio[] = [
     nombre: 'Lavado completo',
     id_categoria: 1,
     descripcion: 'Lavado exterior e interior del vehículo.',
-    duracion: '1h',
+    duracion: '60',
     precio: 15000,
     id_promocion: 2,
-    imagen: 'https://via.placeholder.com/300x180?text=Lavado+Completo',
+    imagen: 'https://resizer.glanacion.com/resizer/v2/lavado-de-BS652MZB7JBQ3CGT3CJP6TNVXQ.jpg?auth=b79423526cf1668dd2ac008b5edddf58df5fbd468b1187aae1342c137b527fe3&width=1280&height=854&quality=70&smart=true',
   },
   {
     id: 2,
     nombre: 'Pulido de pintura',
     id_categoria: 2,
     descripcion: 'Mejora el brillo y elimina rayones superficiales.',
-    duracion: '2h',
+    duracion: '120',
     precio: 30000,
-    imagen: 'https://via.placeholder.com/300x180?text=Pulido+Pintura',
+    imagen: 'https://www.rojassa.com/wp-content/uploads/2018/03/pulido-de-autos.jpg',
   },
   {
     id: 3,
     nombre: 'Desinfección interior',
     id_categoria: 3,
     descripcion: 'Limpieza profunda de asientos y superficies internas.',
-    duracion: '1h 30min',
+    duracion: '90',
     precio: 20000,
     id_promocion: 1,
-    imagen: 'https://via.placeholder.com/300x180?text=Desinfeccion',
+    imagen: 'https://gacetamedica.com/wp-content/uploads/2020/06/GettyImages-1217555995.jpg',
   },
 ]
 
@@ -81,7 +60,7 @@ const Services = () => {
   }
 
   useEffect(() => {
-    const serviciosConPrecio = mockServicios.map(serv => {
+    const serviciosConPrecio: ServicioConPrecio[] = mockServicios.map(serv => {
       if (serv.id_promocion) {
         const descuento = obtenerDescuentoSimulado(serv.id_promocion)
         const precioFinal = Math.round(serv.precio * (1 - descuento))
@@ -133,7 +112,7 @@ const Services = () => {
                 <div className="card-body">
                   <h5 className="card-title">{servicio.nombre}</h5>
                   <p className="card-text">{servicio.descripcion}</p>
-                  <p className="card-text"><strong>Duración:</strong> {servicio.duracion}</p>
+                  <p className="card-text"><strong>Duración:</strong> {servicio.duracion} min</p>
                   <p className="mb-2 fw-bold">
                     {servicio.precioFinal ? (
                       <>
@@ -148,7 +127,7 @@ const Services = () => {
                   <button
                     className="btn"
                     style={{
-                      backgroundColor: '#d9534f', // Rojo más suave
+                      backgroundColor: '#d9534f',
                       color: 'white',
                       border: 'none',
                       width: '100%',
