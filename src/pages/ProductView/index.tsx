@@ -41,7 +41,6 @@ const ProductView = () => {
     fetchProduct()
   }, [id, user])
 
-  // Obtener productos relacionados una vez que se carga el producto
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       if (!product?.categoryId) return
@@ -115,8 +114,6 @@ const ProductView = () => {
             )}
           </div>
         </div>
-
-        {/* 🔁 Productos relacionados */}
         {relatedProducts.length > 0 && (
           <div className="mt-5">
             <h4 className="fw-bold mb-4 text-danger">Productos Relacionados</h4>
