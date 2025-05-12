@@ -12,6 +12,9 @@ import Appointment from './pages/Appointment'
 import AddProduct from './pages/AddProduct'
 import ProductView from './pages/ProductView'
 import EditProduct from './pages/EditProduct'
+import AddService from './pages/Add_Service'
+import EditService from './pages/EditService'
+
 
 function App() {
   return (
@@ -29,6 +32,9 @@ function App() {
       <Route path="/add-product" element={<AddProduct />} />
       <Route path="/product/:id" element={<ProductView />} />
       <Route path="/edit-product/:id" element={<EditProduct />} />
+      <Route path="/add-service" element={<AddService />} />
+      <Route path="/edit-service/:id" element={<EditService />} />
+
     </Routes>
   )
 }

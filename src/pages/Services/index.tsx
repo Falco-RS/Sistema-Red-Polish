@@ -3,7 +3,9 @@ import NavBar from '../../common/NavBar'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Dropdown } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import { Servicio, Categoria, ServicioConPrecio } from '../../common/Interfaces'
+import { Servicio, Categoria, ServicioConPrecio } from '../../common/interfaces'
+import { useAuth } from '../../common/AuthContext' // Asegúrate de tener este hook implementado
+
 
 const mockServicios: Servicio[] = [
   {
@@ -50,6 +52,8 @@ const obtenerDescuentoSimulado = (id_promocion: number): number => {
 }
 
 const Services = () => {
+  const { user } = useAuth()
+  const [isAdmin, setIsAdmin] = useState(false)
   const [servicios, setServicios] = useState<ServicioConPrecio[]>([])
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null)
@@ -59,7 +63,15 @@ const Services = () => {
     navigate('/appointment', { state: { servicio } })
   }
 
+  const manejarModificar = (servicio: ServicioConPrecio) => {
+  navigate(`/edit-service/${servicio.id}`) // Usamos el ID en la URL
+}
+
   useEffect(() => {
+    if (user?.user?.rol === 'Administrador') {
+      setIsAdmin(true)
+    }
+
     const serviciosConPrecio: ServicioConPrecio[] = mockServicios.map(serv => {
       if (serv.id_promocion) {
         const descuento = obtenerDescuentoSimulado(serv.id_promocion)
@@ -68,9 +80,10 @@ const Services = () => {
       }
       return serv
     })
+
     setServicios(serviciosConPrecio)
     setCategorias(mockCategorias)
-  }, [])
+  }, [user])
 
   const serviciosFiltrados = categoriaSeleccionada
     ? servicios.filter(s => s.id_categoria === categoriaSeleccionada)
@@ -97,6 +110,24 @@ const Services = () => {
           </Dropdown>
         </div>
 
+       {/* Aquí podrías mostrar un botón solo para admins si lo necesitas */}
+        {isAdmin && (
+          <div className="mb-3 d-flex justify-content-end gap-2">
+            <button 
+              className="btn btn-danger" 
+              onClick={() => navigate('/add-service')}
+            >
+              Agregar Servicio
+            </button>
+            
+            <button 
+              className="btn btn-warning" 
+              onClick={() => navigate('/modify-calendar')}
+            >
+              Modificar Calendario
+            </button>
+          </div>
+        )}
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           {serviciosFiltrados.map(servicio => (
             <div key={servicio.id} className="col">
@@ -127,7 +158,7 @@ const Services = () => {
                   <button
                     className="btn"
                     style={{
-                      backgroundColor: '#d9534f',
+                      backgroundColor: '#d9534f', // rojo para ambos casos
                       color: 'white',
                       border: 'none',
                       width: '100%',
@@ -137,10 +168,13 @@ const Services = () => {
                       boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
                       transition: 'background-color 0.3s ease',
                     }}
-                    onClick={() => manejarAgendar(servicio)}
+                    onClick={() =>
+                      isAdmin ? manejarModificar(servicio) : manejarAgendar(servicio)
+                    }
                   >
-                    Agendar cita
+                    {isAdmin ? 'Modificar servicio' : 'Agendar cita'}
                   </button>
+
                 </div>
               </div>
             </div>

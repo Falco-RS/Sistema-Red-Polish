@@ -18,3 +18,5 @@ export interface ServicioConPrecio extends Servicio {
   precioFinal?: number
   porcentajeDescuento?: number
 }
+
+
