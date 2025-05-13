@@ -13,6 +13,11 @@ const Appointment = () => {
   const servicio = location.state?.servicio
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null)
   const [confirmado, setConfirmado] = useState(false)
+  const [horaSeleccionada, setHoraSeleccionada] = useState<Date | null>(null)
+  const [fechaConfirmada, setFechaConfirmada] = useState(false);
+
+  const horasDisponibles = [8, 9, 10, 11, 12, 13, 14, 15, 16]
+
 
   const noDisponibles = [
     { fecha: '2025-05-13', horas: [9, 10, 14] }, 
@@ -21,15 +26,35 @@ const Appointment = () => {
 
   // Función para verificar si la fecha y hora están disponibles
   const estaDisponible = (fechaSeleccionada: Date) => {
-    const fechaString = fechaSeleccionada.toISOString().split('T')[0] 
-    const horaSeleccionada = fechaSeleccionada.getHours() 
+    const fechaString = fechaSeleccionada.toISOString().split('T')[0];
+    const horaSeleccionada = fechaSeleccionada.getHours();
+    
+    // Comprobamos si la hora inicial está bloqueada
     for (const noDisponible of noDisponibles) {
       if (noDisponible.fecha === fechaString && noDisponible.horas.includes(horaSeleccionada)) {
-        return false 
+        return false;  // Si está bloqueada, no es disponible
       }
     }
-    return true 
-  }
+
+    // Si el servicio dura más de una hora, verificamos las horas adicionales
+    const duracionEnHoras = Math.ceil(servicio.duracion / 60); // Redondea hacia arriba
+    
+    for (let i = 1; i < duracionEnHoras; i++) {
+      const horaAdicional = new Date(fechaSeleccionada);
+      horaAdicional.setHours(horaSeleccionada + i, 0, 0, 0);
+      const horaAdicionalString = horaAdicional.toISOString().split('T')[0];
+
+      // Verificamos si alguna de las horas adicionales está bloqueada
+      for (const noDisponible of noDisponibles) {
+        if (noDisponible.fecha === horaAdicionalString && noDisponible.horas.includes(horaAdicional.getHours())) {
+          return false;  // Si alguna hora adicional está bloqueada, no es disponible
+        }
+      }
+    }
+
+    return true; // Si todo está disponible, retorna true
+  };
+
   
   useEffect(() => {
     if (!servicio) {
@@ -51,78 +76,12 @@ const Appointment = () => {
     return !isWeekend(date); 
   }
 
-  // Función para manejar la selección de la fecha
-  const handleSelectDate = (date: Date | null) => {
-    if (date) {
-      // Asegurarse de que la hora esté en el rango de 8 AM a 5 PM
-      const selectedDate = new Date(date)
-      const hours = selectedDate.getHours()
-
-      if (!estaDisponible(selectedDate)) {
-        alert('La fecha y hora seleccionadas no están disponibles. Por favor elige otra.');
-        return;
-      }
-
-      if (hours < 8) {
-        selectedDate.setHours(8, 0, 0, 0) 
-      } else if (hours > 17) {
-        selectedDate.setHours(17, 0, 0, 0)
-      }
-
-      setFechaSeleccionada(selectedDate)
-    } else {
-      setFechaSeleccionada(null)
-    }
-  }
-
   // Definir las fechas de inicio y fin para las horas de 8 AM a 5 PM
   const minTime = new Date()
   minTime.setHours(8, 0, 0, 0) 
 
   const maxTime = new Date()
   maxTime.setHours(17, 0, 0, 0) 
-
-  // Función que genera un arreglo de objetos Date a excluir para un día específico
-  const obtenerHorasNoDisponibles = (date: Date): Date[] => {
-    const fechaString = date.toISOString().split('T')[0];
-    const horasNoDisponibles = noDisponibles.find(d => d.fecha === fechaString)?.horas || [];
-
-    return horasNoDisponibles.map(hora => {
-      const excluida = new Date(date);
-      excluida.setHours(hora, 0, 0, 0);
-      return excluida;
-    });
-  };
-
-  // Nueva función que extiende la lógica para bloquear bloques incompletos
-    const obtenerTodasLasHorasExcluidas = (date: Date): Date[] => {
-    const horasExcluidas = obtenerHorasNoDisponibles(date);
-    const horasOcupadas = noDisponibles.find(d => d.fecha === date.toISOString().split('T')[0])?.horas || [];
-
-    const duracion = servicio.duracion || 60; // minutos
-    const bloquesNecesarios = Math.ceil(duracion / 60);
-
-    const horaFinalPermitida = 17; // 5 PM
-
-    for (let hora = 8; hora <= horaFinalPermitida; hora++) {
-      // Si el bloque se pasa del horario permitido (por ejemplo, termina a las 18), excluirlo
-      const horaUltimaRequerida = hora + bloquesNecesarios - 1;
-      const sePasaDelHorario = horaUltimaRequerida > horaFinalPermitida;
-
-      const bloqueIncompleto = Array.from({ length: bloquesNecesarios }, (_, i) => hora + i)
-        .some(h => horasOcupadas.includes(h));
-
-      if (sePasaDelHorario || bloqueIncompleto) {
-        const excluida = new Date(date);
-        excluida.setHours(hora, 0, 0, 0);
-        if (!horasExcluidas.find(h => h.getHours() === excluida.getHours())) {
-          horasExcluidas.push(excluida);
-        }
-      }
-    }
-
-    return horasExcluidas;
-  };
 
   return (
     <>
@@ -151,7 +110,9 @@ const Appointment = () => {
           >
             Volver
           </button>
+
           <h2 className="fw-bold mb-4 text-center text-danger">{servicio.nombre}</h2>
+
           {servicio.imagen && (
             <img
               src={servicio.imagen}
@@ -160,8 +121,9 @@ const Appointment = () => {
               style={{ maxHeight: '300px', objectFit: 'cover' }}
             />
           )}
+
           <p><strong>Descripción:</strong> {servicio.descripcion}</p>
-          <p><strong>Duración:</strong> {servicio.duracion} min </p>
+          <p><strong>Duración:</strong> {servicio.duracion} </p>
           <p>
             <strong>Precio:</strong>{' '}
             {servicio.precioFinal ? (
@@ -176,64 +138,104 @@ const Appointment = () => {
           </p>
 
           <div className="mt-4">
-            <h4>Selecciona la fecha y hora para tu cita</h4>
+            <h4>Selecciona la fecha</h4>
             <DatePicker
-              selected={fechaSeleccionada}
-              onChange={handleSelectDate}
-              showTimeSelect
-              timeIntervals={60}
-              timeCaption="Hora"
-              dateFormat="MMMM d, yyyy h:mm aa"
-              minDate={new Date()}
-              filterDate={esDiaValido}
-              placeholderText="Selecciona una fecha"
-              inline
-              maxTime={maxTime}
-              minTime={minTime}
-              excludeTimes={fechaSeleccionada ? obtenerTodasLasHorasExcluidas(fechaSeleccionada) : []}
-            />
+            selected={fechaSeleccionada}
+            onChange={(date) => {
+              if (date && !fechaConfirmada) {  // Solo permitir seleccionar una fecha si no está confirmada
+                const newDate = new Date(date);
+                newDate.setHours(8, 0, 0, 0);
+                setFechaSeleccionada(newDate);
+                setHoraSeleccionada(null);
+                setConfirmado(false);
+              }
+            }}
+            dateFormat="MMMM d, yyyy"
+            minDate={new Date()}
+            filterDate={esDiaValido}
+            placeholderText="Selecciona una fecha"
+            inline
+            disabled={fechaConfirmada}  // Deshabilitar el selector de fecha si está confirmada
+          />
           </div>
 
-          {/* Botón habilitado solo si hay fecha seleccionada */}
+          {fechaSeleccionada && (
+            <div className="mt-4">
+              <h4>Selecciona una hora</h4>
+              <div className="d-flex flex-wrap gap-2">
+                {horasDisponibles.map((hora) => {
+                  const horaCompleta = new Date(fechaSeleccionada)
+                  horaCompleta.setHours(hora, 0, 0, 0)
+
+                  const horaFormateada = horaCompleta.toLocaleTimeString([], {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })
+
+                  const disponible = estaDisponible(horaCompleta)
+
+                  return (
+                    <button
+                      key={hora}
+                      className={`btn ${
+                        horaSeleccionada &&
+                        horaCompleta.getHours() === horaSeleccionada.getHours()
+                          ? 'btn-danger'
+                          : 'btn-outline-danger'
+                      }`}
+                      onClick={() => disponible && setHoraSeleccionada(horaCompleta)}
+                      disabled={!disponible}
+                    >
+                      {horaFormateada}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+
           <div className="mt-4 text-center">
-            {fechaSeleccionada ? (
+            {horaSeleccionada && confirmado ? (
+              <>
+                <h5 className="text-danger">Fecha y hora seleccionadas:</h5>
+                <p>{horaSeleccionada.toLocaleString()}</p>
+                <button
+                  className="btn btn-outline-secondary mb-3"
+                  onClick={() => setConfirmado(false)}
+                >
+                  Cambiar fecha y hora
+                </button>
+                <br />
+                <button
+                  className="btn btn-danger"
+                  onClick={() =>
+                    navigate('/pago', { state: { servicio, fechaSeleccionada: horaSeleccionada } })
+                  }
+                >
+                  Ir a pagar
+                </button>
+              </>
+            ) : (
               <button
                 className="btn btn-danger"
-                onClick={() => setConfirmado(true)}
+                onClick={() => {
+                  if (horaSeleccionada && estaDisponible(horaSeleccionada)) {
+                    setConfirmado(true)
+                  } else {
+                    alert('Selecciona una hora válida.')
+                  }
+                }}
+                disabled={!horaSeleccionada}
               >
                 Confirmar selección de fecha y hora
               </button>
-            ) : (
-              <button className="btn btn-secondary" disabled>
-                Seleccionar fecha y hora
-              </button>
             )}
           </div>
-
-          {/* Si la fecha y hora están confirmadas, mostrar detalles */}
-          {confirmado && fechaSeleccionada && (
-            <div className="mt-4 text-center">
-              <h5 className="text-success">Fecha y hora seleccionadas:</h5>
-              <p>{fechaSeleccionada.toLocaleString()}</p>
-              <button
-                className="btn btn-outline-secondary mb-3"
-                onClick={() => setConfirmado(false)}
-              >
-                Cambiar fecha y hora
-              </button>
-              <br />
-              <button
-                className="btn btn-success"
-                onClick={() => navigate('/pago', { state: { servicio, fechaSeleccionada } })}
-              >
-                Ir a pagar
-              </button>
-            </div>
-          )}
         </div>
       </div>
     </>
   )
+
 }
 
 export default Appointment

@@ -123,7 +123,7 @@ const Services = () => {
             
             <button 
               className="btn btn-warning" 
-              onClick={() => navigate('/modify-calendar')}
+              onClick={() => navigate('/edit-calendar')}
             >
               Modificar Calendario
             </button>

@@ -14,6 +14,8 @@ import ProductView from './pages/ProductView'
 import EditProduct from './pages/EditProduct'
 import AddService from './pages/Add_Service'
 import EditService from './pages/EditService'
+import EditCalendar from './pages/EditCalendar'
+
 
 
 function App() {
@@ -34,7 +36,7 @@ function App() {
       <Route path="/edit-product/:id" element={<EditProduct />} />
       <Route path="/add-service" element={<AddService />} />
       <Route path="/edit-service" element={<EditService />} />
-
+      <Route path="/edit-calendar" element={<EditCalendar />} />
     </Routes>
   )
 }
