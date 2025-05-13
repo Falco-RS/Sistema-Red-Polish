@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import { Categoria } from '../../common/interfaces'
-
+import { useLocation } from 'react-router-dom'
 
 const EditService = () => {
   const [name, setName] = useState('')
@@ -16,7 +16,8 @@ const EditService = () => {
   const [categories, setCategories] = useState<Categoria[]>([])
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
-  
+  const location = useLocation()
+  const servicio = location.state?.servicio
   const apiUrl = import.meta.env.VITE_IP_API
   const navigate = useNavigate()
   const { id } = useParams()
@@ -28,22 +29,21 @@ const EditService = () => {
   ]
 
   useEffect(() => {
-    // Obtener el servicio actual
-    fetch(`${apiUrl}/api/services/get/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        setName(data.name)
-        setDescription(data.description)
-        setDuration(data.duration)
-        setPrice(data.price.toString())
-        setCategoryId(data.categoryId.toString())
-        setImageUrl(data.image)
-      })
-      .catch(() => setError('Error al cargar el servicio.'))
+   if (!servicio) {
+      setError('No se encontró información del servicio.')
+      return
+    }
+
+    setName(servicio.nombre)
+    setDescription(servicio.descripcion)
+    setDuration(servicio.duracion.toString())
+    setPrice(servicio.precio.toString())
+    setCategoryId(servicio.id_categoria.toString())
+    setImageUrl(servicio.imagen || '')
 
     // Obtener categorías (usando categorías mockeadas por ahora)
     setCategories(mockCategorias)
-  }, [apiUrl, id])
+  }, [servicio])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

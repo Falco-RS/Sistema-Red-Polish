@@ -6,39 +6,6 @@ import { useNavigate } from 'react-router-dom'
 import { Servicio, Categoria, ServicioConPrecio } from '../../common/interfaces'
 import { useAuth } from '../../common/AuthContext' // Asegúrate de tener este hook implementado
 
-
-const mockServicios: Servicio[] = [
-  {
-    id: 1,
-    nombre: 'Lavado completo',
-    id_categoria: 1,
-    descripcion: 'Lavado exterior e interior del vehículo.',
-    duracion: '60',
-    precio: 15000,
-    id_promocion: 2,
-    imagen: 'https://resizer.glanacion.com/resizer/v2/lavado-de-BS652MZB7JBQ3CGT3CJP6TNVXQ.jpg?auth=b79423526cf1668dd2ac008b5edddf58df5fbd468b1187aae1342c137b527fe3&width=1280&height=854&quality=70&smart=true',
-  },
-  {
-    id: 2,
-    nombre: 'Pulido de pintura',
-    id_categoria: 2,
-    descripcion: 'Mejora el brillo y elimina rayones superficiales.',
-    duracion: '120',
-    precio: 30000,
-    imagen: 'https://www.rojassa.com/wp-content/uploads/2018/03/pulido-de-autos.jpg',
-  },
-  {
-    id: 3,
-    nombre: 'Desinfección interior',
-    id_categoria: 3,
-    descripcion: 'Limpieza profunda de asientos y superficies internas.',
-    duracion: '90',
-    precio: 20000,
-    id_promocion: 1,
-    imagen: 'https://gacetamedica.com/wp-content/uploads/2020/06/GettyImages-1217555995.jpg',
-  },
-]
-
 const mockCategorias: Categoria[] = [
   { id: 1, nombre: 'Lavado' },
   { id: 2, nombre: 'Pulido' },
@@ -64,25 +31,59 @@ const Services = () => {
   }
 
   const manejarModificar = (servicio: ServicioConPrecio) => {
-  navigate(`/edit-service/${servicio.id}`) // Usamos el ID en la URL
-}
+    navigate('/edit-service', { state: { servicio } })
+  }
+
 
   useEffect(() => {
     if (user?.user?.rol === 'Administrador') {
-      setIsAdmin(true)
+    setIsAdmin(true)
     }
 
-    const serviciosConPrecio: ServicioConPrecio[] = mockServicios.map(serv => {
-      if (serv.id_promocion) {
-        const descuento = obtenerDescuentoSimulado(serv.id_promocion)
-        const precioFinal = Math.round(serv.precio * (1 - descuento))
-        return { ...serv, precioFinal, porcentajeDescuento: descuento }
+    fetch('http://localhost:8080/api/services/get-services')
+    .then(res => {
+      if (!res.ok) {
+        throw new Error('Error al obtener los servicios')
       }
-      return serv
+      return res.json()
+    })
+    .then((data) => {
+      const serviciosTransformados: ServicioConPrecio[] = data.map((serv: any) => {
+        const id_promocion = serv.promotion ? parseInt(serv.promotion) : undefined
+        const id_categoria = parseInt(serv.category)
+
+        const baseServicio: Servicio = {
+          id: serv.id,
+          nombre: serv.name,
+          id_categoria,
+          descripcion: serv.description,
+          duracion: serv.duration,
+          precio: serv.price,
+          id_promocion,
+          imagen: '', // Puedes llenar esto si más adelante agregas imágenes desde la API
+        }
+
+        if (id_promocion) {
+          const descuento = obtenerDescuentoSimulado(id_promocion)
+          const precioFinal = Math.round(serv.price * (1 - descuento))
+          return {
+            ...baseServicio,
+            precioFinal,
+            porcentajeDescuento: descuento,
+          }
+        }
+
+        return baseServicio
+      })
+
+      setServicios(serviciosTransformados)
+    })
+    .catch(error => {
+      console.error('Error al cargar servicios:', error)
     })
 
-    setServicios(serviciosConPrecio)
-    setCategorias(mockCategorias)
+  setCategorias(mockCategorias)
+
   }, [user])
 
   const serviciosFiltrados = categoriaSeleccionada
