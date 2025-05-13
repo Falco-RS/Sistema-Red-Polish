@@ -14,8 +14,6 @@ const Appointment = () => {
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null)
   const [confirmado, setConfirmado] = useState(false)
   const [horaSeleccionada, setHoraSeleccionada] = useState<Date | null>(null)
-  const [fechaConfirmada, setFechaConfirmada] = useState(false);
-
   const horasDisponibles = [8, 9, 10, 11, 12, 13, 14, 15, 16]
 
 
