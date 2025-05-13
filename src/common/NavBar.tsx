@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../common/AuthContext'; 
 import logo from '../assets/logo.png';
+import carritoIcon from '../assets/carrito-de-compras.png'; // 👈 nuevo import
 
 const NavBar = () => {
   const { user, logout } = useAuth();
@@ -22,6 +23,7 @@ const NavBar = () => {
           />
           Red Polish
         </Link>
+
         <div className="collapse navbar-collapse justify-content-between">
           <ul className="navbar-nav">
             <li className="nav-item">
@@ -31,7 +33,18 @@ const NavBar = () => {
               <Link to="/services" className="nav-link">Servicios</Link>
             </li>
           </ul>
-          <ul className="navbar-nav">
+
+          <ul className="navbar-nav align-items-center">
+            <li className="nav-item me-3">
+              <Link to="/shopping-cart" className="nav-link">
+                <img
+                  src={carritoIcon}
+                  alt="Carrito de compras"
+                  style={{ width: '30px', height: '30px' }}
+                />
+              </Link>
+            </li>
+
             {!user ? (
               <>
                 <li className="nav-item">

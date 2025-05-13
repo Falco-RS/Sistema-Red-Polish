@@ -15,6 +15,8 @@ import EditProduct from './pages/EditProduct'
 import AddService from './pages/Add_Service'
 import EditService from './pages/EditService'
 import EditCalendar from './pages/EditCalendar'
+import PayService from './pages/PayService'
+import ShoppingCart from './pages/ShoppingCart'
 
 
 
@@ -37,6 +39,8 @@ function App() {
       <Route path="/add-service" element={<AddService />} />
       <Route path="/edit-service" element={<EditService />} />
       <Route path="/edit-calendar" element={<EditCalendar />} />
+      <Route path="/pay-service" element={<PayService />} />
+      <Route path="/shopping-cart" element={<ShoppingCart />} />
     </Routes>
   )
 }

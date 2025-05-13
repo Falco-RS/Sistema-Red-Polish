@@ -142,7 +142,7 @@ const Appointment = () => {
             <DatePicker
             selected={fechaSeleccionada}
             onChange={(date) => {
-              if (date && !fechaConfirmada) {  // Solo permitir seleccionar una fecha si no está confirmada
+              if (date && !fechaConfirmada) {  
                 const newDate = new Date(date);
                 newDate.setHours(8, 0, 0, 0);
                 setFechaSeleccionada(newDate);
@@ -155,7 +155,7 @@ const Appointment = () => {
             filterDate={esDiaValido}
             placeholderText="Selecciona una fecha"
             inline
-            disabled={fechaConfirmada}  // Deshabilitar el selector de fecha si está confirmada
+            disabled={fechaConfirmada}  
           />
           </div>
 
@@ -209,7 +209,7 @@ const Appointment = () => {
                 <button
                   className="btn btn-danger"
                   onClick={() =>
-                    navigate('/pago', { state: { servicio, fechaSeleccionada: horaSeleccionada } })
+                    navigate('/pay-service', { state: { servicio, fechaSeleccionada: horaSeleccionada } })
                   }
                 >
                   Ir a pagar
