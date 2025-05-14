@@ -15,61 +15,47 @@ const Appointment = () => {
   const [confirmado, setConfirmado] = useState(false)
   const [horaSeleccionada, setHoraSeleccionada] = useState<Date | null>(null)
   const [fechaConfirmada] = useState(false);
+  const [horasNoDisponibles, setHorasNoDisponibles] = useState<number[]>([])
 
   const horasDisponibles = [8, 9, 10, 11, 12, 13, 14, 15, 16]
 
-
-  const noDisponibles = [
-    { fecha: '2025-05-13', horas: [9, 10, 14] }, 
-    { fecha: '2025-05-14', horas: [13, 15] },   
-  ]
-
   // Función para verificar si la fecha y hora están disponibles
-  const estaDisponible = (fechaSeleccionada: Date) => {
-    const fechaString = fechaSeleccionada.toISOString().split('T')[0];
-    const horaSeleccionada = fechaSeleccionada.getHours();
-    
-    // Comprobamos si la hora inicial está bloqueada
-    for (const noDisponible of noDisponibles) {
-      if (noDisponible.fecha === fechaString && noDisponible.horas.includes(horaSeleccionada)) {
-        return false;  // Si está bloqueada, no es disponible
+  const estaDisponible = (fecha: Date) => {
+    const horaSeleccionada = fecha.getHours();
+    const duracionEnHoras = Math.ceil(servicio.duracion / 60);
+
+    // Validar cada hora que cubriría el servicio
+    for (let i = 0; i < duracionEnHoras; i++) {
+      const hora = horaSeleccionada + i;
+      if (horasNoDisponibles.includes(hora)) {
+        return false;
       }
     }
 
-    // Si el servicio dura más de una hora, verificamos las horas adicionales
-    const duracionEnHoras = Math.ceil(servicio.duracion / 60); // Redondea hacia arriba
-    
-    for (let i = 1; i < duracionEnHoras; i++) {
-      const horaAdicional = new Date(fechaSeleccionada);
-      horaAdicional.setHours(horaSeleccionada + i, 0, 0, 0);
-      const horaAdicionalString = horaAdicional.toISOString().split('T')[0];
-
-      // Verificamos si alguna de las horas adicionales está bloqueada
-      for (const noDisponible of noDisponibles) {
-        if (noDisponible.fecha === horaAdicionalString && noDisponible.horas.includes(horaAdicional.getHours())) {
-          return false;  // Si alguna hora adicional está bloqueada, no es disponible
-        }
-      }
-    }
-
-    return true; // Si todo está disponible, retorna true
+    return true;
   };
 
   
   useEffect(() => {
-    if (!servicio) {
-      console.warn('No se recibió ningún servicio')
-    }
-  }, [servicio])
+      const obtenerHorasNoDisponibles = async () => {
+        if (fechaSeleccionada && servicio?.id) {
+          const fechaISO = fechaSeleccionada.toISOString().split('T')[0];
+          try {
+            const response = await fetch(`http://localhost:8080/api/citas/ocupadas?servicio_id=${servicio.id}&fecha=${fechaISO}`);
+            if (!response.ok) throw new Error('Error al obtener datos de disponibilidad');
+            const data = await response.json();
+            setHorasNoDisponibles(data); // espera un array de números, por ejemplo [9, 10, 14]
+          } catch (error) {
+            console.error('Error al obtener horas no disponibles:', error);
+            setHorasNoDisponibles([]); // fallback
+          }
+        } else {
+          setHorasNoDisponibles([]);
+        }
+      };
 
-  if (!servicio) {
-    return (
-      <>
-        <NavBar />
-        <div className="container mt-5">No se encontró información del servicio.</div>
-      </>
-    )
-  }
+      obtenerHorasNoDisponibles();
+    }, [fechaSeleccionada, servicio]);
 
   // Función para filtrar los días no disponibles (fines de semana)
   const esDiaValido = (date: Date) => {

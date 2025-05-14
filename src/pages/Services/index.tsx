@@ -60,7 +60,7 @@ const Services = () => {
           duracion: serv.duration,
           precio: serv.price,
           id_promocion,
-          imagen: '', // Puedes llenar esto si más adelante agregas imágenes desde la API
+          imagen: serv.imageUrl || '',
         }
 
         if (id_promocion) {

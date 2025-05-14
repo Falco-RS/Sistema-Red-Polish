@@ -29,8 +29,7 @@ const PayService = () => {
       fecha: fechaSeleccionada.toLocaleDateString(),
       hora: fechaSeleccionada.toLocaleTimeString(),
       metodoNotificacion,
-      destino: metodoNotificacion === 'sms' ? numeroTelefono : correoUsuario || 'correo_del_usuario@ejemplo.com',
-      idUsuario: 'usuario123' 
+      destino: metodoNotificacion === 'sms' ? numeroTelefono : correoUsuario || 'correo_del_usuario@ejemplo.com'
     };
 
     console.log('Enviando correo con los datos:', datos);
