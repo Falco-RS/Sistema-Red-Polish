@@ -79,6 +79,9 @@ const ShoppingCart: React.FC = () => {
                       <button className="btn btn-outline-danger btn-sm" onClick={() => {}}>
                         Eliminar producto
                       </button>
+                      <button className="btn btn-outline-warning btn-sm" onClick={() => {}}>
+                        Guardar cambios
+                      </button>
                     </div>
                   </div>
                 </div>

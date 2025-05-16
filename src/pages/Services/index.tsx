@@ -129,10 +129,10 @@ const Services = () => {
             </button>
           </div>
         )}
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
           {serviciosFiltrados.map(servicio => (
             <div key={servicio.id} className="col">
-              <div className="card shadow-sm h-100" style={{ maxWidth: '300px', margin: '0 auto' }}>
+              <div className="card shadow-sm h-100">
                 {servicio.imagen && (
                   <img
                     src={servicio.imagen}
