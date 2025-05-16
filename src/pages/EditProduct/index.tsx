@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
+import { useAuth } from '../../common/AuthContext'
 
 const EditProduct = () => {
   const [name, setName] = useState('')
@@ -14,6 +15,8 @@ const EditProduct = () => {
   const [categories, setCategories] = useState<{ id: number, name: string }[]>([])
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
+  const { user, login } = useAuth()
+  
 
   const apiUrl = import.meta.env.VITE_IP_API
   const navigate = useNavigate()
@@ -58,10 +61,15 @@ const EditProduct = () => {
     }
     console.log('🔧 Editando producto:', productData)
 
+    const userEmail = user?.user?.email
+    const userToken = user?.token
+
     try {
-      const res = await fetch(`${apiUrl}/api/products/update/${id}`, {
+      const res = await fetch(`${apiUrl}/api/products/update/${id}/${userEmail}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`,
+         },
         body: JSON.stringify(productData)
       })
       if (!res.ok) throw new Error('Error en la edición')

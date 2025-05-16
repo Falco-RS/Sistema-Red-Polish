@@ -9,9 +9,14 @@ const ProductView = () => {
   const [product, setProduct] = useState<any>(null)
   const [relatedProducts, setRelatedProducts] = useState<any[]>([])
   const [isAdmin, setIsAdmin] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+
   const { id } = useParams()
   const navigate = useNavigate()
   const apiUrl = import.meta.env.VITE_IP_API
+
+  const userEmail = user?.user?.email
+  const userToken = user?.token
 
   useEffect(() => {
     if (user?.user?.rol === 'Administrador') {
@@ -23,10 +28,8 @@ const ProductView = () => {
         const res = await fetch(`${apiUrl}/api/products/get/${id}`)
         if (!res.ok) throw new Error('Producto no encontrado')
         const data = await res.json()
-        console.log('🟢 Producto cargado:', data)
         setProduct(data)
-      } catch (err) {
-        console.warn('⚠️ Mostrando producto quemado por fallback.')
+      } catch {
         setProduct({
           id: 0,
           name: 'Cera Premium',
@@ -48,7 +51,6 @@ const ProductView = () => {
       try {
         const res = await fetch(`${apiUrl}/api/products/get_all`)
         const data = await res.json()
-
         const related = data.filter((p: any) => p.categoryId === product.categoryId && p.id !== product.id)
         setRelatedProducts(related)
       } catch (err) {
@@ -58,6 +60,28 @@ const ProductView = () => {
 
     fetchRelatedProducts()
   }, [product])
+
+  const handleDelete = async () => {
+    if (!userEmail || !userToken) return
+
+    try {
+      const res = await fetch(`${apiUrl}/api/products/delete/${product.id}/${userEmail}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${userToken}`,
+        },
+      })
+
+      if (!res.ok) throw new Error('Error al eliminar producto')
+
+      alert('Producto eliminado correctamente.')
+      navigate('/catalog')
+    } catch (err) {
+      console.error('❌ Error eliminando producto:', err)
+      alert('Hubo un error al eliminar el producto.')
+    }
+  }
 
   if (!product) {
     return (
@@ -101,12 +125,7 @@ const ProductView = () => {
                 </button>
                 <button
                   className="btn btn-danger w-100 fw-bold"
-                  onClick={() => {
-                    const confirmDelete = window.confirm('¿Estás seguro de eliminar este producto?')
-                    if (confirmDelete) {
-                      console.log('Eliminar producto', product.id)
-                    }
-                  }}
+                  onClick={() => setShowConfirmModal(true)}
                 >
                   🗑 Eliminar Producto
                 </button>
@@ -114,6 +133,7 @@ const ProductView = () => {
             )}
           </div>
         </div>
+
         {relatedProducts.length > 0 && (
           <div className="mt-5">
             <h4 className="fw-bold mb-4 text-danger">Productos Relacionados</h4>
@@ -140,6 +160,32 @@ const ProductView = () => {
           </div>
         )}
       </div>
+
+      {/* 🔴 Modal de confirmación */}
+      {showConfirmModal && (
+        <div className="modal fade show d-block" tabIndex={-1} role="dialog">
+          <div className="modal-dialog" role="document">
+            <div className="modal-content shadow-lg">
+              <div className="modal-header bg-danger text-white">
+                <h5 className="modal-title">Confirmar eliminación</h5>
+                <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <p>¿Estás seguro de que deseas eliminar este producto?</p>
+                <p className="fw-bold text-danger">Esta acción no se puede deshacer.</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
+                  Cancelar
+                </button>
+                <button className="btn btn-danger" onClick={handleDelete}>
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

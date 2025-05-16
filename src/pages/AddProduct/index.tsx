@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
+import { useAuth } from '../../common/AuthContext'
 
 const AddProduct = () => {
   const [name, setName] = useState('')
@@ -14,8 +15,8 @@ const AddProduct = () => {
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const [categories, setCategories] = useState<{ id: number, name: string }[]>([])
-
-  const apiUrl = import.meta.env.VITE_IP_API
+  const { user, login } = useAuth()
+  const apiUrl = import.meta.env.VITE_IP_API;
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -26,36 +27,48 @@ const AddProduct = () => {
   }, [apiUrl])
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!name || !description || !price || !quantity || !categoryId || !imageUrl) {
-      setError('Todos los campos son obligatorios.')
-      return
-    }
-
-    const productData = {
-      name,
-      description,
-      price: parseFloat(price),
-      stock: parseInt(quantity),
-      image: imageUrl,
-      categoryId: parseInt(categoryId)
-    }
-    console.log('Producto a enviar:', productData);
-
-    try {
-      const res = await fetch(`${apiUrl}/api/products/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData)
-      })
-      if (!res.ok) throw new Error('Error en la petición')
-      setSuccess(true)
-      setTimeout(() => navigate('/catalog'), 3000)
-    } catch (err) {
-      setError('Error al subir el producto.')
-    }
+  if (!name || !description || !price || !quantity || !categoryId || !imageUrl) {
+    setError('Todos los campos son obligatorios.')
+    return
   }
+
+  const productData = {
+    name,
+    description,
+    price: parseFloat(price),
+    stock: parseInt(quantity),
+    image: imageUrl,
+    categoryId: parseInt(categoryId)
+  }
+
+  const userEmail = user?.user?.email
+  const userToken = user?.token
+
+  console.log('Producto a enviar:', productData)
+  console.log("Token del Administador:", userToken)
+
+  try {
+    const res = await fetch(`${apiUrl}/api/products/create/${userEmail}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${userToken}`,
+      },
+      body: JSON.stringify(productData)
+    })
+
+    if (!res.ok) throw new Error('Error en la petición')
+
+    setSuccess(true)
+    setTimeout(() => navigate('/catalog'), 3000)
+  } catch (err) {
+    console.error(err)
+    setError('Error al subir el producto.')
+  }
+}
+
 
   const handleAddCategory = async () => {
     if (!newCategory.trim()) return
