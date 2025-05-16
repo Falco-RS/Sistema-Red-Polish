@@ -19,4 +19,15 @@ export interface ServicioConPrecio extends Servicio {
   porcentajeDescuento?: number
 }
 
+export interface Props {
+  servicio: Servicio
+  fechaSeleccionada: Date | null
+  horaSeleccionada: Date | null
+  setHoraSeleccionada: (hora: Date) => void
+}
 
+export interface CitaOcupada {
+  fecha: string
+  hora: string
+  duracion: string
+}

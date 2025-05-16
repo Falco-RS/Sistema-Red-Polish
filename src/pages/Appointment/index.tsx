@@ -1,73 +1,22 @@
-import { useLocation } from 'react-router-dom'
-import { useState, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import NavBar from '../../common/NavBar'
-import { useNavigate } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import DatePicker from 'react-datepicker'
-import "react-datepicker/dist/react-datepicker.css"
+import 'react-datepicker/dist/react-datepicker.css'
 import { isWeekend } from 'date-fns'
+import SelectorHoras from '../../components/HorasDisponibles'
 
 const Appointment = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const servicio = location.state?.servicio
   const [fechaSeleccionada, setFechaSeleccionada] = useState<Date | null>(null)
-  const [confirmado, setConfirmado] = useState(false)
   const [horaSeleccionada, setHoraSeleccionada] = useState<Date | null>(null)
-  const [fechaConfirmada] = useState(false);
-  const [horasNoDisponibles, setHorasNoDisponibles] = useState<number[]>([])
+  const [confirmado, setConfirmado] = useState(false)
+  const [fechaConfirmada] = useState(false)
 
-  const horasDisponibles = [8, 9, 10, 11, 12, 13, 14, 15, 16]
-
-  // Función para verificar si la fecha y hora están disponibles
-  const estaDisponible = (fecha: Date) => {
-    const horaSeleccionada = fecha.getHours();
-    const duracionEnHoras = Math.ceil(servicio.duracion / 60);
-
-    // Validar cada hora que cubriría el servicio
-    for (let i = 0; i < duracionEnHoras; i++) {
-      const hora = horaSeleccionada + i;
-      if (horasNoDisponibles.includes(hora)) {
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  
-  useEffect(() => {
-      const obtenerHorasNoDisponibles = async () => {
-        if (fechaSeleccionada && servicio?.id) {
-          const fechaISO = fechaSeleccionada.toISOString().split('T')[0];
-          try {
-            const response = await fetch(`http://localhost:8080/api/citas/ocupadas?servicio_id=${servicio.id}&fecha=${fechaISO}`);
-            if (!response.ok) throw new Error('Error al obtener datos de disponibilidad');
-            const data = await response.json();
-            setHorasNoDisponibles(data); // espera un array de números, por ejemplo [9, 10, 14]
-          } catch (error) {
-            console.error('Error al obtener horas no disponibles:', error);
-            setHorasNoDisponibles([]); // fallback
-          }
-        } else {
-          setHorasNoDisponibles([]);
-        }
-      };
-
-      obtenerHorasNoDisponibles();
-    }, [fechaSeleccionada, servicio]);
-
-  // Función para filtrar los días no disponibles (fines de semana)
-  const esDiaValido = (date: Date) => {
-    return !isWeekend(date); 
-  }
-
-  // Definir las fechas de inicio y fin para las horas de 8 AM a 5 PM
-  const minTime = new Date()
-  minTime.setHours(8, 0, 0, 0) 
-
-  const maxTime = new Date()
-  maxTime.setHours(17, 0, 0, 0) 
+  const esDiaValido = (date: Date) => !isWeekend(date)
 
   return (
     <>
@@ -109,7 +58,7 @@ const Appointment = () => {
           )}
 
           <p><strong>Descripción:</strong> {servicio.descripcion}</p>
-          <p><strong>Duración:</strong> {servicio.duracion} </p>
+          <p><strong>Duración:</strong> {servicio.duracion} minutos</p>
           <p>
             <strong>Precio:</strong>{' '}
             {servicio.precioFinal ? (
@@ -126,57 +75,34 @@ const Appointment = () => {
           <div className="mt-4">
             <h4>Selecciona la fecha</h4>
             <DatePicker
-            selected={fechaSeleccionada}
-            onChange={(date) => {
-              if (date && !fechaConfirmada) {  
-                const newDate = new Date(date);
-                newDate.setHours(8, 0, 0, 0);
-                setFechaSeleccionada(newDate);
-                setHoraSeleccionada(null);
-                setConfirmado(false);
-              }
-            }}
-            dateFormat="MMMM d, yyyy"
-            minDate={new Date()}
-            filterDate={esDiaValido}
-            placeholderText="Selecciona una fecha"
-            inline
-            disabled={fechaConfirmada}  
-          />
+              selected={fechaSeleccionada}
+              onChange={(date) => {
+                if (date && !fechaConfirmada) {
+                  const nuevaFecha = new Date(date)
+                  nuevaFecha.setHours(8, 0, 0, 0)
+                  setFechaSeleccionada(nuevaFecha)
+                  setHoraSeleccionada(null)
+                  setConfirmado(false)
+                }
+              }}
+              dateFormat="MMMM d, yyyy"
+              minDate={new Date()}
+              filterDate={esDiaValido}
+              placeholderText="Selecciona una fecha"
+              inline
+              disabled={fechaConfirmada}
+            />
           </div>
 
           {fechaSeleccionada && (
             <div className="mt-4">
               <h4>Selecciona una hora</h4>
-              <div className="d-flex flex-wrap gap-2">
-                {horasDisponibles.map((hora) => {
-                  const horaCompleta = new Date(fechaSeleccionada)
-                  horaCompleta.setHours(hora, 0, 0, 0)
-
-                  const horaFormateada = horaCompleta.toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })
-
-                  const disponible = estaDisponible(horaCompleta)
-
-                  return (
-                    <button
-                      key={hora}
-                      className={`btn ${
-                        horaSeleccionada &&
-                        horaCompleta.getHours() === horaSeleccionada.getHours()
-                          ? 'btn-danger'
-                          : 'btn-outline-danger'
-                      }`}
-                      onClick={() => disponible && setHoraSeleccionada(horaCompleta)}
-                      disabled={!disponible}
-                    >
-                      {horaFormateada}
-                    </button>
-                  )
-                })}
-              </div>
+              <SelectorHoras
+                servicio={servicio}
+                fechaSeleccionada={fechaSeleccionada}
+                horaSeleccionada={horaSeleccionada}
+                setHoraSeleccionada={setHoraSeleccionada}
+              />
             </div>
           )}
 
@@ -195,7 +121,12 @@ const Appointment = () => {
                 <button
                   className="btn btn-danger"
                   onClick={() =>
-                    navigate('/pay-service', { state: { servicio, fechaSeleccionada: horaSeleccionada } })
+                    navigate('/pay-service', {
+                      state: {
+                        servicio,
+                        fechaSeleccionada: horaSeleccionada
+                      }
+                    })
                   }
                 >
                   Ir a pagar
@@ -205,7 +136,7 @@ const Appointment = () => {
               <button
                 className="btn btn-danger"
                 onClick={() => {
-                  if (horaSeleccionada && estaDisponible(horaSeleccionada)) {
+                  if (horaSeleccionada) {
                     setConfirmado(true)
                   } else {
                     alert('Selecciona una hora válida.')
@@ -221,7 +152,6 @@ const Appointment = () => {
       </div>
     </>
   )
-
 }
 
 export default Appointment

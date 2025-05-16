@@ -1,7 +1,8 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NavBar from '../../common/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useAuth } from '../../common/AuthContext'
 
 const PayService = () => {
   const location = useLocation();
@@ -11,8 +12,9 @@ const PayService = () => {
   const [metodoNotificacion, setMetodoNotificacion] = useState<'email' | 'sms' | null>(null);
   const [numeroTelefono, setNumeroTelefono] = useState('');
   const [correoUsuario, setCorreoUsuario] = useState(''); 
+  const { token } = useAuth();
 
-  const handleConfirmacion = () => {
+  const handleConfirmacion = async () => {
     if (!metodoNotificacion) {
       alert('Selecciona un método de notificación.');
       return;
@@ -22,19 +24,48 @@ const PayService = () => {
       alert('Ingresa un número telefónico válido con prefijo internacional (ej: +50612345678).');
       return;
     }
+    console.log(token);
 
-    const datos = {
-      servicio: servicio.nombre,
+    if (!token) {
+      alert('No se ha encontrado el token de autenticación.'+ token);
+      return;
+    }
+
+    const fecha = fechaSeleccionada.toISOString().split('T')[0]; 
+    const hora = fechaSeleccionada.toTimeString().slice(0, 5);   
+
+    const body = {
+      servicioId: servicio.id, 
       descripcion: servicio.descripcion,
-      fecha: fechaSeleccionada.toLocaleDateString(),
-      hora: fechaSeleccionada.toLocaleTimeString(),
+      fecha,
+      hora,
       metodoNotificacion,
-      destino: metodoNotificacion === 'sms' ? numeroTelefono : correoUsuario || 'correo_del_usuario@ejemplo.com'
+      destino: metodoNotificacion === 'sms' ? numeroTelefono : correoUsuario
     };
 
-    console.log('Enviando correo con los datos:', datos);
-    alert('Se ha enviado la confirmación al método elegido.');
-    navigate('/services'); 
+    try {
+      const response = await fetch('http://localhost:8080/api/citas/crear', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(body)
+      });
+
+      const result = await response.json();
+
+      if (!result.exito) {
+        alert(`No se pudo agendar la cita: ${result.mensaje}`);
+        return;
+      }
+
+      alert(`Cita confirmada. Se ha enviado la confirmación por ${metodoNotificacion}. ¡Gracias!`);
+      navigate('/services');
+    } catch (error) {
+      console.error('Error al enviar la solicitud:', error);
+      alert('Ocurrió un error al enviar la solicitud. Inténtalo más tarde.');
+    }
   };
 
   if (!servicio || !fechaSeleccionada) {
