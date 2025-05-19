@@ -5,18 +5,16 @@ import { useAuth } from '../../common/AuthContext'
 import image from '../../assets/pulido.png'
 
 const ProductView = () => {
-  const { user } = useAuth()
+  const { user, token } = useAuth()
   const [product, setProduct] = useState<any>(null)
   const [relatedProducts, setRelatedProducts] = useState<any[]>([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
-
+  const [quantity, setQuantity] = useState(1)
   const { id } = useParams()
   const navigate = useNavigate()
   const apiUrl = import.meta.env.VITE_IP_API
-
-  const userEmail = user?.user?.email
-  const userToken = user?.token
+  const userEmail = user?.email
 
   useEffect(() => {
     if (user?.user?.rol === 'Administrador') {
@@ -44,6 +42,41 @@ const ProductView = () => {
     fetchProduct()
   }, [id, user])
 
+  const handleAddToCart = async () => {
+    const qty = Number(quantity)
+    if (!qty || qty < 1) {
+      alert("Por favor ingrese una cantidad válida (mayor a 0).")
+      return
+    }
+
+    if (!userEmail || !token || !user?.id) {
+      alert("Debe iniciar sesión para añadir al carrito.")
+      return
+    }
+
+    try {
+      const res = await fetch(`${apiUrl}/api/cart/add/${userEmail}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          productId: product.id,
+          quantity: qty,
+        }),
+      })
+
+      if (!res.ok) throw new Error('Error al añadir al carrito')
+
+      alert("Producto añadido al carrito exitosamente")
+    } catch (err) {
+      console.error("❌ Error al añadir al carrito:", err)
+      alert("Ocurrió un error al añadir al carrito.")
+    }
+  }
+
   useEffect(() => {
     const fetchRelatedProducts = async () => {
       if (!product?.categoryId) return
@@ -62,14 +95,14 @@ const ProductView = () => {
   }, [product])
 
   const handleDelete = async () => {
-    if (!userEmail || !userToken) return
+    if (!userEmail || !token) return
 
     try {
       const res = await fetch(`${apiUrl}/api/products/delete/${product.id}/${userEmail}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}`,
+          'Authorization': `Bearer ${token}`,
         },
       })
 
@@ -111,9 +144,20 @@ const ProductView = () => {
             <p className="text-muted mb-3">{product.description}</p>
             <h4 className="fw-bold text-success mb-4">₡{product.price.toLocaleString()}</h4>
 
-            <button className="btn btn-primary w-100 fw-bold mb-3">
-              Añadir al carrito
-            </button>
+            <div className="mb-3">
+              <label className="form-label fw-bold">Cantidad:</label>
+              <input
+                type="number"
+                min="1"
+                className="form-control mb-2"
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+              />
+              <button className="btn btn-primary w-100 fw-bold" onClick={handleAddToCart}>
+                Añadir al carrito
+              </button>
+            </div>
+
 
             {isAdmin && (
               <div className="d-flex flex-column gap-2">

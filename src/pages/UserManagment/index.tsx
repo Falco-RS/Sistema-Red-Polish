@@ -6,7 +6,7 @@ import { useAuth } from '../../common/AuthContext'
 
 const UserManagement = () => {
   const navigate = useNavigate()
-  const { user, login } = useAuth()
+  const { user, token, login } = useAuth()
   const apiUrl = import.meta.env.VITE_IP_API;
 
   const [firstName, setFirstName] = useState(user?.user?.name || '')
@@ -21,7 +21,6 @@ const UserManagement = () => {
     e.preventDefault()
 
     const userEmail = user?.user?.email
-    const userToken = user?.token
 
     if (!firstName.trim() || !lastName.trim()) {
       setError('Por favor, complete los campos que desea cambiar en su perfil')
@@ -49,7 +48,7 @@ const UserManagement = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${userToken}`,
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify(updatedUser),
       })
@@ -60,11 +59,9 @@ const UserManagement = () => {
         setSuccess(false)
         return
       }
+      login(fullUser, token!)
 
-      login({
-        token: userToken,
-        user: fullUser,
-      })
+
 
       setError('')
       setSuccess(true)
