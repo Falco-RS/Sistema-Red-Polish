@@ -1,26 +1,47 @@
-import { useState,useEffect  } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import image from '../../assets/pulido.png'
 import { FaFacebook, FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa'
 
-const recommendedProducts = Array.from({ length: 12 }).map((_, i) => ({
-  id: i,
-  name: 'Cera Premium',
-  description: 'Cera especial, rojo, 150ml',
-  price: 2500,
-  originalPrice: i % 2 === 0 ? 5000 : null,
-  isNew: i % 3 === 0,
-  discount: i % 2 === 0 ? '50%' : null,
-}))
-
 function Homepage() {
+  const [products, setProducts] = useState<any[]>([])
   const [startIndex, setStartIndex] = useState(0)
+  const navigate = useNavigate()
+  const apiUrl = import.meta.env.VITE_IP_API
+
+  // Obtenemos productos reales
   useEffect(() => {
-    document.body.style.backgroundColor = '#e0e0e0';
-  }, []);
+    document.body.style.backgroundColor = '#e0e0e0'
+    fetchProducts()
+  }, [])
+
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/products/get_all`)
+      if (!res.ok) throw new Error('Error al obtener productos')
+      const data = await res.json()
+      if (Array.isArray(data) && data.length > 0) {
+        setProducts(data)
+      } else {
+        setProducts([getFallbackProduct()])
+      }
+    } catch (err) {
+      console.error('❌ Error al obtener productos:', err)
+      setProducts([getFallbackProduct()])
+    }
+  }
+
+  const getFallbackProduct = () => ({
+    id: 0,
+    name: 'Cera Premium',
+    description: 'Cera especial, rojo, 150ml',
+    price: 2500,
+    image: image,
+  })
 
   const nextSlide = () => {
-    if (startIndex + 6 < recommendedProducts.length) {
+    if (startIndex + 6 < products.length) {
       setStartIndex(startIndex + 1)
     }
   }
@@ -31,13 +52,13 @@ function Homepage() {
     }
   }
 
-  const visibleProducts = recommendedProducts.slice(startIndex, startIndex + 6)
+  const visibleProducts = products.slice(startIndex, startIndex + 6)
 
   return (
     <>
       <NavBar />
 
-      {/* Sección con fondo difuminado */}
+      {/* Sección de fondo */}
       <div
         className="position-relative text-white d-flex justify-content-center align-items-center"
         style={{
@@ -50,7 +71,7 @@ function Homepage() {
       >
         <div className="position-absolute top-0 start-0 w-100 h-100" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} />
         <div className="position-relative text-center px-3">
-          <h1 className="display-4 fw-bold mb-3" style={{ zIndex: 2,  }}>RED POLISH</h1>
+          <h1 className="display-4 fw-bold mb-3">RED POLISH</h1>
           <p className="fs-5" style={{ maxWidth: '800px', margin: '0 auto' }}>
             Servicio profesional de detallado automotriz. Calidad, dedicación y brillo para tu vehículo.
           </p>
@@ -58,9 +79,6 @@ function Homepage() {
       </div>
 
       <div className="container my-5">
-        
-        {/* Bienvenida */}
-        
         <div className="text-center mb-5">
           <p className="fs-5 text-secondary">
             Nos especializamos en el cuidado y embellecimiento de tu vehículo. Ofrecemos un servicio profesional
@@ -73,38 +91,30 @@ function Homepage() {
           </p>
         </div>
 
-        {/* Carrusel */}
+        {/* Carrusel real */}
         <div className="mb-5">
           <h3 className="fw-bold text-center mb-4 text-dark">Productos Recomendados</h3>
           <div className="d-flex align-items-center justify-content-between">
             <button className="btn btn-outline-light me-2" onClick={prevSlide}>&lt;</button>
             <div className="d-flex overflow-hidden" style={{ gap: '1rem', flex: 1 }}>
               {visibleProducts.map(product => (
-                <div key={product.id} className="card shadow-sm" style={{ minWidth: '180px', maxWidth: '180px' }}>
+                <div
+                  key={product.id}
+                  className="card shadow-sm"
+                  style={{ minWidth: '180px', maxWidth: '180px', cursor: 'pointer' }}
+                  onClick={() => navigate(`/product/${product.id}`)}
+                >
                   <div className="card-body position-relative p-3">
-                    {product.isNew && (
-                      <span className="badge bg-dark text-white position-absolute top-0 end-0 m-2">NEW</span>
-                    )}
                     <div className="text-center mb-3">
                       <img
-                        src={image}
+                        src={product.image || image}
                         alt={product.name}
                         style={{ width: '100%', height: '110px', objectFit: 'cover', borderRadius: '6px' }}
                       />
                     </div>
                     <h6 className="fw-bold">{product.name}</h6>
                     <p className="text-muted small">{product.description}</p>
-                    <div className="d-flex align-items-center">
-                      <span className="fw-bold me-2">₡{product.price}</span>
-                      {product.originalPrice && (
-                        <span className="text-decoration-line-through text-muted small me-1">
-                          ₡{product.originalPrice}
-                        </span>
-                      )}
-                      {product.discount && (
-                        <span className="text-danger small fw-semibold">-{product.discount}</span>
-                      )}
-                    </div>
+                    <div className="fw-bold text-success">₡{product.price.toLocaleString()}</div>
                   </div>
                 </div>
               ))}
