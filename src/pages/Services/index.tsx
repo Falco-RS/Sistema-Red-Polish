@@ -25,6 +25,8 @@ const Services = () => {
   const [categorias, setCategorias] = useState<Categoria[]>([])
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null)
   const navigate = useNavigate()
+  const apiUrl = import.meta.env.VITE_IP_API;
+
 
   const manejarAgendar = (servicio: ServicioConPrecio) => {
     navigate('/appointment', { state: { servicio } })
@@ -40,7 +42,7 @@ const Services = () => {
     setIsAdmin(true)
     }
 
-    fetch('http://localhost:8080/api/services/get-services')
+    fetch(`${apiUrl}/api/services/get-services`)
     .then(res => {
       if (!res.ok) {
         throw new Error('Error al obtener los servicios')
@@ -159,7 +161,7 @@ const Services = () => {
                   <button
                     className="btn"
                     style={{
-                      backgroundColor: '#d9534f', // rojo para ambos casos
+                      backgroundColor: '#d9534f', 
                       color: 'white',
                       border: 'none',
                       width: '100%',

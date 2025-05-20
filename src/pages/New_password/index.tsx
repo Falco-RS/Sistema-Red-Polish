@@ -82,11 +82,11 @@ function New_Password() {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4">{`Cambio de Contraseña - ${email || 'Correo no encontrado'}`}</h2>
+      <h2 className="text-dark text-center mb-4">{`Cambio de Contraseña - ${email || 'Correo no encontrado'}`}</h2>
 
       <form onSubmit={handleSubmit} className="mx-auto" style={{ maxWidth: '400px' }}>
         <div className="mb-3">
-          <label htmlFor="newPassword" className="form-label">Nueva Contraseña</label>
+          <label htmlFor="newPassword" className="form-label text-dark">Nueva Contraseña</label>
           <input
             type="password"
             className="form-control"
@@ -97,7 +97,7 @@ function New_Password() {
           />
         </div>
         <div className="mb-3">
-          <label htmlFor="confirmPassword" className="form-label">Confirmar Contraseña</label>
+          <label htmlFor="confirmPassword" className="form-label text-dark">Confirmar Contraseña</label>
           <input
             type="password"
             className="form-control"
@@ -115,7 +115,7 @@ function New_Password() {
       </form>
 
       <div className="mt-4 text-center">
-        <p className="text-white" style={{ fontSize: '0.9rem' }}>
+        <p className="text-dark" style={{ fontSize: '0.9rem' }}>
           ¿Ya cambiaste tu contraseña?{' '}
           <span
             className="text-primary"

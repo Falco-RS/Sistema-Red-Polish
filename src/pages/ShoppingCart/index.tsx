@@ -11,6 +11,7 @@ const ShoppingCart: React.FC = () => {
   const { user, token } = useAuth();
   const userEmail = user?.email
   const userId = user?.id
+  
 
   const actualizarProductoEnCarrito = async (cartItemId: number, nuevaCantidad: number) => {
     if (!userEmail || !token) return;

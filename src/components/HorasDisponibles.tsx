@@ -9,6 +9,9 @@ const HorasDisponibles: React.FC<Props> = ({
 }) => {
   const [rangosNoDisponibles, setRangosNoDisponibles] = useState<[Date, Date][]>([])
 
+  
+  const apiUrl = import.meta.env.VITE_IP_API;
+  
   useEffect(() => {
     const obtenerHorasNoDisponibles = async () => {
       if (fechaSeleccionada && servicio?.id) {
@@ -16,7 +19,7 @@ const HorasDisponibles: React.FC<Props> = ({
 
         try {
           const response = await fetch(
-            `http://localhost:8080/api/citas/ocupadas?fecha=${fechaISO}`
+            `${apiUrl}/api/citas/ocupadas?fecha=${fechaISO}`
           )
           if (!response.ok) throw new Error('Error al obtener datos de disponibilidad')
 

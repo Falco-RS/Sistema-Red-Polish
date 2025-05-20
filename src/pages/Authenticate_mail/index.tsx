@@ -89,10 +89,10 @@ function Authenticate_mail() {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4">Verificar Código</h2>
+      <h2 className="text-center mb-4 text-dark">Verificar Código</h2>
       <form onSubmit={handleSubmit} className="mx-auto" style={{ maxWidth: '400px' }}>
         <div className="mb-3">
-          <label htmlFor="otp" className="form-label">Código de verificación</label>
+          <label htmlFor="otp" className="form-label text-dark">Código de verificación</label>
           <input
             type="text"
             className="form-control"

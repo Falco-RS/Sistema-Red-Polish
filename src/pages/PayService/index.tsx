@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import NavBar from '../../common/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../common/AuthContext'
@@ -13,6 +13,8 @@ const PayService = () => {
   const [numeroTelefono, setNumeroTelefono] = useState('');
   const [correoUsuario, setCorreoUsuario] = useState(''); 
   const { token } = useAuth();
+  const apiUrl = import.meta.env.VITE_IP_API;
+
 
   const handleConfirmacion = async () => {
     if (!metodoNotificacion) {
@@ -44,7 +46,7 @@ const PayService = () => {
     };
 
     try {
-      const response = await fetch('http://localhost:8080/api/citas/crear', {
+      const response = await fetch(`${apiUrl}/api/citas/crear`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

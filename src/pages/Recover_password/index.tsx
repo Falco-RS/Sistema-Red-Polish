@@ -47,10 +47,10 @@ function Recover_Password() {
 
   return (
     <div className="container mt-5">
-      <h2 className="text-center mb-4">Recuperar Contraseña</h2>
+      <h2 className="text-center mb-4 text-dark">Recuperar Contraseña</h2>
       <form onSubmit={handleSubmit} className="mx-auto" style={{ maxWidth: '400px' }}>
         <div className="mb-3">
-          <label htmlFor="email" className="form-label">Correo electrónico</label>
+          <label htmlFor="email" className="form-label text-dark">Correo electrónico</label>
           <input
             type="email"
             className="form-control"
@@ -62,13 +62,13 @@ function Recover_Password() {
         </div>
         {error && <div className="alert alert-danger">{error}</div>}
         <button type="submit" className="btn btn-primary w-100">Enviar</button>
-        <p className="text-white text-center mt-2" style={{ fontSize: '0.9rem' }}>
+        <p className="text-dark text-center mt-2" style={{ fontSize: '0.9rem' }}>
           Cuando el código se envíe, tendrás 2 minutos antes de que expire.
         </p>
       </form>
 
       <div className="mt-4 text-center">
-        <p className="text-white" style={{ fontSize: '0.9rem' }}>
+        <p className="text-dark" style={{ fontSize: '0.9rem' }}>
           ¿Ya recuerdas tu contraseña?{' '}
           <span
             className="text-primary"
