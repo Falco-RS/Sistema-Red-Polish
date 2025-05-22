@@ -9,8 +9,8 @@ const UserManagement = () => {
   const { user, token, login } = useAuth()
   const apiUrl = import.meta.env.VITE_IP_API;
 
-  const [firstName, setFirstName] = useState(user?.user?.name || '')
-  const [lastName, setLastName] = useState(user?.user?.last_name || '')
+  const [firstName, setFirstName] = useState(user?.name || '')
+  const [lastName, setLastName] = useState(user?.last_name || '')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
@@ -22,7 +22,7 @@ const UserManagement = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    const userEmail = user?.user?.email
+    const userEmail = user?.email
 
     if (!firstName.trim() || !lastName.trim()) {
       setError('Por favor, complete los campos que desea cambiar en su perfil')
@@ -33,16 +33,16 @@ const UserManagement = () => {
     const updatedUser = {
       name: firstName,
       last_name: lastName,
-      password: password || user?.user?.password,
+      password: password || user?.password,
     }
 
     const fullUser = {
-      id: user?.user?.id,
+      id: user?.id,
       name: firstName,
       last_name: lastName,
       email: userEmail,
-      password: password || user?.user?.password,
-      rol: user?.user?.rol,
+      password: password || user?.password,
+      rol: user?.rol,
     }
 
     try {
@@ -204,13 +204,13 @@ const UserManagement = () => {
             <button className={`btn btn-sm w-100 text-start ${activeSection === 'gestion' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
               onClick={() => setActiveSection('gestion')}>Gestión de usuario</button>
           </li>
-          {user?.user?.rol === 'Administrador' && (
+          {user?.rol === 'Administrador' && (
             <li className="nav-item">
               <button className={`btn btn-sm w-100 text-start ${activeSection === 'promos' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
                 onClick={() => setActiveSection('promos')}>Promociones</button>
             </li>
           )}
-          {user?.user?.rol === 'Administrador'
+          {user?.rol === 'Administrador'
         ? <li className="nav-item">
             <button className={`btn btn-sm w-100 text-start ${activeSection === 'ventas' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
               onClick={() => setActiveSection('ventas')}>Historial Compras</button>
@@ -226,9 +226,9 @@ const UserManagement = () => {
         {activeSection === 'info' && (
           <>
             <h2 className="text-danger fw-bold mb-4">Información del Usuario</h2>
-            <div className="mb-3"><strong>Nombre:</strong> {user?.user?.name}</div>
-            <div className="mb-3"><strong>Apellidos:</strong> {user?.user?.last_name}</div>
-            <div className="mb-3"><strong>Correo:</strong> {user?.user?.email}</div>
+            <div className="mb-3"><strong>Nombre:</strong> {user?.name}</div>
+            <div className="mb-3"><strong>Apellidos:</strong> {user?.last_name}</div>
+            <div className="mb-3"><strong>Correo:</strong> {user?.email}</div>
           </>
         )}
 
@@ -377,7 +377,7 @@ const UserManagement = () => {
         {activeSection === 'ventas' && (
         <div>
           <h2 className="text-danger fw-bold mb-4">
-            {user?.user?.rol === 'Administrador' ? 'Historial de Compras' : 'Mi Historial de Compras'}
+            {user?.rol === 'Administrador' ? 'Historial de Compras' : 'Mi Historial de Compras'}
           </h2>
           <div className="table-responsive">
             <table className="table table-bordered align-middle">
@@ -394,7 +394,7 @@ const UserManagement = () => {
               </thead>
               <tbody>
                 {salesHistory
-                  .filter(sale => user?.user?.rol === 'Administrador' || sale.client === user?.user?.name)
+                  .filter(sale => user?.rol === 'Administrador' || sale.client === user?.name)
                   .map((sale) => (
                     <tr key={sale.id}>
                       <td>{sale.client}</td>

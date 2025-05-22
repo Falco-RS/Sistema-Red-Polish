@@ -16,7 +16,7 @@ const Catalog = () => {
   const apiUrl = import.meta.env.VITE_IP_API
 
   useEffect(() => {
-    if (user?.user?.rol === 'Administrador') {
+    if (user?.rol === 'Administrador') {
       setIsAdmin(true)
     }
 

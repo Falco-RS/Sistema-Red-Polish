@@ -4,7 +4,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import { Dropdown } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { Servicio, Categoria, ServicioConPrecio } from '../../common/interfaces'
-import { useAuth } from '../../common/AuthContext' // Asegúrate de tener este hook implementado
+import { useAuth } from '../../common/AuthContext' 
 
 const mockCategorias: Categoria[] = [
   { id: 1, nombre: 'Lavado' },
@@ -38,7 +38,7 @@ const Services = () => {
 
 
   useEffect(() => {
-    if (user?.user?.rol === 'Administrador') {
+    if (user?.rol === 'Administrador') {
     setIsAdmin(true)
     }
 
