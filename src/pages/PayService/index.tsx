@@ -16,6 +16,21 @@ const PayService = () => {
   const apiUrl = import.meta.env.VITE_IP_API;
 
 
+  const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
+
+  // Transferencia (tarjeta)
+  const [numeroTarjeta, setNumeroTarjeta] = useState('');
+  const [nombreTarjeta, setNombreTarjeta] = useState('');
+  const [vencimiento, setVencimiento] = useState('');
+  const [cvv, setCvv] = useState('');
+
+  // SINPE
+  const [monto, setMonto] = useState('');
+  const [referencia, setReferencia] = useState('');
+  const [fechaSinpe, setFechaSinpe] = useState('');
+  const [comprobante, setComprobante] = useState<File | null>(null);
+
+
   const handleConfirmacion = async () => {
     if (!metodoNotificacion) {
       alert('Selecciona un método de notificación.');
@@ -163,11 +178,124 @@ const PayService = () => {
 
 
           <hr />
-
           <div className="mb-3">
-            <h5 className="text-muted">[Espacio reservado para el pago]</h5>
-            <div className="alert alert-secondary">La funcionalidad de pago será integrada más adelante.</div>
+            <label className="form-label fw-bold">Método de pago</label>
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                name="metodoPago"
+                id="transferencia"
+                onChange={() => setMetodoPago('transferencia')}
+              />
+              <label className="form-check-label" htmlFor="transferencia">Transferencia con tarjeta</label>
+            </div>
+            <div className="form-check">
+              <input
+                type="radio"
+                className="form-check-input"
+                name="metodoPago"
+                id="sinpe"
+                onChange={() => setMetodoPago('sinpe')}
+              />
+              <label className="form-check-label" htmlFor="sinpe">SINPE</label>
+            </div>
           </div>
+
+          {metodoPago === 'transferencia' && (
+            <div className="border p-3 mb-3">
+              <h5 className="text-primary">Pago con tarjeta</h5>
+              <div className="mb-2">
+                <label className="form-label">Número de tarjeta</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  maxLength={16}
+                  value={numeroTarjeta}
+                  onChange={(e) => setNumeroTarjeta(e.target.value)}
+                />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Nombre del titular</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={nombreTarjeta}
+                  onChange={(e) => setNombreTarjeta(e.target.value)}
+                />
+              </div>
+              <div className="row">
+                <div className="col-md-6 mb-2">
+                  <label className="form-label">Vencimiento</label>
+                  <input
+                    type="month"
+                    className="form-control"
+                    value={vencimiento}
+                    onChange={(e) => setVencimiento(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6 mb-2">
+                  <label className="form-label">CVV</label>
+                  <input
+                    type="password"
+                    maxLength={4}
+                    className="form-control"
+                    value={cvv}
+                    onChange={(e) => setCvv(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="alert alert-info mt-2">
+                Los datos no serán almacenados y serán enviados de forma segura (simulado).
+              </div>
+            </div>
+          )}
+
+          {metodoPago === 'sinpe' && (
+            <div className="border p-3 mb-3">
+              <h5 className="text-success">Pago por SINPE</h5>
+              <div className="mb-2">
+                <label className="form-label">Monto</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  value={monto}
+                  onChange={(e) => setMonto(e.target.value)}
+                />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Número de referencia</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={referencia}
+                  onChange={(e) => setReferencia(e.target.value)}
+                />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Fecha de pago</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={fechaSinpe}
+                  onChange={(e) => setFechaSinpe(e.target.value)}
+                />
+              </div>
+              <div className="mb-2">
+                <label className="form-label">Comprobante (archivo PDF o imagen)</label>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  className="form-control"
+                  onChange={(e) => setComprobante(e.target.files?.[0] || null)}
+                />
+              </div>
+              <div className="alert alert-info mt-2">
+                Asegúrate de completar todos los campos y subir el comprobante antes de confirmar.
+              </div>
+            </div>
+          )}
+
 
           <div className="text-center">
             <button className="btn btn-danger" onClick={handleConfirmacion}>
