@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import NavBar from '../../common/NavBar'
 import { useAuth } from '../../common/AuthContext'
+import MostrarCitas from '../../components/MostrarCitas'
+import Cancelacion from '../../components/Cancelaciones'
 
 const UserManagement = () => {
   const navigate = useNavigate()
@@ -15,7 +17,7 @@ const UserManagement = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas'>('info')
+  const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas' | 'cancelar'>('info')
 
 
 
@@ -196,10 +198,24 @@ const UserManagement = () => {
             <button className={`btn btn-sm w-100 text-start ${activeSection === 'info' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
               onClick={() => setActiveSection('info')}>Información</button>
           </li>
-          <li className="nav-item mb-2">
-            <button className={`btn btn-sm w-100 text-start ${activeSection === 'citas' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
-              onClick={() => setActiveSection('citas')}>Mis citas</button>
+          {user?.rol === 'Administrador'
+        ? <li className="nav-item">
+            <button className={`btn btn-sm w-100 text-start ${activeSection === 'ventas' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
+              onClick={() => setActiveSection('citas')}>Citas</button>
           </li>
+        : <li className="nav-item">
+            <button className={`btn btn-sm w-100 text-start ${activeSection === 'ventas' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
+              onClick={() => setActiveSection('citas')}>Mis citas</button>
+          </li>}
+          {user?.rol === 'Administrador'
+        ? <li className="nav-item">
+            <button className={`btn btn-sm w-100 text-start ${activeSection === 'cancelar' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
+              onClick={() => setActiveSection('cancelar')}>Cancelaciones</button>
+          </li>
+        : <li className="nav-item">
+            <button className={`btn btn-sm w-100 text-start ${activeSection === 'cancelar' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
+              onClick={() => setActiveSection('cancelar')}>Mis cancelaciones</button>
+          </li>}
           <li className="nav-item">
             <button className={`btn btn-sm w-100 text-start ${activeSection === 'gestion' ? 'btn-light text-danger fw-bold' : 'btn-outline-light text-white'}`}
               onClick={() => setActiveSection('gestion')}>Gestión de usuario</button>
@@ -232,12 +248,8 @@ const UserManagement = () => {
           </>
         )}
 
-        {activeSection === 'citas' && (
-          <div>
-            <h2 className="text-danger fw-bold mb-4">Mis Citas</h2>
-            <p>(Apartado en Construcción)</p>
-          </div>
-        )}
+        {activeSection === 'citas' && <MostrarCitas />}
+        {activeSection === 'cancelar' && <Cancelacion />}
 
         {activeSection === 'gestion' && (
           <div className="bg-light p-4 rounded-4 shadow" style={{ border: '2px solid #dc3545', maxWidth: '600px' }}>

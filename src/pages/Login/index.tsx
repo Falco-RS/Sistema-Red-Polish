@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../common/AuthContext'
-import { useEffect } from 'react'
-
 
 const Login = () => {
   const [email, setEmail] = useState('')
