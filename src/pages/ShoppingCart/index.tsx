@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import NavBar from '../../common/NavBar';
 import { useAuth } from '../../common/AuthContext'
+import { useNavigate } from 'react-router-dom';
+
 
 
 const ShoppingCart: React.FC = () => {
@@ -11,7 +13,8 @@ const ShoppingCart: React.FC = () => {
   const { user, token } = useAuth();
   const userEmail = user?.email
   const userId = user?.id
-  
+  const navigate = useNavigate();
+
 
   const actualizarProductoEnCarrito = async (cartItemId: number, nuevaCantidad: number) => {
     if (!userEmail || !token) return;
@@ -228,12 +231,26 @@ const ShoppingCart: React.FC = () => {
           >
             Vaciar carrito
           </button>
-          <button
-            className="btn btn-success"
-            disabled={Object.keys(seleccionados).length === 0}
-          >
-            Finalizar Compra
-          </button>
+         <button
+        className="btn btn-success"
+        disabled={Object.keys(seleccionados).length === 0}
+        onClick={() =>
+          navigate('/pay-products', {
+            state: {
+              productosSeleccionados: productos.map(p => ({
+                id: p.id,
+                name: p.name,
+                price: p.price,
+                quantity: seleccionados[p.id],
+                image: p.image
+              })),
+              total: totalSeleccionados
+            }
+          })
+        }
+      >
+        Finalizar Compra
+      </button>
         </div>
       </div>
     </>

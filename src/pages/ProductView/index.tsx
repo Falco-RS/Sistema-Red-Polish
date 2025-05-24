@@ -17,7 +17,7 @@ const ProductView = () => {
   const userEmail = user?.email
 
   useEffect(() => {
-    if (user?.user?.rol === 'Administrador') {
+    if (user?.rol === 'Administrador') {
       setIsAdmin(true)
     }
 
