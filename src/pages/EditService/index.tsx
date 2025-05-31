@@ -3,8 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import { Categoria } from '../../common/interfaces'
 import { useLocation } from 'react-router-dom'
+import { useAuth } from '../../common/AuthContext'
 
 const EditService = () => {
+  const { user, token } = useAuth()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [duration, setDuration] = useState('')
@@ -21,6 +23,7 @@ const EditService = () => {
   const apiUrl = import.meta.env.VITE_IP_API
   const navigate = useNavigate()
   const { id } = useParams()
+  const userEmail = user?.email
 
   const mockCategorias: Categoria[] = [
     { id: 1, nombre: 'Lavado' },
@@ -95,8 +98,36 @@ const EditService = () => {
   }
 
   const handleDeleteService = async () => {
-    // Aquí irá la lógica para eliminar el servicio más adelante
-    console.log('Eliminar servicio con id:', id)
+   if (!userEmail || !token) return
+
+    try {
+      const res = await fetch(`${apiUrl}/api/services/delete/${servicio.id}/${userEmail}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (!res.ok) throw new Error('Error al eliminar el servicio')
+
+      alert('Servicio eliminado correctamente.')
+      navigate('/catalog')
+    } catch (err) {
+      console.error('❌ Error eliminando el servicio:', err)
+      alert('Hubo un error al eliminar el servicio.')
+    }
+  }
+
+  if (!servicio) {
+    return (
+      <>
+        <NavBar />
+        <div className="container text-center mt-5">
+          <p className="text-muted">Cargando servicio...</p>
+        </div>
+      </>
+    )
   }
 
   return (
