@@ -252,21 +252,25 @@ const PayService = () => {
           )}
 
           {metodoPago === 'sinpe' && (
-            <div className="border p-3 mb-3 bg-light">
-              <h5 className="text-success mb-3">Pago por SINPE</h5>
-              <p>
-                Para finalizar la compra debes mandarle un mensaje a nuestro administrador <strong>Cristian Rojas</strong> al siguiente número:
-              </p>
-              <div className="border rounded p-3 text-center bg-white fw-bold fs-5 text-primary mb-3">
-                +506 12345678
+             <div className="border p-3 mb-3">
+              <h5 className="text-success">Pago por SINPE</h5>
+              
+              <div className="bg-white text-dark p-4 rounded">
+                <p className="fw-bold">
+                  Para finalizar la compra debes mandarle un mensaje a nuestro administrador Cristian Rojas al siguiente número:
+                </p>
+
+                <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
+                  +506 12345678
+                </div>
+
+                <p>
+                  Con él podrás hacer el pago por un SINPE. Tienes 2 días para realizarlo después de seleccón finalizar compra, por ese tiempo tendrás tu cita apartada.
+                  Antes de acabar los dos días, Cristian podrá actualizar el estado de tu pago a exitoso o cancelado.
+                  Podrás ver este estado en el apartado de <strong>“Mis Citas”</strong> en tu usuario.
+                  ¡Gracias por preferirnos!
+                </p>
               </div>
-              <p>
-                Con él podrás hacer el pago por un SINPE. Tienes <strong>2 días</strong> para realizarlo; por ese tiempo tendrás tu cita apartada.
-                Antes de acabar los dos días, Cristian podrá actualizar el estado de tu pago a <strong>exitoso</strong> o <strong>cancelado</strong>.
-              </p>
-              <p>
-                Podrás ver este estado en el apartado de <strong>"Mis Citas"</strong> en tu usuario. ¡Gracias por preferirnos!
-              </p>
             </div>
           )}
           <div className="text-center">
