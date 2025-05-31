@@ -131,26 +131,56 @@ const UserManagement = () => {
   const [assigningPromoId, setAssigningPromoId] = useState<number | null>(null)
   const [availableProducts, setAvailableProducts] = useState<any[]>([])
   const [selectedProducts, setSelectedProducts] = useState<number[]>([])
+  const userToken = user?.token
 
-  const handlePromoSubmit = () => {
-    if (editingPromoId) {
-      setPromotions(promotions.map(p => p.id === editingPromoId ? {
-        ...p,
-        ...newPromo,
-        percentage: parseInt(newPromo.percentage),
-      } : p))
-    } else {
-      const newId = promotions.length + 1
-      setPromotions([...promotions, {
-        id: newId,
-        ...newPromo,
-        percentage: parseInt(newPromo.percentage),
-        active: true,
-      }])
+  const handlePromoSubmit = async () => {
+  if (!newPromo.name || !newPromo.start || !newPromo.end || !newPromo.percentage) {
+    alert('Por favor, completa todos los campos.')
+    return
+  }
+
+  const promoPayload = {
+    title: newPromo.name,
+    description: "Descuento Nuevo",
+    percentage: parseInt(newPromo.percentage),
+    start_date: newPromo.start,
+    end_date: newPromo.end
+  }
+  console.log('📦 Enviando promoción:', promoPayload, '🔑 Token:', token)
+
+  try {
+    const res = await fetch(`http://localhost:8080/api/promotions`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(promoPayload)
+    })
+
+    if (!res.ok) {
+      const text = await res.text(); // en vez de res.json()
+      console.error(`❌ Error ${res.status}:`, text)
+      alert(`❌ Error ${res.status}: ${text}`)
+      return
     }
+
+    const savedPromo = await res.json()
+
+    if (editingPromoId) {
+      setPromotions(promotions.map(p => p.id === editingPromoId ? savedPromo : p))
+    } else {
+      setPromotions([...promotions, savedPromo])
+    }
+
     setNewPromo({ name: '', start: '', end: '', percentage: '' })
     setEditingPromoId(null)
+    alert('✅ Promoción guardada correctamente.')
+  } catch (error) {
+    console.error('❌ Error al guardar promoción:', error)
+    alert('Error de conexión con el servidor.')
   }
+}
 
   const togglePromoActive = (id: number) => {
     setPromotions(promotions.map(p => p.id === id ? { ...p, active: !p.active } : p))
