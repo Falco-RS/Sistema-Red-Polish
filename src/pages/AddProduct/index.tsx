@@ -15,7 +15,7 @@ const AddProduct = () => {
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const [categories, setCategories] = useState<{ id: number, name: string }[]>([])
-  const { user, login } = useAuth()
+  const { user, login, token } = useAuth()
   const apiUrl = import.meta.env.VITE_IP_API;
   const navigate = useNavigate()
 
@@ -48,13 +48,15 @@ const AddProduct = () => {
 
   console.log('Producto a enviar:', productData)
   console.log("Token del Administador:", userToken)
+  console.log(token)
+  console.log(userToken)
 
   try {
     const res = await fetch(`${apiUrl}/api/products/create/${userEmail}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${userToken}`,
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify(productData)
     })

@@ -85,24 +85,34 @@ const UserManagement = () => {
     }
   }, [success, navigate])
 
-  const [promotions, setPromotions] = useState([
-    {
-      id: 1,
-      name: 'Promo de Julio',
-      start: '2025-07-01',
-      end: '2025-07-31',
-      percentage: 20,
-      active: true,
-    },
-    {
-      id: 2,
-      name: 'Black Friday',
-      start: '2025-11-28',
-      end: '2025-11-30',
-      percentage: 50,
-      active: false,
-    },
-  ])
+  const [promotions, setPromotions] = useState<any[]>([])
+
+useEffect(() => {
+  const fetchPromotions = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/promotions`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+
+      if (!res.ok) {
+        const errorText = await res.text()
+        console.error(`❌ Error ${res.status}:`, errorText)
+        return
+      }
+
+      const data = await res.json()
+      setPromotions(data)
+    } catch (error) {
+      console.error('❌ Error al obtener promociones:', error)
+    }
+  }
+
+  fetchPromotions()
+}, [apiUrl, token])
 
   const [salesHistory, setSalesHistory] = useState([
   {
@@ -146,11 +156,15 @@ const UserManagement = () => {
     start_date: newPromo.start,
     end_date: newPromo.end
   }
-  console.log('📦 Enviando promoción:', promoPayload, '🔑 Token:', token)
+
+  const method = editingPromoId ? 'PUT' : 'POST'
+  const url = editingPromoId
+    ? `http://localhost:8080/api/promotions/${editingPromoId}`
+    : `http://localhost:8080/api/promotions`
 
   try {
-    const res = await fetch(`http://localhost:8080/api/promotions`, {
-      method: 'POST',
+    const res = await fetch(url, {
+      method,
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`,
@@ -159,23 +173,17 @@ const UserManagement = () => {
     })
 
     if (!res.ok) {
-      const text = await res.text(); 
+      const text = await res.text()
       console.error(`❌ Error ${res.status}:`, text)
       alert(`❌ Error ${res.status}: ${text}`)
       return
     }
 
-    const savedPromo = await res.json()
-
-    if (editingPromoId) {
-      setPromotions(promotions.map(p => p.id === editingPromoId ? savedPromo : p))
-    } else {
-      setPromotions([...promotions, savedPromo])
-    }
-
+    alert('✅ Promoción guardada correctamente.')
     setNewPromo({ name: '', start: '', end: '', percentage: '' })
     setEditingPromoId(null)
-    alert('✅ Promoción guardada correctamente.')
+
+    await refreshPromotions()
   } catch (error) {
     console.error('❌ Error al guardar promoción:', error)
     alert('Error de conexión con el servidor.')
@@ -216,6 +224,61 @@ const UserManagement = () => {
       prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
     )
   }
+
+  const editPromo = async (promoId: number) => {
+  try {
+    const res = await fetch(`http://localhost:8080/api/promotions/${promoId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+
+    if (!res.ok) {
+      const errorText = await res.text()
+      console.error(`❌ Error al obtener promoción ${promoId}:`, errorText)
+      alert(`Error al obtener datos de la promoción.`)
+      return
+    }
+
+    const promo = await res.json()
+    setNewPromo({
+      name: promo.title,
+      start: promo.start_date,
+      end: promo.end_date,
+      percentage: promo.percentage.toString()
+    })
+    setEditingPromoId(promoId)
+  } catch (err) {
+    console.error('❌ Error al cargar promoción para edición:', err)
+    alert('Error al cargar la promoción.')
+  }
+}
+
+const refreshPromotions = async () => {
+  try {
+    const res = await fetch(`http://localhost:8080/api/promotions`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    })
+
+    if (!res.ok) {
+      const text = await res.text()
+      console.error(`❌ Error al refrescar promociones:`, text)
+      return
+    }
+
+    const data = await res.json()
+    setPromotions(data)
+  } catch (error) {
+    console.error('❌ Error al refrescar promociones:', error)
+  }
+}
+
 
   return (
   <>
@@ -412,6 +475,16 @@ const UserManagement = () => {
                     {editingPromoId ? 'Guardar' : 'Crear'}
                   </button>
                 </div>
+                {editingPromoId && (
+                <div className="col-md-2">
+                  <button
+                    className="btn btn-outline-danger w-100"
+                    onClick={() => setShowAssignPanel(true)}
+                  >
+                    Asignar Productos
+                  </button>
+                </div>
+              )}
               </div>
             </div>
           </div>
@@ -471,3 +544,7 @@ const UserManagement = () => {
 )
 }
 export default UserManagement
+function refreshPromotions() {
+  throw new Error('Function not implemented.')
+}
+
