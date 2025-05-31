@@ -15,7 +15,7 @@ const EditService = () => {
   const [imageUrl, setImageUrl] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [categories, setCategories] = useState<Categoria[]>([])
+  const [categories, setCategories] = useState<{ id: number, name: string }[]>([])
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const location = useLocation()
@@ -25,14 +25,8 @@ const EditService = () => {
   const { id } = useParams()
   const userEmail = user?.email
 
-  const mockCategorias: Categoria[] = [
-    { id: 1, nombre: 'Lavado' },
-    { id: 2, nombre: 'Pulido' },
-    { id: 3, nombre: 'Desinfección' },
-  ]
-
   useEffect(() => {
-   if (!servicio) {
+    if (!servicio) {
       setError('No se encontró información del servicio.')
       return
     }
@@ -44,9 +38,20 @@ const EditService = () => {
     setCategoryId(servicio.id_categoria.toString())
     setImageUrl(servicio.imagen || '')
 
-    // Obtener categorías (usando categorías mockeadas por ahora)
-    setCategories(mockCategorias)
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/categories/get_categories`)
+        if (!res.ok) throw new Error('Error al obtener categorías')
+        const data = await res.json()
+        setCategories(data)
+      } catch (err) {
+        setError('No se pudieron cargar las categorías.')
+      }
+    }
+
+    fetchCategories()
   }, [servicio])
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,18 +63,21 @@ const EditService = () => {
 
     const serviceData = {
       name,
+      categoryId: parseInt(categoryId),
       description,
       duration,
       price: parseFloat(price),
-      categoryId: parseInt(categoryId),
-      image: imageUrl,
+      imageUrl: imageUrl
+      
     }
     console.log('🔧 Editando servicio:', serviceData)
 
     try {
-      const res = await fetch(`${apiUrl}/api/services/update/${id}`, {
+      const res = await fetch(`${apiUrl}/api/services/update/${id}/${userEmail}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+         },
         body: JSON.stringify(serviceData),
       })
       if (!res.ok) throw new Error('Error en la edición')
@@ -83,11 +91,12 @@ const EditService = () => {
   const handleAddCategory = async () => {
     if (!newCategory.trim()) return
     try {
-      await fetch(`${apiUrl}/api/categories/create`, {
+      const res = await fetch(`${apiUrl}/api/categories/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: newCategory }),
+        body: JSON.stringify({ name: newCategory })
       })
+      if (!res.ok) throw new Error('Error al crear categoría')
       const updated = await fetch(`${apiUrl}/api/categories/get_categories`).then(res => res.json())
       setCategories(updated)
       setNewCategory('')
@@ -101,7 +110,7 @@ const EditService = () => {
    if (!userEmail || !token) return
 
     try {
-      const res = await fetch(`${apiUrl}/api/services/delete/${servicio.id}/${userEmail}`, {
+      const res = await fetch(`http://localhost:8080/api/services/delete/${servicio.id}/${userEmail}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -112,7 +121,7 @@ const EditService = () => {
       if (!res.ok) throw new Error('Error al eliminar el servicio')
 
       alert('Servicio eliminado correctamente.')
-      navigate('/catalog')
+      navigate('/services')
     } catch (err) {
       console.error('❌ Error eliminando el servicio:', err)
       alert('Hubo un error al eliminar el servicio.')
@@ -173,7 +182,7 @@ const EditService = () => {
                 >
                   <option value="">Seleccione una categoría</option>
                   {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
                 <button

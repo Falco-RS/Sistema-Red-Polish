@@ -1,8 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
+import { useAuth } from '../../common/AuthContext'
 
 const AddService = () => {
+  const { user, token } = useAuth()
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [price, setPrice] = useState('')
@@ -12,14 +14,24 @@ const AddService = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [newCategory, setNewCategory] = useState('')
+  const apiUrl = import.meta.env.VITE_IP_API;
   const [showNewCategory, setShowNewCategory] = useState(false)
+  const [categories, setCategories] = useState([])
 
-  // Mock de categorías (quemado por ahora)
-  const mockCategorias = [
-    { id: 1, nombre: 'Lavado' },
-    { id: 2, nombre: 'Pulido' },
-    { id: 3, nombre: 'Desinfección' },
-  ]
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetch(`${apiUrl}/api/categories/get_categories`)
+        if (!res.ok) throw new Error('Error al obtener categorías')
+        const data = await res.json()
+        setCategories(data)
+      } catch (err) {
+        setError('No se pudieron cargar las categorías.')
+      }
+    }
+
+    fetchCategories()
+  }, [])
 
   const navigate = useNavigate()
 
@@ -33,22 +45,33 @@ const AddService = () => {
 
     const serviceData = {
       name,
+      categoryId: parseInt(categoryId),
       description,
-      price: parseFloat(price),
       duration,
-      image: imageUrl,
-      categoryId: parseInt(categoryId)
+      price: parseFloat(price),
+      imageUrl: imageUrl
     }
-    console.log('Servicio a enviar:', serviceData)
 
     try {
-      // Lógica para enviar el servicio (aún no implementado para la API)
+      const res = await fetch(`${apiUrl}/api/services/create/${user?.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(serviceData)
+      })
+
+      if (!res.ok) throw new Error('Error en la petición')
+
       setSuccess(true)
       setTimeout(() => navigate('/services'), 3000)
     } catch (err) {
+      console.error(err)
       setError('Error al subir el servicio.')
     }
   }
+
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value
@@ -64,12 +87,22 @@ const AddService = () => {
     }
   }
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (!newCategory.trim()) return
-    // Espacio reservado para agregar una nueva categoría a la API
-    console.log('Nueva categoría:', newCategory)
-    setNewCategory('')
-    setShowNewCategory(false)
+    try {
+      const res = await fetch(`${apiUrl}/api/categories/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: newCategory })
+      })
+      if (!res.ok) throw new Error('Error al crear categoría')
+      const updated = await fetch(`${apiUrl}/api/categories/get_categories`).then(res => res.json())
+      setCategories(updated)
+      setNewCategory('')
+      setShowNewCategory(false)
+    } catch {
+      setError('Error al crear la categoría.')
+    }
   }
 
   return (
@@ -113,8 +146,8 @@ const AddService = () => {
                   required
                 >
                   <option value="">Seleccione una categoría</option>
-                  {mockCategorias.map((cat) => (
-                    <option key={cat.id} value={cat.id}>{cat.nombre}</option>
+                  {categories.map((cat: any) => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
                 </select>
                 <button

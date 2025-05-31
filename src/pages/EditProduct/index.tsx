@@ -15,7 +15,7 @@ const EditProduct = () => {
   const [categories, setCategories] = useState<{ id: number, name: string }[]>([])
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
-  const { user, login } = useAuth()
+  const { user, token, login } = useAuth()
   
 
   const apiUrl = import.meta.env.VITE_IP_API
@@ -61,8 +61,8 @@ const EditProduct = () => {
     }
     console.log('🔧 Editando producto:', productData)
 
-    const userEmail = user?.user?.email
-    const userToken = user?.token
+    const userEmail = user?.email
+    const userToken = token
 
     try {
       const res = await fetch(`${apiUrl}/api/products/update/${id}/${userEmail}`, {

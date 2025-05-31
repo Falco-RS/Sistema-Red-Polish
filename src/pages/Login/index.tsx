@@ -51,7 +51,7 @@ const Login = () => {
       setPassword('');
       navigate('/');
     } catch (err) {
-      setError('Error de conexión con el servidor.');
+      setError('Contraseña o usuario incorrecto.');
     }
   };  
 

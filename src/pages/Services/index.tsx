@@ -3,14 +3,8 @@ import NavBar from '../../common/NavBar'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import { Dropdown } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
-import { Servicio, Categoria, ServicioConPrecio } from '../../common/interfaces'
+import { Servicio, ServicioConPrecio } from '../../common/interfaces'
 import { useAuth } from '../../common/AuthContext' 
-
-const mockCategorias: Categoria[] = [
-  { id: 1, nombre: 'Lavado' },
-  { id: 2, nombre: 'Pulido' },
-  { id: 3, nombre: 'Desinfección' },
-]
 
 const obtenerDescuentoSimulado = (id_promocion: number): number => {
   if (id_promocion === 1) return 0.15
@@ -22,11 +16,21 @@ const Services = () => {
   const { user } = useAuth()
   const [isAdmin, setIsAdmin] = useState(false)
   const [servicios, setServicios] = useState<ServicioConPrecio[]>([])
-  const [categorias, setCategorias] = useState<Categoria[]>([])
+  const [categories, setCategories] = useState<{ id: number, name: string }[]>([])  
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<number | null>(null)
   const navigate = useNavigate()
   const apiUrl = import.meta.env.VITE_IP_API;
-
+  
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/categories/get_categories`)
+      if (!res.ok) throw new Error('Error al obtener categorías')
+        const data = await res.json()
+        setCategories(data)
+    } catch (err) {
+      console.error('❌ Error al obtener categorías:', err)
+    }
+  }
 
   const manejarAgendar = (servicio: ServicioConPrecio) => {
     navigate('/appointment', { state: { servicio } })
@@ -42,7 +46,9 @@ const Services = () => {
     setIsAdmin(true)
     }
 
-    fetch(`${apiUrl}/api/services/get-services`)
+    fetchCategories()
+
+    fetch(`http://localhost:8080/api/services/get_all`)
     .then(res => {
       if (!res.ok) {
         throw new Error('Error al obtener los servicios')
@@ -83,9 +89,6 @@ const Services = () => {
     .catch(error => {
       console.error('Error al cargar servicios:', error)
     })
-
-  setCategorias(mockCategorias)
-
   }, [user])
 
   const serviciosFiltrados = categoriaSeleccionada
@@ -104,9 +107,9 @@ const Services = () => {
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item onClick={() => setCategoriaSeleccionada(null)}>Todas</Dropdown.Item>
-              {categorias.map(cat => (
+              {categories.map(cat => (
                 <Dropdown.Item key={cat.id} onClick={() => setCategoriaSeleccionada(cat.id)}>
-                  {cat.nombre}
+                  {cat.name}
                 </Dropdown.Item>
               ))}
             </Dropdown.Menu>

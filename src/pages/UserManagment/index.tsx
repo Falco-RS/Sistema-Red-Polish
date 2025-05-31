@@ -159,7 +159,7 @@ const UserManagement = () => {
     })
 
     if (!res.ok) {
-      const text = await res.text(); // en vez de res.json()
+      const text = await res.text(); 
       console.error(`❌ Error ${res.status}:`, text)
       alert(`❌ Error ${res.status}: ${text}`)
       return
