@@ -105,6 +105,7 @@ useEffect(() => {
       }
 
       const data = await res.json()
+      console.log('Promotions fetched:', data)
       setPromotions(data)
     } catch (error) {
       console.error('❌ Error al obtener promociones:', error)
@@ -113,6 +114,7 @@ useEffect(() => {
 
   fetchPromotions()
 }, [apiUrl, token])
+
 
   const [salesHistory, setSalesHistory] = useState([
   {
@@ -247,7 +249,7 @@ useEffect(() => {
       name: promo.title,
       start: promo.start_date,
       end: promo.end_date,
-      percentage: promo.percentage.toString()
+      percentage: promo.percentage
     })
     setEditingPromoId(promoId)
   } catch (err) {
@@ -394,7 +396,7 @@ const refreshPromotions = async () => {
                       <td>{promo.name}</td>
                       <td>{promo.start}</td>
                       <td>{promo.end}</td>
-                      <td>{promo.percentage}%</td>
+                      <td>{promo.percentage !== undefined && promo.percentage !== null ? `${promo.percentage}%` : '—'}</td>
                       <td className="text-center">
                       <span
                         className={`d-inline-block rounded-circle`}
@@ -544,7 +546,5 @@ const refreshPromotions = async () => {
 )
 }
 export default UserManagement
-function refreshPromotions() {
-  throw new Error('Function not implemented.')
-}
+
 
