@@ -90,7 +90,7 @@ const UserManagement = () => {
 useEffect(() => {
   const fetchPromotions = async () => {
     try {
-      const res = await fetch(`http://localhost:8080/api/promotions`, {
+      const res = await fetch(`${apiUrl}/api/promotions`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +137,17 @@ useEffect(() => {
   }
 ])
 
-  const [newPromo, setNewPromo] = useState({ name: '', start: '', end: '', percentage: '' })
+  const [newPromo, setNewPromo] = useState<{
+    title: string;
+    start_date: string;
+    end_date: string;
+    porcentage: number | '';
+  }>({
+    title: '',
+    start_date: '',
+    end_date: '',
+    porcentage: '',
+  });
   const [editingPromoId, setEditingPromoId] = useState<number | null>(null)
   const [showAssignPanel, setShowAssignPanel] = useState(false)
   const [assigningPromoId, setAssigningPromoId] = useState<number | null>(null)
@@ -146,23 +156,23 @@ useEffect(() => {
   const userToken = user?.token
 
   const handlePromoSubmit = async () => {
-  if (!newPromo.name || !newPromo.start || !newPromo.end || !newPromo.percentage) {
+  if (!newPromo.title || !newPromo.start_date || !newPromo.end_date || !newPromo.porcentage) {
     alert('Por favor, completa todos los campos.')
     return
   }
 
   const promoPayload = {
-    title: newPromo.name,
+    title: newPromo.title,
     description: "Descuento Nuevo",
-    percentage: parseInt(newPromo.percentage),
-    start_date: newPromo.start,
-    end_date: newPromo.end
+    porcentage: newPromo.porcentage,
+    start_date: newPromo.start_date,
+    end_date: newPromo.end_date
   }
 
   const method = editingPromoId ? 'PUT' : 'POST'
   const url = editingPromoId
-    ? `http://localhost:8080/api/promotions/${editingPromoId}`
-    : `http://localhost:8080/api/promotions`
+    ? `${apiUrl}/api/promotions/${editingPromoId}`
+    : `${apiUrl}/api/promotions`
 
   try {
     const res = await fetch(url, {
@@ -182,7 +192,7 @@ useEffect(() => {
     }
 
     alert('✅ Promoción guardada correctamente.')
-    setNewPromo({ name: '', start: '', end: '', percentage: '' })
+    setNewPromo({ title: '', start_date: '', end_date: '', porcentage: '' })
     setEditingPromoId(null)
 
     await refreshPromotions()
@@ -196,11 +206,26 @@ useEffect(() => {
     setPromotions(promotions.map(p => p.id === id ? { ...p, active: !p.active } : p))
   }
 
-  const deletePromo = (id: number) => {
-    if (confirm('¿Seguro que deseas eliminar esta promoción?')) {
-      setPromotions(promotions.filter(p => p.id !== id))
+  const deletePromo = async (id: number) => {
+  try {
+    const response = await fetch(`${apiUrl}/api/promotions/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      console.log('Promoción eliminada correctamente');
+      refreshPromotions(); 
+    } else {
+      console.error('Error al eliminar la promoción');
     }
+  } catch (error) {
+    console.error('Error en la petición DELETE:', error);
   }
+};
 
   const assignPromoToProduct = async (promoId: number) => {
     setAssigningPromoId(promoId)
@@ -229,7 +254,7 @@ useEffect(() => {
 
   const editPromo = async (promoId: number) => {
   try {
-    const res = await fetch(`http://localhost:8080/api/promotions/${promoId}`, {
+    const res = await fetch(`${apiUrl}/api/promotions/${promoId}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -246,10 +271,10 @@ useEffect(() => {
 
     const promo = await res.json()
     setNewPromo({
-      name: promo.title,
-      start: promo.start_date,
-      end: promo.end_date,
-      percentage: promo.percentage
+      title: promo.title,
+      start_date: promo.start_date,
+      end_date: promo.end_date,
+      porcentage: promo.porcentage
     })
     setEditingPromoId(promoId)
   } catch (err) {
@@ -260,7 +285,7 @@ useEffect(() => {
 
 const refreshPromotions = async () => {
   try {
-    const res = await fetch(`http://localhost:8080/api/promotions`, {
+    const res = await fetch(`${apiUrl}/api/promotions`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -394,9 +419,9 @@ const refreshPromotions = async () => {
                   {promotions.map((promo) => (
                     <tr key={promo.id}>
                       <td>{promo.title}</td>
-                      <td>{promo.start_date}</td>
-                      <td>{promo.end_date}</td>
-                      <td>{promo.percentage !== undefined && promo.percentage !== null ? `${promo.percentage}%` : '—'}</td>
+                      <td>{promo.start_date.split('T')[0]}</td>
+                      <td>{promo.end_date.split('T')[0]}</td>
+                      <td>{promo.porcentage !== undefined && promo.porcentage !== null ? `${promo.porcentage}%` : '—'}</td>
                       <td className="text-center">
                       <span
                         className={`d-inline-block rounded-circle`}
@@ -410,15 +435,17 @@ const refreshPromotions = async () => {
                       <td className="d-flex gap-1">
                         <button className="btn btn-sm btn-outline-primary" onClick={() => {
                           setEditingPromoId(promo.id)
-                          setNewPromo({ ...promo, percentage: promo.percentage.toString() })
+                          setNewPromo({ ...promo})
                         }}>Editar</button>
                         <button className="btn btn-sm btn-outline-warning" onClick={() => togglePromoActive(promo.id)}>
                           {promo.active ? 'Desactivar' : 'Activar'}
                         </button>
-                        <button className="btn btn-sm btn-outline-danger" onClick={() => deletePromo(promo.id)}>
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => deletePromo(promo.id)}
+                        >
                           Eliminar
                         </button>
-                        <button className="btn btn-sm btn-outline-dark" onClick={() => assignPromoToProduct(promo.id)}>Asignar</button>
                       </td>
                     </tr>
                   ))}
@@ -426,51 +453,31 @@ const refreshPromotions = async () => {
               </table>
             </div>
 
-            {showAssignPanel && (
-              <div className="bg-light p-4 border mt-4 rounded-3 shadow-sm">
-                <h5 className="fw-bold text-danger mb-3">Asignar productos a promoción</h5>
-                <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-                  {availableProducts.map((prod) => (
-                    <div key={prod.id} className="form-check">
-                      <input
-                        className="form-check-input"
-                        type="checkbox"
-                        value={prod.id}
-                        id={`product-${prod.id}`}
-                        checked={selectedProducts.includes(prod.id)}
-                        onChange={() => toggleSelectProduct(prod.id)}
-                      />
-                      <label className="form-check-label text-dark" htmlFor={`product-${prod.id}`}>
-                        {prod.name} - ₡{prod.price.toLocaleString()}
-                      </label>
-                    </div>
-                  ))}
-                </div>
-                <div className="d-flex justify-content-end gap-2 mt-4">
-                  <button className="btn btn-outline-secondary" onClick={() => setShowAssignPanel(false)}>Cancelar</button>
-                  <button className="btn btn-danger fw-bold" onClick={confirmAssignProducts}>Asignar</button>
-                </div>
-              </div>
-            )}
-
             <div className="mt-4">
               <h5>{editingPromoId ? 'Editar Promoción' : 'Nueva Promoción'}</h5>
               <div className="row g-3">
                 <div className="col-md-4">
                   <input type="text" className="form-control" placeholder="Nombre"
-                    value={newPromo.name} onChange={(e) => setNewPromo({ ...newPromo, name: e.target.value })} />
+                    value={newPromo.title} onChange={(e) => setNewPromo({ ...newPromo, title: e.target.value })} />
                 </div>
                 <div className="col-md-2">
                   <input type="date" className="form-control" placeholder="Inicio"
-                    value={newPromo.start} onChange={(e) => setNewPromo({ ...newPromo, start: e.target.value })} />
+                    value={newPromo.start_date} onChange={(e) => setNewPromo({ ...newPromo, start_date: e.target.value })} />
                 </div>
                 <div className="col-md-2">
                   <input type="date" className="form-control" placeholder="Fin"
-                    value={newPromo.end} onChange={(e) => setNewPromo({ ...newPromo, end: e.target.value })} />
+                    value={newPromo.end_date} onChange={(e) => setNewPromo({ ...newPromo, end_date: e.target.value })} />
                 </div>
                 <div className="col-md-2">
-                  <input type="number" className="form-control" placeholder="%"
-                    value={newPromo.percentage} onChange={(e) => setNewPromo({ ...newPromo, percentage: e.target.value })} />
+                  <input 
+                    type="number"
+                    className="form-control"
+                    placeholder="%"
+                    value={newPromo.porcentage}
+                    onChange={(e) =>
+                      setNewPromo({ ...newPromo, porcentage: parseFloat(e.target.value) })
+                    }
+                  />
                 </div>
                 <div className="col-md-2">
                   <button className="btn btn-danger w-100 fw-bold" onClick={handlePromoSubmit}>

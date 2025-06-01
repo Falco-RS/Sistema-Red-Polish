@@ -48,7 +48,7 @@ const Services = () => {
 
     fetchCategories()
 
-    fetch(`http://localhost:8080/api/services/get_all`)
+    fetch(`${apiUrl}/api/services/get_all`)
     .then(res => {
       if (!res.ok) {
         throw new Error('Error al obtener los servicios')
