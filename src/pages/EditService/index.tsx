@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
-import { Categoria } from '../../common/interfaces'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../common/AuthContext'
 
@@ -22,7 +21,6 @@ const EditService = () => {
   const servicio = location.state?.servicio
   const apiUrl = import.meta.env.VITE_IP_API
   const navigate = useNavigate()
-  const { id } = useParams()
   const userEmail = user?.email
 
   useEffect(() => {
@@ -73,7 +71,7 @@ const EditService = () => {
     console.log('🔧 Editando servicio:', serviceData)
 
     try {
-      const res = await fetch(`${apiUrl}/api/services/update/${id}/${userEmail}`, {
+      const res = await fetch(`${apiUrl}/api/services/update/${servicio.id}/${userEmail}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
@@ -110,7 +108,7 @@ const EditService = () => {
    if (!userEmail || !token) return
 
     try {
-      const res = await fetch(`http://localhost:8080/api/services/delete/${servicio.id}/${userEmail}`, {
+      const res = await fetch(`${apiUrl}/api/services/delete/${servicio.id}/${userEmail}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

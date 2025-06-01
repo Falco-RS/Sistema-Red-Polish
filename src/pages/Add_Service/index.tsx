@@ -53,7 +53,7 @@ const AddService = () => {
     }
 
     try {
-      const res = await fetch(`${apiUrl}/api/services/create/${user?.email}`, {
+      const res = await fetch(`${apiUrl}/api/services/add/${user?.email}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
