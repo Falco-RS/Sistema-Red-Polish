@@ -193,12 +193,12 @@ const Catalog = () => {
                       {promotion?.porcentage ? (
                       <div>
                         <span className="text-muted text-decoration-line-through me-2">
-                          ₡{Math.round(product.price / (1 - promotion.porcentage / 100)).toLocaleString()}
+                          ${Math.round(product.price / (1 - promotion.porcentage / 100)).toLocaleString()}
                         </span>
-                        <span className="fw-bold text-danger">₡{product.price.toLocaleString()}</span>
+                        <span className="fw-bold text-danger">${product.price.toLocaleString()}</span>
                       </div>
                     ) : (
-                      <p className="mb-0 fw-bold">₡{product.price.toLocaleString()}</p>
+                      <p className="mb-0 fw-bold">${product.price.toLocaleString()}</p>
                     )}
                     </div>
                   </div>
