@@ -17,6 +17,8 @@ const EditService = () => {
   const [categories, setCategories] = useState<{ id: number, name: string }[]>([])
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
+  const [promotionId, setPromotionId] = useState('') // NUEVO
+  const [promotions, setPromotions] = useState<{ id: number, title: string }[]>([]) // NUEVO
   const location = useLocation()
   const servicio = location.state?.servicio
   const apiUrl = import.meta.env.VITE_IP_API
@@ -28,13 +30,14 @@ const EditService = () => {
       setError('No se encontró información del servicio.')
       return
     }
-
+    console.log(servicio)
     setName(servicio.nombre)
     setDescription(servicio.descripcion)
     setDuration(servicio.duracion.toString())
     setPrice(servicio.precio.toString())
     setCategoryId(servicio.id_categoria.toString())
     setImageUrl(servicio.imagen || '')
+    setPromotionId(servicio.id_promocion)
 
     const fetchCategories = async () => {
       try {
@@ -50,6 +53,24 @@ const EditService = () => {
     fetchCategories()
   }, [servicio])
 
+  useEffect(() => {
+  const fetchPromotions = async () => {
+    try {
+      const res = await fetch(`${apiUrl}/api/promotions`)
+      if (!res.ok) throw new Error('Error al obtener promociones')
+      const data = await res.json()
+      setPromotions(data)
+    } catch (err) {
+      console.error(err)
+      setError('No se pudieron cargar las promociones.')
+    }
+  }
+
+  if (servicio) {
+    fetchPromotions()
+    setPromotionId(servicio.id_promocion?.toString() || '')
+  }
+}, [servicio])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,8 +86,8 @@ const EditService = () => {
       description,
       duration,
       price: parseFloat(price),
-      imageUrl: imageUrl
-      
+      imageUrl: imageUrl,   
+      promotionId: promotionId ? parseInt(promotionId) : null, 
     }
     console.log('🔧 Editando servicio:', serviceData)
 
@@ -191,6 +212,22 @@ const EditService = () => {
                   Agregar categoría
                 </button>
               </div>
+
+              <div className="mb-3">
+              <label className="text-danger fw-bold d-block">Asignar promoción</label>
+              <select
+                className="form-select"
+                value={promotionId}
+                onChange={(e) => setPromotionId(e.target.value)}
+              >
+                <option value="">Sin promoción</option>
+                {promotions.map((promo) => (
+                  <option key={promo.id} value={promo.id}>
+                    {promo.title}
+                  </option>
+                ))}
+              </select>
+            </div>
 
               {showNewCategory && (
                 <div className="mt-2 d-flex gap-2">
