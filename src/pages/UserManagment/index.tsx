@@ -393,9 +393,9 @@ const refreshPromotions = async () => {
                 <tbody>
                   {promotions.map((promo) => (
                     <tr key={promo.id}>
-                      <td>{promo.name}</td>
-                      <td>{promo.start}</td>
-                      <td>{promo.end}</td>
+                      <td>{promo.title}</td>
+                      <td>{promo.start_date}</td>
+                      <td>{promo.end_date}</td>
                       <td>{promo.percentage !== undefined && promo.percentage !== null ? `${promo.percentage}%` : '—'}</td>
                       <td className="text-center">
                       <span
