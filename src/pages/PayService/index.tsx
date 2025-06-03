@@ -9,6 +9,10 @@ const PayService = () => {
   const navigate = useNavigate();
   const { servicio, fechaSeleccionada } = location.state || {};
 
+
+  const { productosSeleccionados, total } = location.state || { productosSeleccionados: [], total: 0 };
+
+
   const [metodoNotificacion, setMetodoNotificacion] = useState<'email' | 'sms' | null>(null);
   const [numeroTelefono, setNumeroTelefono] = useState('');
   const [correoUsuario, setCorreoUsuario] = useState(''); 
@@ -61,15 +65,19 @@ const PayService = () => {
     };
 
     try {
-      const response = await fetch(`${apiUrl}/api/citas/crear`, {
+      const response = await fetch(`${apiUrl}/api/ordenes/crear`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify({
+          productosSeleccionados,
+          total,
+          metodoNotificacion,
+          destino: metodoNotificacion === 'sms' ? numeroTelefono : correoUsuario,
+        })
       });
-
       const result = await response.json();
 
       if (!result.exito) {
@@ -178,77 +186,34 @@ const PayService = () => {
 
 
           <hr />
-          <div className="mb-3">
+          {/* Pago */}
+          <div className="mb-3 mt-4">
             <label className="form-label fw-bold">Método de pago</label>
             <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="metodoPago"
-                id="transferencia"
-                onChange={() => setMetodoPago('transferencia')}
-              />
+              <input type="radio" className="form-check-input" name="metodoPago" id="transferencia" onChange={() => setMetodoPago('transferencia')} />
               <label className="form-check-label" htmlFor="transferencia">Transferencia con tarjeta</label>
             </div>
             <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="metodoPago"
-                id="sinpe"
-                onChange={() => setMetodoPago('sinpe')}
-              />
-              <label className="form-check-label" htmlFor="sinpe">SINPE</label>
+              <input type="radio" className="form-check-input" name="metodoPago" id="sinpe" onChange={() => setMetodoPago('sinpe')} />
+              <label className="form-check-label" htmlFor="sinpe">SINPE Móvil</label>
             </div>
           </div>
 
           {metodoPago === 'transferencia' && (
-            <div className="border p-3 mb-3">
-              <h5 className="text-primary">Pago con tarjeta</h5>
-              <div className="mb-2">
+            <>
+              <div className="mb-3">
                 <label className="form-label">Número de tarjeta</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  maxLength={16}
-                  value={numeroTarjeta}
-                  onChange={(e) => setNumeroTarjeta(e.target.value)}
-                />
+                <input type="text" className="form-control" value={numeroTarjeta} onChange={(e) => setNumeroTarjeta(e.target.value)} />
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label className="form-label">Nombre del titular</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={nombreTarjeta}
-                  onChange={(e) => setNombreTarjeta(e.target.value)}
-                />
+                <input type="text" className="form-control" value={nombreTarjeta} onChange={(e) => setNombreTarjeta(e.target.value)} />
               </div>
-              <div className="row">
-                <div className="col-md-6 mb-2">
-                  <label className="form-label">Vencimiento</label>
-                  <input
-                    type="month"
-                    className="form-control"
-                    value={vencimiento}
-                    onChange={(e) => setVencimiento(e.target.value)}
-                  />
-                </div>
-                <div className="col-md-6 mb-2">
-                  <label className="form-label">CVV</label>
-                  <input
-                    type="password"
-                    maxLength={4}
-                    className="form-control"
-                    value={cvv}
-                    onChange={(e) => setCvv(e.target.value)}
-                  />
-                </div>
+              <div className="mb-3 d-flex gap-3">
+                <input type="text" className="form-control" placeholder="MM/AA" value={vencimiento} onChange={(e) => setVencimiento(e.target.value)} />
+                <input type="text" className="form-control" placeholder="CVV" value={cvv} onChange={(e) => setCvv(e.target.value)} />
               </div>
-              <div className="alert alert-info mt-2">
-                Los datos no serán almacenados y serán enviados de forma segura (simulado).
-              </div>
-            </div>
+            </>
           )}
 
           {metodoPago === 'sinpe' && (
