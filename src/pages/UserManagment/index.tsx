@@ -46,7 +46,7 @@ const UserManagement = () => {
       password: password || user?.password,
       rol: user?.rol,
     }
-
+ 
     try {
       const response = await fetch(`${apiUrl}/api/users/update/${userEmail}`, {
         method: 'POST',

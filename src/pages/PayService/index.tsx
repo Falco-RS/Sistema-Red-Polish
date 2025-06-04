@@ -21,18 +21,6 @@ const PayService = () => {
 
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
 
-  // Transferencia (tarjeta)
-  const [numeroTarjeta, setNumeroTarjeta] = useState('');
-  const [nombreTarjeta, setNombreTarjeta] = useState('');
-  const [vencimiento, setVencimiento] = useState('');
-  const [cvv, setCvv] = useState('');
-
-  // SINPE
-  const [monto, setMonto] = useState('');
-  const [referencia, setReferencia] = useState('');
-  const [fechaSinpe, setFechaSinpe] = useState('');
-  const [comprobante, setComprobante] = useState<File | null>(null);
-
 
   const handleConfirmacion = async () => {
     if (!metodoNotificacion) {
@@ -54,7 +42,6 @@ const PayService = () => {
     const fecha = fechaSeleccionada.toISOString().split('T')[0]; 
     const hora = fechaSeleccionada.toTimeString().slice(0, 5);   
 
-
     const body = {
       date: fecha,
       hour: hora,
@@ -63,10 +50,9 @@ const PayService = () => {
       serviceId: servicio.id,
     };
 
-
     console.log(JSON.stringify(body))
     try {
-      const response = await fetch(`${apiUrl}/api/citas/add/${user.email}`, {
+      const response = await fetch(`${apiUrl}/api/payments/pay/appointment/${user.email}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,13 +62,27 @@ const PayService = () => {
       });
       const result = await response.json();
 
+      console.log("Redirigiendo a:", result.sessionUrl);
+      console.log("Tipo:", typeof result.sessionUrl);
+      console.log("Contiene https?:", result.sessionUrl.includes("https://"));
+
+      if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
+        window.location.href = result.sessionUrl;
+      } else {
+        alert("URL inválida para redirección");
+      }
+
+      /*
+
       if (!result.exito) {
         alert(`No se pudo agendar la cita: ${result.mensaje}`);
         return;
-      }
+      }*/
+
+
 
       alert(`Cita confirmada. Se ha enviado la confirmación por ${metodoNotificacion}. ¡Gracias!`);
-      navigate('/services');
+
     } catch (error) {
       console.error('Error al enviar la solicitud:', error);
       alert('Ocurrió un error al enviar la solicitud. Inténtalo más tarde.');
