@@ -10,13 +10,12 @@ const PayService = () => {
   const { servicio, fechaSeleccionada } = location.state || {};
 
 
-  const { productosSeleccionados, total } = location.state || { productosSeleccionados: [], total: 0 };
 
 
   const [metodoNotificacion, setMetodoNotificacion] = useState<'email' | 'sms' | null>(null);
   const [numeroTelefono, setNumeroTelefono] = useState('');
   const [correoUsuario, setCorreoUsuario] = useState(''); 
-  const { token } = useAuth();
+  const { user ,token } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
 
 
@@ -55,28 +54,25 @@ const PayService = () => {
     const fecha = fechaSeleccionada.toISOString().split('T')[0]; 
     const hora = fechaSeleccionada.toTimeString().slice(0, 5);   
 
+
     const body = {
-      servicioId: servicio.id, 
-      descripcion: servicio.descripcion,
-      fecha,
-      hora,
-      metodoNotificacion,
-      destino: metodoNotificacion === 'sms' ? numeroTelefono : correoUsuario
+      date: fecha,
+      hour: hora,
+      state: 'PENDIENTE',
+      userId: user.id,
+      serviceId: servicio.id,
     };
 
+
+    console.log(JSON.stringify(body))
     try {
-      const response = await fetch(`${apiUrl}/api/ordenes/crear`, {
+      const response = await fetch(`${apiUrl}/api/citas/add/${user.email}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          productosSeleccionados,
-          total,
-          metodoNotificacion,
-          destino: metodoNotificacion === 'sms' ? numeroTelefono : correoUsuario,
-        })
+        body: JSON.stringify(body)
       });
       const result = await response.json();
 
@@ -200,25 +196,14 @@ const PayService = () => {
           </div>
 
           {metodoPago === 'transferencia' && (
-            <>
-              <div className="mb-3">
-                <label className="form-label">Número de tarjeta</label>
-                <input type="text" className="form-control" value={numeroTarjeta} onChange={(e) => setNumeroTarjeta(e.target.value)} />
-              </div>
-              <div className="mb-3">
-                <label className="form-label">Nombre del titular</label>
-                <input type="text" className="form-control" value={nombreTarjeta} onChange={(e) => setNombreTarjeta(e.target.value)} />
-              </div>
-              <div className="mb-3 d-flex gap-3">
-                <input type="text" className="form-control" placeholder="MM/AA" value={vencimiento} onChange={(e) => setVencimiento(e.target.value)} />
-                <input type="text" className="form-control" placeholder="CVV" value={cvv} onChange={(e) => setCvv(e.target.value)} />
-              </div>
-            </>
+            <div className="alert alert-danger">
+              Al confirmar tu cita, serás redirigido automáticamente a <strong>PayPal</strong> para realizar el pago de forma segura.
+            </div>
           )}
 
           {metodoPago === 'sinpe' && (
              <div className="border p-3 mb-3">
-              <h5 className="text-success">Pago por SINPE</h5>
+              <h5 className="text-danger">Pago por SINPE</h5>
               
               <div className="bg-white text-dark p-4 rounded">
                 <p className="fw-bold">

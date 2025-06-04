@@ -14,6 +14,8 @@ interface Appointment {
   total: number
 }
 
+const apiUrl = 'https://tu-servidor.com' // <-- Ajusta esto según tu backend
+
 const Appointments = () => {
   const { user } = useAuth()
   const [appointments, setAppointments] = useState<Appointment[]>([])
@@ -21,58 +23,43 @@ const Appointments = () => {
   const [message, setMessage] = useState<string | null>(null)
   const [showPrompt, setShowPrompt] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    setTimeout(() => {
-      if (user?.rol === 'Administrador') {
-        const adminAppointments: Appointment[] = [
-          {
-            id: 1,
-            clientName: 'Carlos Gómez',
-            date: '2025-05-23',
-            time: '10:00 AM',
-            serviceName: 'Lavado',
-            paymentMethod: 'Efectivo',
-            paymentStatus: 'Pagado',
-            total: 25000,
+    const fetchAppointments = async () => {
+      if (!user) return
+      try {
+        let url = ''
+        if (user.rol === 'Administrador') {
+          url = `${apiUrl}/api/citas/get_all`
+        } else {
+          url = `${apiUrl}/api/citas/get/${user.id}`
+        }
+
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
           },
-          {
-            id: 2,
-            clientName: 'Laura Ríos',
-            date: '2025-06-30',
-            time: '02:30 PM',
-            serviceName: 'Protección Básica',
-            paymentMethod: 'SINPE',
-            paymentStatus: 'Pendiente',
-            total: 30000,
-          },
-        ]
-        setAppointments(adminAppointments)
-      } else {
-        const userAppointments: Appointment[] = [
-          {
-            id: 1,
-            date: '2025-06-23',
-            time: '10:00 AM',
-            serviceName: 'Lavado',
-            paymentMethod: 'Efectivo',
-            paymentStatus: 'Pagado',
-            total: 25000,
-          },
-          {
-            id: 2,
-            date: '2025-06-21',
-            time: '11:00 AM',
-            serviceName: 'Pulido',
-            paymentMethod: 'Transferencia',
-            paymentStatus: 'Pagado',
-            total: 30000,
-          },
-        ]
-        setAppointments(userAppointments)
+        })
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          setError(errorData.message || 'Error al mostrar los datos.')
+          setLoading(false)
+          return
+        }
+
+        const data = await response.json()
+        setAppointments(data)
+      } catch (err) {
+        setError('Error de red al obtener las citas.')
+      } finally {
+        setLoading(false)
       }
-      setLoading(false)
-    }, 1000)
+    }
+
+    fetchAppointments()
   }, [user])
 
   const handleCancel = (appt: Appointment) => {
@@ -81,7 +68,7 @@ const Appointments = () => {
     const timeDiff = appointmentDate.getTime() - currentDate.getTime()
     const daysLeft = Math.ceil(timeDiff / (1000 * 60 * 60 * 24))
 
-    if (daysLeft < 10) return // Protección extra si el botón no está deshabilitado por error
+    if (daysLeft < 10) return 
 
     if (user?.rol === 'Administrador') {
       setMessage('IMPORTANTE: hacer la devolución en menos de 10 días')
@@ -90,8 +77,6 @@ const Appointments = () => {
         setMessage('Su dinero se devolverá en menos de 10 días')
     }
 
-    // Aquí podrías también eliminar la cita de la lista si quieres
-    // setAppointments(prev => prev.filter(a => a.id !== appt.id))
   }
 
   if (loading) return <Spinner animation="border" variant="danger" />

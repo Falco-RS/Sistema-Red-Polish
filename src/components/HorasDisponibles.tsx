@@ -19,7 +19,7 @@ const HorasDisponibles: React.FC<Props> = ({
 
         try {
           const response = await fetch(
-            `${apiUrl}/api/citas/ocupadas?fecha=${fechaISO}`
+            `${apiUrl}/api/citas/busy?fecha=${fechaISO}`
           )
           if (!response.ok) throw new Error('Error al obtener datos de disponibilidad')
 
