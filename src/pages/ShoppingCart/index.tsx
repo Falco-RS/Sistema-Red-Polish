@@ -170,7 +170,7 @@ const ShoppingCart: React.FC = () => {
             const seleccionado = producto.id in seleccionados;
             return (
               <div className="col" key={producto.id}>
-                <div className={`card h-100 ${seleccionado ? 'border-success' : ''}`}>
+                <div className={`card h-100 ${seleccionado ? 'border-dark' : ''}`}>
                   <div className="card-body d-flex align-items-center">
                     <img
                       src={producto.image}
@@ -205,7 +205,7 @@ const ShoppingCart: React.FC = () => {
                       </button>
 
                       <button
-                        className="btn btn-outline-warning btn-sm"
+                        className="btn btn-outline-primary btn-sm"
                         onClick={() => actualizarProductoEnCarrito(producto.cartItemId, seleccionados[producto.id])}
                         disabled={seleccionados[producto.id] === producto.quantity}
                       >

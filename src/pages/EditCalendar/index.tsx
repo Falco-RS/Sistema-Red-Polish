@@ -45,12 +45,12 @@ const EditCalendar = () => {
       <NavBar />
       <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
         <div className="bg-white rounded-4 shadow-lg p-5 w-100" style={{ maxWidth: '500px' }}>
-          <h2 className="text-center mb-4 text-danger fw-bold">Modificar Calendario</h2>
+          <h2 className="text-center mb-4 text-dark fw-bold">Modificar Calendario</h2>
 
           {saved && <div className="alert alert-success">Disponibilidad actualizada correctamente.</div>}
 
           <div className="mb-3">
-            <label className="text-danger fw-bold">Selecciona una fecha</label>
+            <label className="text-primary fw-bold">Selecciona una fecha</label>
             <DatePicker
               selected={selectedDate}
               onChange={date => {
@@ -66,7 +66,7 @@ const EditCalendar = () => {
 
           {selectedDate && (
             <div className="mb-4">
-              <label className="text-danger fw-bold">Horas disponibles: las que marques dejaran de estar disponible para los usuarios</label>
+              <label className="text-dark ">Horas disponibles: las que marques dejaran de estar disponible para los usuarios</label>
               <div className="d-flex flex-wrap gap-2 mt-2">
                 {hours
                 .filter(hour => {
@@ -78,7 +78,7 @@ const EditCalendar = () => {
                     <button
                     key={hour}
                     type="button"
-                    className={`btn ${selectedHours.includes(hour) ? 'btn-danger' : 'btn-outline-danger'} btn-sm`}
+                    className={`btn ${selectedHours.includes(hour) ? 'btn-primary' : 'btn-outline-primary'} btn-sm`}
                     onClick={() => handleHourToggle(hour)}
                     >
                     {hour}:00
@@ -88,7 +88,7 @@ const EditCalendar = () => {
             </div>
           )}
 
-          <button onClick={handleSave} className="btn btn-danger w-100 fw-bold mb-3">
+          <button onClick={handleSave} className="btn btn-primary w-100 fw-bold mb-3">
             Guardar disponibilidad
           </button>
 

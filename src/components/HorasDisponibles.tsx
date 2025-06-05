@@ -99,8 +99,8 @@ const HorasDisponibles: React.FC<Props> = ({
               className={`btn ${
                 horaSeleccionada &&
                 hora.getTime() === horaSeleccionada.getTime()
-                  ? 'btn-danger'
-                  : 'btn-outline-danger'
+                  ? 'btn-primary'
+                  : 'btn-outline-primary'
               }`}
               onClick={() => disponible && setHoraSeleccionada(hora)}
               disabled={!disponible}

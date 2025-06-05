@@ -110,34 +110,34 @@ const AddService = () => {
       <NavBar />
       <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
         <div className="bg-white rounded-4 shadow-lg p-5 w-100" style={{ maxWidth: '500px' }}>
-          <h2 className="text-center mb-4 text-danger fw-bold">Agregar Servicio</h2>
+          <h2 className="text-center mb-4 text-dark fw-bold">Agregar Servicio</h2>
 
-          {error && <div className="alert alert-danger py-2 mb-4">{error}</div>}
+          {error && <div className="alert alert-primary py-2 mb-4">{error}</div>}
           {success && <div className="alert alert-success py-2 mb-4">Servicio agregado correctamente. Redirigiendo...</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="text-danger fw-bold">Nombre</label>
+              <label className="text-dark fw-bold">Nombre</label>
               <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
 
             <div className="mb-3">
-              <label className="text-danger fw-bold">Descripción</label>
+              <label className="text-dark fw-bold">Descripción</label>
               <input type="text" className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} required />
             </div>
 
             <div className="mb-3">
-              <label className="text-danger fw-bold">Precio</label>
+              <label className="text-dark fw-bold">Precio</label>
               <input type="text" className="form-control" value={price} onChange={handlePriceChange} required />
             </div>
 
             <div className="mb-3">
-              <label className="text-danger fw-bold">Duración (minutos)</label>
+              <label className="text-dark fw-bold">Duración (minutos)</label>
               <input type="text" className="form-control" value={duration} onChange={handleDurationChange} required />
             </div>
 
             <div className="mb-3">
-              <label className="text-danger fw-bold d-block">Categoría</label>
+              <label className="text-dark fw-bold d-block">Categoría</label>
               <div className="d-flex gap-2">
                 <select
                   className="form-select"
@@ -152,7 +152,7 @@ const AddService = () => {
                 </select>
                 <button
                   type="button"
-                  className="btn btn-danger btn-sm"
+                  className="btn btn-primary btn-sm"
                   onClick={() => setShowNewCategory(!showNewCategory)}
                 >
                   Agregar categoría
@@ -170,7 +170,7 @@ const AddService = () => {
                   />
                   <button
                     type="button"
-                    className="btn btn-outline-danger"
+                    className="btn btn-outline-primary"
                     onClick={handleAddCategory}
                   >
                     Guardar
@@ -180,7 +180,7 @@ const AddService = () => {
             </div>
 
             <div className="mb-4">
-              <label className="text-danger fw-bold">URL de Imagen</label>
+              <label className="text-dark fw-bold">URL de Imagen</label>
               <input
                 type="text"
                 className="form-control"
@@ -191,7 +191,7 @@ const AddService = () => {
               />
             </div>
 
-            <button type="submit" className="btn btn-danger w-100 fw-bold">Agregar Servicio</button>
+            <button type="submit" className="btn btn-primary w-100 fw-bold">Agregar Servicio</button>
           </form>
 
           <div className="mt-3 text-center">

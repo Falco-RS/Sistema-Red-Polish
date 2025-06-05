@@ -29,14 +29,14 @@ const Appointment = () => {
             width: '100%',
             backgroundColor: '#f7f7f7',
             borderRadius: '10px',
-            border: '1px solid #FF6F61',
+            border: '1px solid #007bff',
           }}
         >
           <button
             onClick={() => navigate('/services')}
             className="btn btn-light position-absolute top-0 end-0 m-3"
             style={{
-              backgroundColor: '#FF6F61',
+              backgroundColor: '#007bff',
               color: '#fff',
               borderRadius: '50%',
               padding: '10px 15px',
@@ -46,7 +46,7 @@ const Appointment = () => {
             Volver
           </button>
 
-          <h2 className="fw-bold mb-4 text-center text-danger">{servicio.nombre}</h2>
+          <h2 className="fw-bold mb-4 text-center text-primary">{servicio.nombre}</h2>
 
           {servicio.imagen && (
             <img
@@ -65,7 +65,7 @@ const Appointment = () => {
               <>
                 ${servicio.precioFinal}{' '}
                 <span className="text-decoration-line-through text-muted">${servicio.precio}</span>{' '}
-                <span className="text-danger">{Math.round(servicio.porcentajeDescuento * 100)}%</span>
+                <span className="text-primary">{Math.round(servicio.porcentajeDescuento * 100)}%</span>
               </>
             ) : (
               <>${servicio.precio}</>
@@ -109,7 +109,7 @@ const Appointment = () => {
           <div className="mt-4 text-center">
             {horaSeleccionada && confirmado ? (
               <>
-                <h5 className="text-danger">Fecha y hora seleccionadas:</h5>
+                <h5 className="text-primary">Fecha y hora seleccionadas:</h5>
                 <p>{horaSeleccionada.toLocaleString()}</p>
                 <button
                   className="btn btn-outline-secondary mb-3"
@@ -119,7 +119,7 @@ const Appointment = () => {
                 </button>
                 <br />
                 <button
-                  className="btn btn-danger"
+                  className="btn btn-primary"
                   onClick={() =>
                     navigate('/pay-service', {
                       state: {
@@ -134,7 +134,7 @@ const Appointment = () => {
               </>
             ) : (
               <button
-                className="btn btn-danger"
+                className="btn btn-primary"
                 onClick={() => {
                   if (horaSeleccionada) {
                     setConfirmado(true)

@@ -99,7 +99,7 @@ const PayService = () => {
       <NavBar />
       <div className="container mt-5">
         <div className="card p-4 shadow-lg">
-          <h2 className="text-danger mb-4 text-center">Confirmación de cita</h2>
+          <h2 className="text-dark mb-4 text-center">Confirmación de cita</h2>
 
           <p><strong>Servicio:</strong> {servicio.nombre}</p>
           <p><strong>Descripción:</strong> {servicio.descripcion}</p>
@@ -192,14 +192,14 @@ const PayService = () => {
           </div>
 
           {metodoPago === 'transferencia' && (
-            <div className="alert alert-danger">
+            <div className="alert alert-primary">
               Al confirmar tu cita, serás redirigido automáticamente a <strong>PayPal</strong> para realizar el pago de forma segura.
             </div>
           )}
 
           {metodoPago === 'sinpe' && (
              <div className="border p-3 mb-3">
-              <h5 className="text-danger">Pago por SINPE</h5>
+              <h5 className="text-primary">Pago por SINPE</h5>
               
               <div className="bg-white text-dark p-4 rounded">
                 <p className="fw-bold">
@@ -207,7 +207,7 @@ const PayService = () => {
                 </p>
 
                 <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
-                  +506 12345678
+                  +506  83582929
                 </div>
 
                 <p>
@@ -220,7 +220,7 @@ const PayService = () => {
             </div>
           )}
           <div className="text-center">
-            <button className="btn btn-danger" onClick={handleConfirmacion}>
+            <button className="btn btn-primary" onClick={handleConfirmacion}>
               Confirmar cita
             </button>
           </div>

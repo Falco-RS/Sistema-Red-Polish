@@ -100,9 +100,7 @@ const Services = () => {
 
   // Este useEffect ejecuta fetchServices cuando promotions estén listas
   useEffect(() => {
-    if (promotions.length > 0) {
       fetchServices()
-    }
   }, [promotions])
 
   const manejarAgendar = (servicio: ServicioConPrecio) => {
