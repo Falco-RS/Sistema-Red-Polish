@@ -44,7 +44,7 @@ const Appoiment = () => {
 
   return (
     <div className="container mt-4">
-      <h2>Mis Citas</h2>
+      <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Mis Citas</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       <table className="table table-bordered table-hover mt-3">
         <thead className="thead-dark">

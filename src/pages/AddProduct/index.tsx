@@ -43,8 +43,8 @@ const AddProduct = () => {
     categoryId: parseInt(categoryId)
   }
 
-  const userEmail = user?.user?.email
-  const userToken = user?.token
+  const userEmail = user?.email
+  const userToken = token
 
   console.log('Producto a enviar:', productData)
   console.log("Token del Administador:", userToken)

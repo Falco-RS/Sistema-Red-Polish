@@ -81,7 +81,7 @@ const Cancelaciones: React.FC = () => {
   return (
     <div className="container mt-4">
     <div className="d-flex justify-content-start">
-        <h2 className="text-danger">Cancelaciones</h2>
+        <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Cancelaciones</h2>
       </div>
 
       {rol === 'administrador' ? (
