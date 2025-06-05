@@ -12,7 +12,7 @@ function Homepage() {
 
   // Obtenemos productos reales
   useEffect(() => {
-    document.body.style.backgroundColor = '#e0e0e0'
+    document.body.style.backgroundColor = '#ffffff'
     fetchProducts()
   }, [])
 
@@ -71,8 +71,8 @@ function Homepage() {
       >
         <div className="position-absolute top-0 start-0 w-100 h-100" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} />
         <div className="position-relative text-center px-3">
-          <h1 className="display-4 fw-bold mb-3">RED POLISH</h1>
-          <p className="fs-5" style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <h1 className="display-4 fw-light text-uppercase mb-3">RED POLISH</h1>
+          <p className="fs-5 fst-italic lh-lg" style={{ maxWidth: '800px', margin: '0 auto' }}>
             Servicio profesional de detallado automotriz. Calidad, dedicación y brillo para tu vehículo.
           </p>
         </div>
@@ -80,7 +80,7 @@ function Homepage() {
 
       <div className="container my-5">
         <div className="text-center mb-5">
-          <p className="fs-5 text-secondary">
+          <p className="fs-5 text-dark lh-lg">
             Nos especializamos en el cuidado y embellecimiento de tu vehículo. Ofrecemos un servicio profesional
             de abrillantado y detallado automotriz, asegurando que tu auto luzca impecable en todo momento.
             Además, contamos con una amplia selección de productos de alta calidad para el mantenimiento y
@@ -93,9 +93,9 @@ function Homepage() {
 
         {/* Carrusel real */}
         <div className="mb-5">
-          <h3 className="fw-bold text-center mb-4 text-dark">Productos Recomendados</h3>
+          <h3 className="fw-semibold text-center mb-4 text-capitalize text-dark">Productos Recomendados</h3>
           <div className="d-flex align-items-center justify-content-between">
-            <button className="btn btn-outline-light me-2" onClick={prevSlide}>&lt;</button>
+            <button className="btn btn-outline-dark me-2" onClick={prevSlide}>&lt;</button>
             <div className="d-flex overflow-hidden" style={{ gap: '1rem', flex: 1 }}>
               {visibleProducts.map(product => (
                 <div
@@ -119,7 +119,7 @@ function Homepage() {
                 </div>
               ))}
             </div>
-            <button className="btn btn-outline-light ms-2" onClick={nextSlide}>&gt;</button>
+            <button className="btn btn-outline-darkt ms-2" onClick={nextSlide}>&gt;</button>
           </div>
         </div>
       </div>
