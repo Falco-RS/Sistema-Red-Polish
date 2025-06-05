@@ -128,82 +128,99 @@ const ProductView = () => {
   }
 
   return (
-    <>
-      <NavBar />
-      <div className="container mt-5">
-        <button className="btn btn-outline-dark mb-4" onClick={() => navigate(-1)}>
-          ⬅ Volver
-        </button>
+  <>
+    <NavBar />
+    <div className="container mt-5">
+      <button className="btn btn-outline-dark mb-4" onClick={() => navigate(-1)}>
+        ⬅ Volver
+      </button>
 
-        <div className="row align-items-center">
-          <div className="col-md-6 mb-4 mb-md-0">
-            <img src={product.image} alt={product.name} className="img-fluid rounded shadow" />
-          </div>
-          <div className="col-md-6">
-            <h2 className="fw-bold text-danger mb-3">{product.name}</h2>
-            <p className="text-muted mb-3">{product.description}</p>
-            <h4 className="fw-bold text-success mb-4">₡{product.price.toLocaleString()}</h4>
+      <div className="row align-items-center">
+        <div className="col-md-6 mb-4 mb-md-0 text-center">
+          <img
+            src={product.image}
+            alt={product.name}
+            className="img-fluid rounded shadow"
+            style={{ maxHeight: '400px', objectFit: 'contain' }}
+          />
+        </div>
+        <div className="col-md-6">
+          <h2 className="fw-bold text-dark mb-3">{product.name}</h2>
+          <p className="text-muted mb-3">{product.description}</p>
+          <h4 className="fw-bold text-dark mb-3">${product.price.toLocaleString()}</h4>
 
-            <div className="mb-3">
-              <label className="form-label fw-bold">Cantidad:</label>
-              <input
-                type="number"
-                min="1"
-                className="form-control mb-2"
-                value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-              />
-              <button className="btn btn-primary w-100 fw-bold" onClick={handleAddToCart}>
-                Añadir al carrito
-              </button>
-            </div>
-
-
-            {isAdmin && (
-              <div className="d-flex flex-column gap-2">
-                <button
-                  className="btn btn-primary w-100 fw-bold mb-3"
-                  onClick={() => navigate(`/edit-product/${product.id}`)}
-                >
-                  ✏ Editar Producto
-                </button>
-                <button
-                  className="btn btn-danger w-100 fw-bold"
-                  onClick={() => setShowConfirmModal(true)}
-                >
-                  🗑 Eliminar Producto
-                </button>
-              </div>
-            )}
-          </div>
+          <div className="mb-3">
+          <label className="fw-bold text-dark mb-3">Cantidad:</label>
+          <input
+            type="number"
+            min="1"
+            className="form-control mb-2"
+            value={quantity}
+            onChange={(e) => setQuantity(Number(e.target.value))}
+          />
+          <button
+            className="btn btn-primary fw-bold py-2 w-100 mb-2"
+            style={{ maxWidth: '300px' }}
+            onClick={handleAddToCart}
+          >
+            Añadir al carrito
+          </button>
         </div>
 
-        {relatedProducts.length > 0 && (
-          <div className="mt-5">
-            <h4 className="fw-bold mb-4 text-danger">Productos Relacionados</h4>
-            <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-              {relatedProducts.map((prod) => (
-                <div key={prod.id} className="col">
-                  <div
-                    className="card shadow-sm h-100"
-                    style={{ cursor: 'pointer' }}
-                    onClick={() => navigate(`/product/${prod.id}`)}
-                  >
-                    <div className="card-img-top bg-light d-flex justify-content-center align-items-center" style={{ height: '180px' }}>
-                      <img src={prod.image} alt={prod.name} className="img-fluid" style={{ maxHeight: '100%' }} />
-                    </div>
-                    <div className="card-body">
-                      <h6 className="card-title fw-bold">{prod.name}</h6>
-                      <p className="text-muted mb-1">{prod.description}</p>
-                      <p className="mb-0 fw-bold">₡{prod.price.toLocaleString()}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        {isAdmin && (
+          <div className="d-flex flex-column gap-2">
+            <button
+              className="btn btn-primary fw-bold py-2 w-100 mb-2"
+              style={{ maxWidth: '300px' }}
+              onClick={() => navigate(`/edit-product/${product.id}`)}
+            >
+              ✏ Editar Producto
+            </button>
+            <button
+              className="btn btn-danger fw-bold py-2 w-100"
+              style={{ maxWidth: '300px' }}
+              onClick={() => setShowConfirmModal(true)}
+            >
+              🗑 Eliminar Producto
+            </button>
           </div>
         )}
+        </div>
       </div>
+
+      {relatedProducts.length > 0 && (
+        <div className="mt-5">
+          <h4 className="fw-bold mb-4 text-dark">Productos Relacionados</h4>
+          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5 g-3">
+            {relatedProducts.map((prod) => (
+              <div key={prod.id} className="col">
+                <div
+                  className="card shadow-sm h-100"
+                  style={{ cursor: 'pointer', minHeight: '320px' }}
+                  onClick={() => navigate(`/product/${prod.id}`)}
+                >
+                  <div
+                    className="card-img-top bg-light d-flex justify-content-center align-items-center"
+                    style={{ height: '150px' }}
+                  >
+                    <img
+                      src={prod.image}
+                      alt={prod.name}
+                      className="img-fluid"
+                      style={{ maxHeight: '100%' }}
+                    />
+                  </div>
+                  <div className="card-body">
+                    <h6 className="card-title fw-bold">{prod.name}</h6>
+                    <p className="card-text text-muted mb-1">{prod.description}</p>
+                    <p className="mb-0 fw-bold">${prod.price.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 🔴 Modal de confirmación */}
       {showConfirmModal && (
@@ -230,8 +247,8 @@ const ProductView = () => {
           </div>
         </div>
       )}
-    </>
-  )
+    </div>
+  </>
+)
 }
-
 export default ProductView

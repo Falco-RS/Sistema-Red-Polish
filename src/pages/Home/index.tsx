@@ -101,22 +101,26 @@ function Homepage() {
                 <div
                   key={product.id}
                   className="card shadow-sm"
-                  style={{ minWidth: '180px', maxWidth: '180px', cursor: 'pointer' }}
+                   style={{ minWidth: '200px', maxWidth: '200px', minHeight: '300px', cursor: 'pointer' }}
                   onClick={() => navigate(`/product/${product.id}`)}
                 >
-                  <div className="card-body position-relative p-3">
-                    <div className="text-center mb-3">
-                      <img
-                        src={product.image || image}
-                        alt={product.name}
-                        style={{ width: '100%', height: '110px', objectFit: 'cover', borderRadius: '6px' }}
-                      />
-                    </div>
-                    <h6 className="fw-bold">{product.name}</h6>
-                    <p className="text-muted small">{product.description}</p>
-                    <div className="fw-bold text-success">₡{product.price.toLocaleString()}</div>
-                  </div>
+                  <div
+                  className="card-img-top bg-light d-flex justify-content-center align-items-center"
+                  style={{ height: '160px' }}
+                >
+                     <img
+                    src={product.image || image}
+                    alt={product.name}
+                    className="img-fluid"
+                    style={{ maxHeight: '100%', objectFit: 'contain' }}
+                  />
                 </div>
+                <div className="card-body">
+                  <h6 className="fw-bold card-title">{product.name}</h6>
+                  <p className="text-muted mb-1 small">{product.description}</p>
+                  <p className="mb-0 fw-bold">${product.price.toLocaleString()}</p>
+                </div>
+              </div>
               ))}
             </div>
             <button className="btn btn-outline-darkt ms-2" onClick={nextSlide}>&gt;</button>
