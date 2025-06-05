@@ -1,19 +1,25 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../common/AuthContext'; 
+import { useAuth } from '../common/AuthContext';
 import logo from '../assets/logo.png';
-import carritoIcon from '../assets/carrito-de-compras.png'; // 👈 nuevo import
+import carritoIcon from '../assets/carrito-de-compras.png';
+import { useState } from 'react';
 
 const NavBar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   const handleLogout = () => {
     logout();
-    navigate('/'); // Redirigir al home después de cerrar sesión
+    navigate('/');
+  };
+
+  const toggleNavbar = () => {
+    setIsCollapsed(!isCollapsed);
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <nav className="navbar navbar-expand-lg bg-light" style={{ borderBottom: '2px solid #ccc' }}>
       <div className="container">
         <Link to="/" className="navbar-brand d-flex align-items-center fw-bold">
           <img
@@ -24,8 +30,20 @@ const NavBar = () => {
           Red Polish
         </Link>
 
-        <div className="collapse navbar-collapse justify-content-between">
-          <ul className="navbar-nav">
+        {/* Botón hamburguesa */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          onClick={toggleNavbar}
+          aria-controls="navbarNav"
+          aria-expanded={!isCollapsed}
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        <div className={`collapse navbar-collapse ${!isCollapsed ? 'show' : ''}`} id="navbarNav">
+          <ul className="navbar-nav me-auto">
             <li className="nav-item">
               <Link to="/catalog" className="nav-link">Productos</Link>
             </li>
