@@ -124,8 +124,8 @@ const Services = () => {
         <div className="d-flex justify-content-between align-items-center mb-4">
           <h4 className="fw-bold text-dark">Catálogo de Servicios</h4>
           <Dropdown>
-            <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-              Categorías
+            <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" className="text-dark">
+              Sort by
             </Dropdown.Toggle>
             <Dropdown.Menu>
               <Dropdown.Item onClick={() => setCategoriaSeleccionada(null)}>Todas</Dropdown.Item>
@@ -142,12 +142,24 @@ const Services = () => {
           <div className="mb-3 d-flex justify-content-end gap-2">
             <button 
               className="btn btn-danger" 
+              style={{
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none', 
+              margin: '5px',
+            }}
               onClick={() => navigate('/add-service')}
             >
               Agregar Servicio
             </button>
             <button 
-              className="btn btn-warning" 
+              className="btn btn-warning"
+              style={{
+              backgroundColor: '#007bff',
+              color: 'white',
+              border: 'none', 
+              margin: '5px',
+            }} 
               onClick={() => navigate('/edit-calendar')}
             >
               Modificar Calendario
@@ -197,7 +209,7 @@ const Services = () => {
                   <button
                     className="btn"
                     style={{
-                      backgroundColor: '#d9534f',
+                      backgroundColor: '#007bff',
                       color: 'white',
                       border: 'none',
                       width: '100%',
