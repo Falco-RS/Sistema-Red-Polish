@@ -10,55 +10,44 @@ const Login = () => {
   const { login } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
 
-
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-  
+
     if (!email.trim() || !password.trim()) {
       setError('Todos los campos son obligatorios.');
       return;
     }
-  
-    const loginData = {
-      email,
-      password,
-    };
-  
+
+    const loginData = { email, password };
+
     try {
       const response = await fetch(`${apiUrl}/api/users/sign_in`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(loginData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || 'Error al iniciar sesion.')
+        setError(errorData.message || 'Error al iniciar sesión.');
         return;
       }
-  
+
       const data = await response.json();
-  
-      login(data.user, data.token);         
-      navigate('/');        
-      
-  
+      login(data.user, data.token);
+      navigate('/');
       setError('');
       setEmail('');
       setPassword('');
-      navigate('/');
     } catch (err) {
       setError('Contraseña o usuario incorrecto.');
     }
-  };  
+  };
 
   return (
     <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
-      <div className="bg-white rounded-4 shadow-lg p-5 w-100" style={{ maxWidth: '400px', boxShadow: '0px 8px 30px rgba(0, 0, 0, 0.1)' }}>
-        <h2 className="text-center mb-4 text-danger fw-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>Iniciar Sesión</h2>
+      <div className="bg-white rounded-4 shadow-lg p-5 w-100" style={{ maxWidth: '450px', boxShadow: '0px 8px 30px rgba(0, 0, 0, 0.1)' }}>
+        <h2 className="text-center mb-4 text-primary fw-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>Iniciar Sesión</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label htmlFor="email" className="form-label fw-medium" style={{ fontSize: '1.1rem', color: '#555' }}>Correo electrónico</label>
@@ -87,18 +76,19 @@ const Login = () => {
           </div>
 
           {error && (
-            <div className="alert alert-danger py-2 mb-4">
+            <div className="alert alert-primary py-2 mb-4">
               {error}
             </div>
           )}
 
           <button type="submit" className="btn btn-gradient w-100 py-3 fw-bold" style={{
-            background: 'linear-gradient(to right, #ff416c 0%, #ff4b2b 100%)',
+            background: 'linear-gradient(to right, #007bff 0%, #3399ff 100%)',
             borderRadius: '50px',
             color: '#fff',
             fontSize: '1.1rem',
             transition: 'transform 0.2s ease-in-out',
             boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.15)',
+            border: 'none'
           }}>
             Ingresar
           </button>
@@ -108,7 +98,7 @@ const Login = () => {
           <p className="text-dark" style={{ fontSize: '0.9rem' }}>
             ¿No tienes una cuenta aún?{' '}
             <span
-              className="text-danger"
+              className="text-primary"
               role="button"
               style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
               onClick={() => navigate('/register')}
@@ -119,7 +109,7 @@ const Login = () => {
           <p className="text-dark" style={{ fontSize: '0.9rem' }}>
             ¿Deseas volver al home?{' '}
             <span
-              className="text-danger"
+              className="text-primary"
               role="button"
               style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
               onClick={() => navigate('/')}
@@ -130,7 +120,7 @@ const Login = () => {
           <p className="text-dark" style={{ fontSize: '0.9rem' }}>
             ¿Olvidaste tu contraseña?{' '}
             <span
-              className="text-danger"
+              className="text-primary"
               role="button"
               style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
               onClick={() => navigate('/recover')}

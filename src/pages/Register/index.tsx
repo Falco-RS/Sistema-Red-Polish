@@ -73,7 +73,7 @@ const Register = () => {
       const data = await responselog.json();
       console.log('Usuario autenticado:', data);
 
-      login(data);
+      login(data.user, data.token);
 
       setTimeout(() => {
         navigate('/')
@@ -87,7 +87,7 @@ const Register = () => {
   return (
     <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
       <div className="bg-white rounded-4 shadow-lg p-5 w-100" style={{ maxWidth: '450px', boxShadow: '0px 8px 30px rgba(0, 0, 0, 0.1)', overflowY: 'auto', maxHeight: '90vh' }}>
-        <h2 className="text-center mb-4 text-danger fw-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
+        <h2 className="text-center mb-4 text-primary fw-bold" style={{ fontFamily: 'Poppins, sans-serif' }}>
           Bienvenido al Registro de Red Polish
         </h2>
         <form onSubmit={handleSubmit}>
@@ -176,7 +176,7 @@ const Register = () => {
           </div>
 
           {error && (
-            <div className="alert alert-danger py-2 mb-4">
+            <div className="alert alert-primary py-2 mb-4">
               {error}
             </div>
           )}
@@ -184,12 +184,13 @@ const Register = () => {
                 type="submit"
                 className="btn w-100 py-3 fw-bold"
                 style={{
-                  background: 'linear-gradient(to right, #ff416c 0%, #ff4b2b 100%)',
+                  background: 'linear-gradient(to right, #007bff 0%, #3399ff 100%)',
                   borderRadius: '50px',
                   color: '#fff',
                   fontSize: '1.1rem',
                   transition: 'transform 0.2s ease-in-out',
                   boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.15)',
+                  border: 'none'
                 }}
               >
                 Registrar
@@ -200,7 +201,7 @@ const Register = () => {
           <p className="text-dark" style={{ fontSize: '0.9rem' }}>
             ¿Ya tienes una cuenta?{' '}
             <span
-              className="text-danger"
+              className="text-primary"
               role="button"
               style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
               onClick={() => navigate('/login')}
@@ -211,7 +212,7 @@ const Register = () => {
           <p className="text-dark" style={{ fontSize: '0.9rem' }}>
             ¿Deseas volver al home?{' '}
             <span
-              className="text-danger"
+              className="text-primary"
               role="button"
               style={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: '500' }}
               onClick={() => navigate('/')}

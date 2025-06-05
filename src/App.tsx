@@ -18,7 +18,6 @@ import EditCalendar from './pages/EditCalendar'
 import PayService from './pages/PayService'
 import ShoppingCart from './pages/ShoppingCart'
 import PayProduct from './pages/PayProducts'
-import PaymentFailure from './pages/PaymentFailure'
 import PaymentSuccess from './pages/PaymentSuccess'
 
 
@@ -45,7 +44,6 @@ function App() {
       <Route path="/pay-service" element={<PayService />} />
       <Route path="/shopping-cart" element={<ShoppingCart />} />
       <Route path="/pay-products" element={<PayProduct />} />
-      <Route path="/payment-failure" element={<PaymentFailure />} />
       <Route path="/payment-success" element={<PaymentSuccess />} />
     </Routes>
   )
