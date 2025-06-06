@@ -150,14 +150,16 @@ const ProductView = () => {
           <h4 className="fw-bold text-dark mb-3">${product.price.toLocaleString()}</h4>
 
           <div className="mb-3">
-          <label className="fw-bold text-dark mb-3">Cantidad:</label>
-          <input
-            type="number"
-            min="1"
-            className="form-control mb-2"
-            value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-          />
+  <label className="fw-bold text-dark mb-3">Cantidad:</label>
+  <input
+    type="number"
+    min="1"
+    className="form-control mb-2"
+    value={quantity}
+    onChange={(e) => setQuantity(Number(e.target.value))}
+  />
+
+        {user ? (
           <button
             className="btn btn-primary fw-bold py-2 w-100 mb-2"
             style={{ maxWidth: '300px' }}
@@ -165,7 +167,12 @@ const ProductView = () => {
           >
             Añadir al carrito
           </button>
-        </div>
+        ) : (
+          <div className="alert alert-warning text-center mt-2" style={{ maxWidth: '300px' }}>
+            ⚠ Debes iniciar sesión para poder comprar productos.
+          </div>
+        )}
+      </div>
 
         {isAdmin && (
           <div className="d-flex flex-column gap-2">

@@ -14,7 +14,6 @@ const PayProduct = () => {
   const [metodoNotificacion, setMetodoNotificacion] = useState<'email' | 'sms' | null>(null);
   const [numeroTelefono, setNumeroTelefono] = useState('');
   const [correoUsuario, setCorreoUsuario] = useState('');
-
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
 
   const handleConfirmacion = async () => {
@@ -33,7 +32,37 @@ const PayProduct = () => {
       return;
     }
 
+    if (!metodoPago) {
+      alert('Selecciona un método de pago.');
+      return;
+    }
+
     try {
+      if (metodoPago === 'sinpe') {
+        const bodySinpe = {
+          productos: productosSeleccionados,
+          total,
+        };
+
+        const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/producto/${user.email}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(bodySinpe),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'No se pudo registrar el pago por SINPE.');
+        }
+
+        alert('Tu compra ha sido registrada exitosamente. Tienes 2 días para realizar el pago por SINPE.');
+        navigate('/catalog');
+        return;
+      }
+
       if (metodoPago === 'transferencia') {
         const response = await fetch(`${apiUrl}/apy/payments/pay/${user.email}`, {
           method: 'POST',
@@ -56,33 +85,9 @@ const PayProduct = () => {
         } else {
           alert("URL inválida para redirección a PayPal.");
         }
+
         return;
       }
-
-      // Si el método es SINPE o no transferencia, sigue flujo normal
-      const confirmResponse = await fetch(`${apiUrl}/api/ordenes/crear`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          productosSeleccionados,
-          total,
-          metodoNotificacion,
-          destino: metodoNotificacion === 'sms' ? numeroTelefono : correoUsuario,
-        })
-      });
-
-      const confirmResult = await confirmResponse.json();
-
-      if (!confirmResult.exito) {
-        alert(`No se pudo completar la compra: ${confirmResult.mensaje}`);
-        return;
-      }
-
-      alert(`Compra realizada correctamente. Se envió confirmación por ${metodoNotificacion}.`);
-      navigate('/catalog');
     } catch (error) {
       console.error('Error al procesar la compra:', error);
       alert('Ocurrió un error al procesar la compra. Inténtalo más tarde.');
@@ -199,4 +204,3 @@ const PayProduct = () => {
 };
 
 export default PayProduct;
-
