@@ -28,60 +28,85 @@ const PayService = () => {
       alert('Ingresa un número telefónico válido con prefijo internacional (ej: +50612345678).');
       return;
     }
-    console.log(token);
 
     if (!token) {
-      alert('No se ha encontrado el token de autenticación.'+ token);
+      alert('No se ha encontrado el token de autenticación.');
       return;
     }
 
-    const fecha = fechaSeleccionada.toISOString().split('T')[0]; 
-    const hora = fechaSeleccionada.toTimeString().slice(0, 5);   
+    if (!metodoPago) {
+      alert('Selecciona un método de pago.');
+      return;
+    }
 
-    const body = {
-      date: fecha,
-      hour: hora,
-      state: 'PENDIENTE',
-      userId: user.id,
-      serviceId: servicio.id,
-    };
+    const fecha = fechaSeleccionada.toISOString().split('T')[0];
+    const hora = fechaSeleccionada.toTimeString().slice(0, 5);
 
-    console.log(JSON.stringify(body))
     try {
-      const response = await fetch(`${apiUrl}/api/payments/pay/appointment/${user.email}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(body)
-      });
-      const result = await response.json();
+      if (metodoPago === 'sinpe') {
+        const bodySinpe = {
+          date: fecha,
+          hour: hora,
+          serviceId: servicio.id,
+        };
 
-      console.log("Redirigiendo a:", result.sessionUrl);
-      console.log("Tipo:", typeof result.sessionUrl);
-      console.log("Contiene https?:", result.sessionUrl.includes("https://"));
+        const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/cita/${user.email}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(bodySinpe)
+        });
 
-      if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
-        window.location.href = result.sessionUrl;
-      } else {
-        alert("URL inválida para redirección");
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'No se pudo registrar la cita por SINPE');
+        }
+
+        alert('Tu cita ha sido registrada exitosamente. Tienes 2 días para realizar el pago por SINPE.');
+        navigate('/services');
+        return;
       }
 
-      /*
+      if (metodoPago === 'transferencia') {
+        const bodyTransferencia = {
+          date: fecha,
+          hour: hora,
+          state: 'PENDIENTE',
+          userId: user.id,
+          serviceId: servicio.id,
+        };
 
-      if (!result.exito) {
-        alert(`No se pudo agendar la cita: ${result.mensaje}`);
-        return;
-      }*/
+        const response = await fetch(`${apiUrl}/api/payments/pay/appointment/${user.email}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(bodyTransferencia)
+        });
 
+        const result = await response.json();
 
+        console.log("Redirigiendo a:", result.sessionUrl);
+        console.log("Tipo:", typeof result.sessionUrl);
+        console.log("Contiene https?:", result.sessionUrl.includes("https://"));
 
-      alert(`Cita confirmada. Se ha enviado la confirmación por ${metodoNotificacion}. ¡Gracias!`);
+        if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
+          window.location.href = result.sessionUrl;
+        } else {
+          alert("URL inválida para redirección");
+        }
 
+        if (!result.exito) {
+          alert(`No se pudo agendar la cita: ${result.mensaje}`);
+          return;
+        }
+      }
     } catch (error) {
-      console.error('Error al enviar la solicitud:', error);
-      alert('Ocurrió un error al enviar la solicitud. Inténtalo más tarde.');
+      console.error('Error al confirmar cita:', error);
+      alert('Ocurrió un error al procesar la cita. Inténtalo más tarde.');
     }
   };
 

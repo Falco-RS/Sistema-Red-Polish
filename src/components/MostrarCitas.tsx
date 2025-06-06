@@ -68,7 +68,7 @@ const Appoiment = () => {
               <td>{cita.date}</td>
               <td>{cita.hour}</td>
               <td>{cita.state}</td>
-              <td>₡{cita.service.price.toFixed(2)}</td>
+              <td>${cita.service.price.toFixed(2)}</td>
               <td>
                 <button className="btn btn-danger btn-sm" disabled>
                   Cancelar

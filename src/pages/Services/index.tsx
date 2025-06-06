@@ -116,121 +116,109 @@ const Services = () => {
     : servicios
 
   return (
-    <>
-      <NavBar />
-      <div className="container mt-5">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h4 className="fw-bold text-dark">Catálogo de Servicios</h4>
-          <Dropdown>
-            <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" className="text-dark">
-              Sort by
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={() => setCategoriaSeleccionada(null)}>Todas</Dropdown.Item>
-              {categories.map(cat => (
-                <Dropdown.Item key={cat.id} onClick={() => setCategoriaSeleccionada(cat.id)}>
-                  {cat.name}
-                </Dropdown.Item>
-              ))}
-            </Dropdown.Menu>
-          </Dropdown>
-        </div>
+  <>
+    <NavBar />
+    <div className="container mt-5">
+      <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+        <h4 className="fw-bold text-dark mb-2">Catálogo de Servicios</h4>
+        <Dropdown className="mb-2">
+          <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" className="text-dark">
+            Sort by
+          </Dropdown.Toggle>
+          <Dropdown.Menu>
+            <Dropdown.Item onClick={() => setCategoriaSeleccionada(null)}>Todas</Dropdown.Item>
+            {categories.map(cat => (
+              <Dropdown.Item key={cat.id} onClick={() => setCategoriaSeleccionada(cat.id)}>
+                {cat.name}
+              </Dropdown.Item>
+            ))}
+          </Dropdown.Menu>
+        </Dropdown>
 
         {isAdmin && (
-          <div className="mb-3 d-flex justify-content-end gap-2">
-            <button 
-              className="btn btn-danger" 
-              style={{
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none', 
-              margin: '5px',
-            }}
-              onClick={() => navigate('/add-service')}
-            >
+          <div className="d-flex flex-wrap gap-2 ms-auto mb-2">
+            <button className="btn btn-primary" onClick={() => navigate('/add-service')}>
               Agregar Servicio
             </button>
-            <button 
-              className="btn btn-warning"
-              style={{
-              backgroundColor: '#007bff',
-              color: 'white',
-              border: 'none', 
-              margin: '5px',
-            }} 
-              onClick={() => navigate('/edit-calendar')}
-            >
+            <button className="btn btn-primary" onClick={() => navigate('/edit-calendar')}>
               Modificar Calendario
             </button>
           </div>
         )}
+      </div>
 
-        <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
-          {serviciosFiltrados.map(servicio => (
-            <div key={servicio.id} className="col">
-              <div className="card shadow-sm h-100">
-                {servicio.id_promocion && (
-                  <div className="bg-danger text-white text-center fw-bold py-1 rounded-top">
-                    {promotions.find(promo => promo.id === servicio.id_promocion)?.title || 'Promoción'}
-                  </div>
-                )}
+      {serviciosFiltrados.length === 0 ? (
+        <p className="text-center text-muted">No hay servicios para esta categoría.</p>
+      ) : (
+        <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+          {serviciosFiltrados.map(servicio => {
+            const promocion = promotions.find(promo => promo.id === servicio.id_promocion)
 
-                {servicio.imagen && (
-                  <img
-                    src={servicio.imagen}
-                    alt={servicio.nombre}
-                    className="card-img-top"
-                    style={{ height: '180px', objectFit: 'cover' }}
-                  />
-                )}
-
-                <div className="card-body">
-                  <h5 className="card-title">{servicio.nombre}</h5>
-                  <p className="card-text">{servicio.descripcion}</p>
-                  <p className="card-text"><strong>Duración:</strong> {servicio.duracion} min</p>
-
-                  {servicio.id_promocion && servicio.porcentajeDescuento ? (
-                  <div>
-                    {/* Precio original calculado */}
-                    <span className="text-muted text-decoration-line-through me-2">
-                      ${Math.round(servicio.precio / (1 - servicio.porcentajeDescuento / 100)).toLocaleString()}
-                    </span>
-                    {/* Precio con descuento */}
-                    <span className="fw-bold text-danger">
-                      ${servicio.precio.toLocaleString()}
-                    </span>
-                  </div>
-                ) : (
-                  <p className="mb-0 fw-bold">${servicio.precio.toLocaleString()}</p>
-                )}
-
-                  <button
-                    className="btn"
-                    style={{
-                      backgroundColor: '#007bff',
-                      color: 'white',
-                      border: 'none',
-                      width: '100%',
-                      padding: '10px',
-                      borderRadius: '5px',
-                      fontWeight: 'bold',
-                      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                      transition: 'background-color 0.3s ease',
-                    }}
-                    onClick={() =>
-                      isAdmin ? manejarModificar(servicio) : manejarAgendar(servicio)
+            return (
+              <div key={servicio.id} className="col">
+                <div
+                  className="card shadow-sm position-relative h-100"
+                  onClick={() => {
+                    if (!user) {
+                      alert('Debes iniciar sesión para agendar una cita.');
+                      return;
                     }
+
+                    if (isAdmin) {
+                      manejarModificar(servicio);
+                    } else {
+                      manejarAgendar(servicio);
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  {promocion && (
+                    <span className="badge bg-danger position-absolute top-0 start-0 m-2" title={promocion.title}>
+                      {promocion.title}
+                    </span>
+                  )}
+
+                  <div
+                    className="card-img-top bg-light d-flex justify-content-center align-items-center"
+                    style={{ height: '180px' }}
                   >
-                    {isAdmin ? 'Modificar servicio' : 'Agendar cita'}
-                  </button>
+                    {servicio.imagen && (
+                      <img
+                        src={servicio.imagen}
+                        alt={servicio.nombre}
+                        className="img-fluid"
+                        style={{ maxHeight: '100%' }}
+                      />
+                    )}
+                  </div>
+
+                  <div className="card-body">
+                    <h6 className="card-title fw-bold">{servicio.nombre}</h6>
+                    <p className="card-text text-muted mb-1">{servicio.descripcion}</p>
+                    <p className="card-text mb-1"><strong>Duración:</strong> {servicio.duracion} min</p>
+
+                    {servicio.id_promocion && servicio.porcentajeDescuento ? (
+                      <div>
+                        <span className="text-muted text-decoration-line-through me-2">
+                          ${Math.round(servicio.precio / (1 - servicio.porcentajeDescuento / 100)).toLocaleString()}
+                        </span>
+                        <span className="fw-bold text-danger">
+                          ${servicio.precio.toLocaleString()}
+                        </span>
+                      </div>
+                    ) : (
+                      <p className="mb-0 fw-bold">${servicio.precio.toLocaleString()}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
-      </div>
-    </>
-  )
+      )}
+    </div>
+  </>
+)
 }
 
 export default Services

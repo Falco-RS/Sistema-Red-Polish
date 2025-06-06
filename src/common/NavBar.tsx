@@ -53,15 +53,18 @@ const NavBar = () => {
           </ul>
 
           <ul className="navbar-nav align-items-center">
-            <li className="nav-item me-3">
-              <Link to="/shopping-cart" className="nav-link">
-                <img
-                  src={carritoIcon}
-                  alt="Carrito de compras"
-                  style={{ width: '30px', height: '30px' }}
-                />
-              </Link>
-            </li>
+            {user && user.rol !== 'Administrador' && (
+              <li className="nav-item me-3">
+                <Link to="/shopping-cart" className="nav-link">
+                  <img
+                    src={carritoIcon}
+                    alt="Carrito de compras"
+                    style={{ width: '30px', height: '30px' }}
+                  />
+                </Link>
+              </li>
+            )}
+
 
             {!user ? (
               <>
