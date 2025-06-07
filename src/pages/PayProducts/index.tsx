@@ -8,7 +8,7 @@ const PayProduct = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { productosSeleccionados, total } = location.state || { productosSeleccionados: [], total: 0 };
-  const { token, user } = useAuth();
+  const { token, user, setIdTrans, setIsCompra } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
 
   const [metodoNotificacion, setMetodoNotificacion] = useState<'email' | 'sms' | null>(null);
@@ -40,11 +40,13 @@ const PayProduct = () => {
     try {
       if (metodoPago === 'sinpe') {
         const bodySinpe = {
-          productos: productosSeleccionados,
-          total,
+          descripcion: 'Compra desde el carrito',
+            fechaCompra: new Date().toISOString().split('T')[0],
+            estadoPago: 'PENDIENTE',
+            usuarioEmail: user.email
         };
 
-        const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/producto/${user.email}`, {
+        const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/compra/${user.email}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -64,7 +66,7 @@ const PayProduct = () => {
       }
 
       if (metodoPago === 'transferencia') {
-        const response = await fetch(`${apiUrl}/apy/payments/pay/${user.email}`, {
+        const response = await fetch(`${apiUrl}/api/payments/pay/${user.email}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -73,15 +75,17 @@ const PayProduct = () => {
           body: JSON.stringify({
             descripcion: 'Compra desde el carrito',
             fechaCompra: new Date().toISOString().split('T')[0],
-            estadoPago: 'Pendiente',
+            estadoPago: 'PENDIENTE',
             usuarioEmail: user.email
           })
         });
-
+        
         const result = await response.json();
-
+        console.log(result)
+        setIdTrans(result.id_compra)
+        setIsCompra(true)
         if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
-          window.location.href = result.sessionUrl;
+          window.location.href = result.sessionUrl;     
         } else {
           alert("URL inválida para redirección a PayPal.");
         }

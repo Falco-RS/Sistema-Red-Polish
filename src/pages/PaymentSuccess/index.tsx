@@ -5,7 +5,7 @@ import { useAuth } from '../../common/AuthContext';
 const PaymentSuccess = () => {
   const [mensaje, setMensaje] = useState("Procesando tu pago...");
   const navigate = useNavigate();
-  const { user, token, idTrans } = useAuth();
+  const { user, token, idTrans, isCompra } = useAuth();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -18,9 +18,27 @@ const PaymentSuccess = () => {
     }
 
     const confirmarPago = async () => {
+      
       try {
-        console.log(idTrans)
-          const response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/appointment/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
+        var response;
+        console.log(isCompra);
+        if (isCompra) {
+            console.log(idTrans)
+            response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/buy/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            }
+          });
+
+            if (!response.ok) {
+              setMensaje("❌ El servidor rechazó la solicitud de confirmación del pago.");
+              return;
+            }
+        }else {
+          console.log(idTrans)
+          response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/appointment/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -32,7 +50,8 @@ const PaymentSuccess = () => {
           setMensaje("❌ El servidor rechazó la solicitud de confirmación del pago.");
           return;
         }
-
+        }
+      
         const text = await response.text();
         const result = text ? JSON.parse(text) : null;
 
