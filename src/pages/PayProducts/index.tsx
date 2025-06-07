@@ -112,7 +112,7 @@ const PayProduct = () => {
       <NavBar />
       <div className="container mt-5">
         <div className="card p-4 shadow-lg">
-          <h2 className="text-danger mb-4 text-center">Confirmación de compra</h2>
+          <h2 className="text-dark mb-4 text-center">Confirmación de compra</h2>
 
           <h5 className="mb-3">Productos seleccionados</h5>
           <ul className="list-group mb-3">
@@ -171,7 +171,7 @@ const PayProduct = () => {
           </div>
 
           {metodoPago === 'transferencia' && (
-            <div className="alert alert-danger">
+            <div className="alert alert-primary">
               Al confirmar tu compra, serás redirigido automáticamente a <strong>PayPal</strong> para realizar el pago de forma segura.
             </div>
           )}
