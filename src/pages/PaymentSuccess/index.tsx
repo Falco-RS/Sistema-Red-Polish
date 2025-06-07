@@ -56,7 +56,7 @@ const PaymentSuccess = () => {
         const result = text ? JSON.parse(text) : null;
 
         if (result?.status === "Success") {
-          setMensaje("✅ ¡Pago confirmado con éxito! Tu cita ha sido agendada.");
+          setMensaje("✅ ¡Pago confirmado con éxito!.");
           //setTimeout(() => navigate("/mis-citas"), 4000);
         } else {
           setMensaje("❌ El pago no fue aprobado.");
