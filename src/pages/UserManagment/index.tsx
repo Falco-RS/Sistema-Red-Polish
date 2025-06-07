@@ -25,7 +25,7 @@ const UserManagement = () => {
     e.preventDefault()
 
     const userEmail = user?.email
-
+    
     if (!firstName.trim() || !lastName.trim()) {
       setError('Por favor, complete los campos que desea cambiar en su perfil')
       setSuccess(false)
@@ -114,28 +114,7 @@ useEffect(() => {
 
   fetchPromotions()
 }, [apiUrl, token])
-
-
-  const [salesHistory, setSalesHistory] = useState([
-  {
-    id: 1,
-    client: 'Pedro',
-    date: '11/03/2025',
-    products: [{ name: 'Cera', quantity: 2 }],
-    payment: 'T.Bancaria',
-    status: 'Venta Exitosa',
-    total: 14500,
-  },
-  {
-    id: 2,
-    client: 'Lucas',
-    date: '11/03/2025',
-    products: [{ name: 'Cera', quantity: 1 }],
-    payment: 'Efectivo',
-    status: 'Venta Anulada',
-    total: 0,
-  }
-])
+ 
 
   const [newPromo, setNewPromo] = useState<{
     title: string;
@@ -305,6 +284,55 @@ const refreshPromotions = async () => {
     console.error('❌ Error al refrescar promociones:', error)
   }
 }
+  const [salesHistory, setSalesHistory] = useState<any[]>([]);
+
+  useEffect(() => {
+  const fetchSalesHistory = async () => {
+    if (!user || !token) return;
+
+    const endpoint = user.rol === 'Administrador'
+      ? `${apiUrl}/api/compras/admin`
+      : `${apiUrl}/api/compras/history/${user.email}`;
+
+    try {
+      const response = await fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`❌ Error al obtener historial de compras: ${errorText}`);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('🧾 Compras recibidas:', data);
+
+      const mappedData = data.map((compra: any, index: number) => ({
+        id: compra.idCompra || index,
+        client: compra.cliente?.name || 'Desconocido',
+        date: compra.fechaCompra || 'Fecha no disponible',
+        description: compra.descripcion || '—',
+        status: compra.estadoPago || 'Sin estado',
+        total: compra.precioCompra || 0
+      }));
+
+      setSalesHistory(mappedData);
+      console.log(salesHistory);
+      console.log(mappedData);
+    } catch (error) {
+      console.error('❌ Error al cargar historial de compras:', error);
+    }
+  };
+
+  fetchSalesHistory();
+  console.log(salesHistory);
+}, [user, token, apiUrl]);
+
+
 
 
    return (
@@ -483,43 +511,33 @@ const refreshPromotions = async () => {
           <div className="table-responsive">
             <table className="table table-bordered align-middle">
               <thead className="table-light">
-                <tr>
-                  <th>Nombre del Cliente</th>
-                  <th>Fecha Venta</th>
-                  <th>Productos</th>
-                  <th>Cantidad</th>
-                  <th>Forma de Pago</th>
-                  <th>Estado Venta</th>
-                  <th>Total Venta</th>
+              <tr>
+                <th>Nombre del Cliente</th>
+                <th>Fecha de Compra</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {salesHistory.map((sale, index) => (
+                <tr key={sale.id ?? `sale-${index}`}>
+                  <td>{sale.client || 'Desconocido'}</td>
+                  <td>{sale.date || 'Fecha no disponible'}</td>
+                  <td>{sale.description || '—'}</td>
+                  <td>
+                    <span className={`badge ${sale.status === 'EXITOSO' || sale.status === 'CONFIRMADA' ? 'bg-success' : 'bg-danger'}`}>
+                      {sale.status || 'Sin estado'}
+                    </span>
+                  </td>
+                  <td>
+                    {sale.total !== undefined
+                      ? `$${sale.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
+                      : '$0.00'}
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {salesHistory
-                  .filter(sale => user?.rol === 'Administrador' || sale.client === user?.name)
-                  .map((sale) => (
-                    <tr key={sale.id}>
-                      <td>{sale.client}</td>
-                      <td>{sale.date}</td>
-                      <td>
-                        {sale.products.map((p, i) => (
-                          <div key={i}>{p.name}</div>
-                        ))}
-                      </td>
-                      <td>
-                        {sale.products.map((p, i) => (
-                          <div key={i}>{p.quantity}</div>
-                        ))}
-                      </td>
-                      <td>{sale.payment}</td>
-                      <td>
-                        <span className={`badge ${sale.status === 'Venta Exitosa' ? 'bg-success' : 'bg-danger'}`}>
-                          {sale.status}
-                        </span>
-                      </td>
-                      <td>₡{sale.total.toLocaleString()}</td>
-                    </tr>
-                ))}
-              </tbody>
+              ))}
+            </tbody>
             </table>
           </div>
         </div>
