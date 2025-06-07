@@ -5,7 +5,7 @@ import { useAuth } from '../../common/AuthContext';
 const PaymentSuccess = () => {
   const [mensaje, setMensaje] = useState("Procesando tu pago...");
   const navigate = useNavigate();
-  const { user, token } = useAuth(); // ✅ Mover fuera del useEffect
+  const { user, token, idTrans } = useAuth();
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -19,7 +19,8 @@ const PaymentSuccess = () => {
 
     const confirmarPago = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
+        console.log(idTrans)
+          const response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/appointment/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

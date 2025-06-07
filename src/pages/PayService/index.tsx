@@ -11,7 +11,7 @@ const PayService = () => {
   const [metodoNotificacion, setMetodoNotificacion] = useState<'email' | 'sms' | null>(null);
   const [numeroTelefono, setNumeroTelefono] = useState('');
   const [correoUsuario, setCorreoUsuario] = useState(''); 
-  const { user ,token } = useAuth();
+  const { user ,token, setIdTrans } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
 
 
@@ -77,6 +77,7 @@ const PayService = () => {
           userId: user.id,
           serviceId: servicio.id,
         };
+        console.log(`${apiUrl}/api/payments/pay/appointment/${user.email}`)
 
         const response = await fetch(`${apiUrl}/api/payments/pay/appointment/${user.email}`, {
           method: 'POST',
@@ -88,12 +89,14 @@ const PayService = () => {
         });
 
         const result = await response.json();
+        console.log(result)
 
         console.log("Redirigiendo a:", result.sessionUrl);
         console.log("Tipo:", typeof result.sessionUrl);
         console.log("Contiene https?:", result.sessionUrl.includes("https://"));
 
         if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
+          setIdTrans(result.id_compra)
           window.location.href = result.sessionUrl;
         } else {
           alert("URL inválida para redirección");
