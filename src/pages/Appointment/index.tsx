@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NavBar from '../../common/NavBar'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import DatePicker from 'react-datepicker'
@@ -17,6 +17,10 @@ const Appointment = () => {
   const [fechaConfirmada] = useState(false)
 
   const esDiaValido = (date: Date) => !isWeekend(date)
+
+  useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+  }, [])
 
   return (
     <>

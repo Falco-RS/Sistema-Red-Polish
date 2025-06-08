@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../common/AuthContext';
 
@@ -67,6 +67,11 @@ const Cancelaciones: React.FC = () => {
       estado: 'Cancelación exitosa'
     }
   ]);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+  }, [])
+
 
   const cambiarEstado = (id: number) => {
     setDatosAdmin(prev =>

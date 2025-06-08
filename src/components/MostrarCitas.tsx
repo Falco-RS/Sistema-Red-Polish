@@ -9,6 +9,8 @@ const Appoiment = () => {
   const apiUrl = import.meta.env.VITE_IP_API;
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     const fetchAppointments = async () => {
       try {
         const url =
@@ -42,6 +44,12 @@ const Appoiment = () => {
     }
   }, [user]);
 
+
+  const handleConfirm = (citaId: number) => {
+    // Aquí puedes agregar la lógica para confirmar el pago más adelante
+    console.log("Confirmar pago para la cita:", citaId);
+  };
+
   return (
     <div className="container mt-4">
       <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Mis Citas</h2>
@@ -70,6 +78,14 @@ const Appoiment = () => {
               <td>{cita.state}</td>
               <td>${cita.service.price.toFixed(2)}</td>
               <td>
+                {user.rol === 'Administrador' && cita.state === 'PENDIENTE' ? (
+                    <button
+                      className="btn btn-success btn-sm me-2"
+                      onClick={() => handleConfirm(cita.id)}
+                    >
+                      Confirmar pago
+                    </button>
+                  ) : null}
                 <button className="btn btn-danger btn-sm" disabled>
                   Cancelar
                 </button>

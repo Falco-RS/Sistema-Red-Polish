@@ -77,6 +77,8 @@ const UserManagement = () => {
   }
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     if (success) {
       const timer = setTimeout(() => {
         navigate('/')

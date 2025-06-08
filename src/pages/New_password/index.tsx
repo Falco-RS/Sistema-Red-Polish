@@ -12,6 +12,7 @@ function New_Password() {
   const apiUrl = import.meta.env.VITE_IP_API;
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
     const emailFromState = location.state?.email
     if (emailFromState) {
       setEmail(emailFromState)

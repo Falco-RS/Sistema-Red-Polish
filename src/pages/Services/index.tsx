@@ -88,6 +88,8 @@ const Services = () => {
   }
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     if (user?.rol === 'Administrador') {
       setIsAdmin(true)
     }

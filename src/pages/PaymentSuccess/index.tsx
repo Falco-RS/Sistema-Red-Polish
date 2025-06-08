@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../common/AuthContext';
+import NavBar from '../../common/NavBar'; // <- Importación de la NavBar
 
 const PaymentSuccess = () => {
   const [mensaje, setMensaje] = useState("Procesando tu pago...");
@@ -8,6 +9,8 @@ const PaymentSuccess = () => {
   const { user, token, idTrans, isCompra } = useAuth();
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     const queryParams = new URLSearchParams(window.location.search);
     const paymentId = queryParams.get("paymentId");
     const payerId = queryParams.get("PayerID");
@@ -18,13 +21,12 @@ const PaymentSuccess = () => {
     }
 
     const confirmarPago = async () => {
-      
       try {
         var response;
         console.log(isCompra);
         if (isCompra) {
-            console.log(idTrans)
-            response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/buy/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
+          console.log(idTrans)
+          response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/buy/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -32,26 +34,26 @@ const PaymentSuccess = () => {
             }
           });
 
-            if (!response.ok) {
-              setMensaje("❌ El servidor rechazó la solicitud de confirmación del pago.");
-              return;
-            }
-        }else {
+          if (!response.ok) {
+            setMensaje("❌ El servidor rechazó la solicitud de confirmación del pago.");
+            return;
+          }
+        } else {
           console.log(idTrans)
           response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/appointment/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          }
-        });
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`,
+            }
+          });
 
-        if (!response.ok) {
-          setMensaje("❌ El servidor rechazó la solicitud de confirmación del pago.");
-          return;
+          if (!response.ok) {
+            setMensaje("❌ El servidor rechazó la solicitud de confirmación del pago.");
+            return;
+          }
         }
-        }
-      
+
         const text = await response.text();
         const result = text ? JSON.parse(text) : null;
 
@@ -71,11 +73,28 @@ const PaymentSuccess = () => {
   }, [navigate, user.email, token]);
 
   return (
-    <div className="container mt-5">
-      <div className="card p-4 shadow">
-        <h3 className="text-center text-danger">{mensaje}</h3>
+    <>
+      <NavBar />
+      <div className="container mt-5">
+        <div className="card p-4 shadow">
+          <h3 className="text-center text-danger">{mensaje}</h3>
+        </div>
+        <div className="text-center mt-4">
+          <button
+            className="btn btn-outline-primary me-2"
+            onClick={() => navigate("/catalog")}
+          >
+            Ir a comprar productos
+          </button>
+          <button
+            className="btn btn-outline-success"
+            onClick={() => navigate("/services")}
+          >
+            Agendar un servicio
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

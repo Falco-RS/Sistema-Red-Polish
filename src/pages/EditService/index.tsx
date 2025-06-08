@@ -26,6 +26,8 @@ const EditService = () => {
   const userEmail = user?.email
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     if (!servicio) {
       setError('No se encontró información del servicio.')
       return

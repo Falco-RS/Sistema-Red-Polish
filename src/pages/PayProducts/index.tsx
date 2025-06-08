@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NavBar from '../../common/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../common/AuthContext';
@@ -15,6 +15,10 @@ const PayProduct = () => {
   const [numeroTelefono, setNumeroTelefono] = useState('');
   const [correoUsuario, setCorreoUsuario] = useState('');
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
+
+  useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+  }, [])
 
   const handleConfirmacion = async () => {
     if (!metodoNotificacion) {

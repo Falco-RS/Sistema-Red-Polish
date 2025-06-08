@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function Recover_Password() {
@@ -11,6 +11,11 @@ function Recover_Password() {
     return email.includes('@') && email.endsWith('.com')
   }
 
+  useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+  }, [])
+
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 

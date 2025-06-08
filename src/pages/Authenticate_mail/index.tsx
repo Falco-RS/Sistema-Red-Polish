@@ -15,6 +15,8 @@ function Authenticate_mail() {
   const email = location.state?.email
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     if (resendTimer > 0) {
       const timer = setTimeout(() => setResendTimer(resendTimer - 1), 1000)
       return () => clearTimeout(timer)

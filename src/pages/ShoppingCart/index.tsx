@@ -88,6 +88,8 @@ const ShoppingCart: React.FC = () => {
   };
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     const fetchCartAndProducts = async () => {
       if (!userId || !userEmail || !token) return;
 

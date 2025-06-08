@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {useAuth} from "../../common/AuthContext.tsx";
 
@@ -13,6 +13,10 @@ const Register = () => {
   const [success, setSuccess] = useState(false)
   const apiUrl = import.meta.env.VITE_IP_API;
   const { login } = useAuth();
+
+  useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

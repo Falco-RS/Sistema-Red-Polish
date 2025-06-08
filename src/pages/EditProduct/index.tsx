@@ -24,6 +24,8 @@ const EditProduct = () => {
   const { id } = useParams()
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     fetch(`${apiUrl}/api/products/get/${id}`)
       .then(res => res.json())
       .then(data => {

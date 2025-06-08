@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NavBar from '../../common/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../common/AuthContext'
@@ -18,17 +18,12 @@ const PayService = () => {
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
 
 
+  useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+  }, [])
+
+
   const handleConfirmacion = async () => {
-    if (!metodoNotificacion) {
-      alert('Selecciona un método de notificación.');
-      return;
-    }
-
-    if (metodoNotificacion === 'sms' && !numeroTelefono.startsWith('+')) {
-      alert('Ingresa un número telefónico válido con prefijo internacional (ej: +50612345678).');
-      return;
-    }
-
     if (!token) {
       alert('No se ha encontrado el token de autenticación.');
       return;
@@ -136,76 +131,6 @@ const PayService = () => {
 
           <hr />
 
-          <div className="mb-3">
-            <label className="form-label fw-bold">¿Cómo deseas recibir la confirmación de la cita?</label>
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="notificacion"
-                id="email"
-                value="email"
-                onChange={() => setMetodoNotificacion('email')}
-              />
-              <label className="form-check-label" htmlFor="email">Correo electrónico</label>
-            </div>
-            <div className="form-check">
-              <input
-                type="radio"
-                className="form-check-input"
-                name="notificacion"
-                id="sms"
-                value="sms"
-                onChange={() => setMetodoNotificacion('sms')}
-              />
-              <label className="form-check-label" htmlFor="sms">SMS</label>
-            </div>
-          </div>
-
-          {metodoNotificacion === 'email' && (
-            <div className="mb-3">
-              <label className="form-label">Correo electrónico</label>
-              <input
-                type="email"
-                className="form-control"
-                value={correoUsuario}
-                onChange={(e) => setCorreoUsuario(e.target.value)}
-                placeholder="ejemplo@correo.com"
-              />
-            </div>
-          )}
-
-          {metodoNotificacion === 'sms' && (
-            <div className="mb-3">
-            <label className="form-label">Número telefónico con prefijo</label>
-            <div className="input-group">
-            <select
-                className="form-select"
-                style={{ maxWidth: '120px' }}
-                onChange={(e) => {
-                const numero = numeroTelefono.replace(/^\+\d+/, ''); // quitar prefijo actual
-                setNumeroTelefono(`${e.target.value}${numero}`);
-                }}
-            >
-                <option value="+506">+506 (CR)</option>
-                <option value="+52">+52 (MX)</option>
-                <option value="+1">+1 (US)</option>
-                <option value="+34">+34 (ES)</option>
-                <option value="+57">+57 (CO)</option>
-            </select>
-            <input
-                type="tel"
-                className="form-control"
-                value={numeroTelefono}
-                onChange={(e) => setNumeroTelefono(e.target.value)}
-                placeholder="+50612345678"
-            />
-            </div>
-        </div>
-        )}
-
-
-          <hr />
           {/* Pago */}
           <div className="mb-3 mt-4">
             <label className="form-label fw-bold">Método de pago</label>
@@ -226,20 +151,17 @@ const PayService = () => {
           )}
 
           {metodoPago === 'sinpe' && (
-             <div className="border p-3 mb-3">
+            <div className="border p-3 mb-3">
               <h5 className="text-primary">Pago por SINPE</h5>
-              
               <div className="bg-white text-dark p-4 rounded">
                 <p className="fw-bold">
                   Para finalizar la compra debes mandarle un mensaje a nuestro administrador Cristian Rojas al siguiente número:
                 </p>
-
                 <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
                   +506  83582929
                 </div>
-
                 <p>
-                  Con él podrás hacer el pago por un SINPE. Tienes 2 días para realizarlo después de seleccón finalizar compra, por ese tiempo tendrás tu cita apartada.
+                  Con él podrás hacer el pago por un SINPE. Tienes 2 días para realizarlo después de seleccionar finalizar compra, por ese tiempo tendrás tu cita apartada.
                   Antes de acabar los dos días, Cristian podrá actualizar el estado de tu pago a exitoso o cancelado.
                   Podrás ver este estado en el apartado de <strong>“Mis Citas”</strong> en tu usuario.
                   ¡Gracias por preferirnos!
@@ -247,6 +169,7 @@ const PayService = () => {
               </div>
             </div>
           )}
+
           <div className="text-center">
             <button className="btn btn-primary" onClick={handleConfirmacion}>
               Confirmar cita

@@ -17,6 +17,8 @@ const ProductView = () => {
   const userEmail = user?.email
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     if (user?.rol === 'Administrador') {
       setIsAdmin(true)
     }

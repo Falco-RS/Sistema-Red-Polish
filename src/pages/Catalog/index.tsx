@@ -17,6 +17,8 @@ const Catalog = () => {
   const apiUrl = import.meta.env.VITE_IP_API
 
   useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+
     if (user?.rol === 'Administrador') setIsAdmin(true)
     fetchProducts()
     fetchCategories()
