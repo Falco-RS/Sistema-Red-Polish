@@ -3,7 +3,7 @@ import { useAuth } from '../common/AuthContext'
 
 
 const Appoiment = () => {
-  const { user } = useAuth();
+  const { user, token } = useAuth();
   const [appointments, setAppointments] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const apiUrl = import.meta.env.VITE_IP_API;
@@ -45,9 +45,66 @@ const Appoiment = () => {
   }, [user]);
 
 
-  const handleConfirm = (citaId: number) => {
-    // Aquí puedes agregar la lógica para confirmar el pago más adelante
-    console.log("Confirmar pago para la cita:", citaId);
+  const handleConfirm = async (citaId: number) => {
+  try {
+    const response = await fetch(`${apiUrl}/api/citas/update-state/${citaId}/${user.email}/CONFIRMADA`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+        const err = await response.json();
+        setError(err.message || 'Error al confirmar la cita.');
+        return;
+      }
+
+    const updated = await response.json();
+    setAppointments(prev =>
+      prev.map(cita =>
+        cita.id === updated.id ? { ...cita, state: updated.state } : cita
+      )
+    );
+
+  } catch (err) {
+    console.error(err);
+    setError('Error de red al confirmar el pago.');
+  }
+};
+
+
+  const handleCancel = async (citaId: number) => {
+    try {
+      const endpoint = user.rol === 'Administrador'
+        ? `${apiUrl}/api/citas/cancel_admin/${citaId}/${user.email}`
+        : `${apiUrl}/api/citas/cancel/${citaId}/${user.email}`;
+
+      const response = await fetch(endpoint, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        setError(err.message || 'Error al cancelar la cita.');
+        return;
+      }
+
+    const updated = await response.json();
+      setAppointments(prev =>
+        prev.map(cita =>
+          cita.id === updated.id ? { ...cita, state: updated.state } : cita
+        )
+      );
+    } catch (err) {
+      console.error(err);
+      setError('Error de red al cancelar la cita.' );
+    }
   };
 
   return (
@@ -78,17 +135,37 @@ const Appoiment = () => {
               <td>{cita.state}</td>
               <td>${cita.service.price.toFixed(2)}</td>
               <td>
-                {user.rol === 'Administrador' && cita.state === 'PENDIENTE' ? (
-                    <button
-                      className="btn btn-success btn-sm me-2"
-                      onClick={() => handleConfirm(cita.id)}
-                    >
-                      Confirmar pago
-                    </button>
-                  ) : null}
-                <button className="btn btn-danger btn-sm" disabled>
-                  Cancelar
-                </button>
+                {/* CONFIRMAR PAGO SOLO PARA ADMIN EN ESTADO PENDIENTE */}
+                {user.rol === 'Administrador' && cita.state === 'PENDIENTE' && (
+                  <button
+                    className="btn btn-success btn-sm me-2"
+                    onClick={async () => {
+                      await handleConfirm(cita.id);
+                    }}
+                  >
+                    Confirmar pago
+                  </button>
+                )}
+
+                {/* CANCELAR si está PENDIENTE o CONFIRMADA */}
+                {(cita.state === 'PENDIENTE' || cita.state === 'CONFIRMADA') && (
+                  <button
+                    className="btn btn-danger btn-sm"
+                    onClick={() => handleCancel(cita.id)}
+                  >
+                    Cancelar
+                  </button>
+                )}
+
+                {/* CONFIRMAR CANCELACIÓN si es CANCELADA PENDIENTE y el admin la ve */}
+                {cita.state === 'CANCELADA PENDIENTE' && user.rol === 'Administrador' && (
+                  <button
+                    className="btn btn-warning btn-sm"
+                    onClick={() => handleCancel(cita.id)}
+                  >
+                    Confirmar cancelación
+                  </button>
+                )}
               </td>
             </tr>
           ))}
