@@ -333,8 +333,57 @@ const refreshPromotions = async () => {
   console.log(salesHistory);
 }, [user, token, apiUrl]);
 
+const confirmarCompra = async (idCompra: number) => {
+  if (!user?.email || !token) return;
 
+  const url = `${apiUrl}/api/payments/sinpe/confirm/compra/${idCompra}`;
 
+  try {
+    const res = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('❌ Error al confirmar la compra:', errorText);
+      alert('No se pudo confirmar la compra.');
+      return;
+    }
+
+    alert('✅ Compra confirmada exitosamente.');
+    const fetchSalesHistory = async () => {
+      const endpoint = user.rol === 'Administrador'
+        ? `${apiUrl}/api/compras/admin`
+        : `${apiUrl}/api/compras/history/${user.email}`;
+      const response = await fetch(endpoint, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+      const data = await response.json();
+      const mappedData = data.map((compra: any, index: number) => ({
+        id: compra.idCompra || index,
+        client: compra.cliente?.name || 'Desconocido',
+        date: compra.fechaCompra || 'Fecha no disponible',
+        description: compra.descripcion || '—',
+        status: compra.estadoPago || 'Sin estado',
+        total: compra.precioCompra || 0
+      }));
+      setSalesHistory(mappedData);
+    };
+
+    fetchSalesHistory();
+
+  } catch (error) {
+    console.error('❌ Error al hacer PUT:', error);
+    alert('Error de conexión.');
+  }
+};
 
    return (
     <>
@@ -523,10 +572,18 @@ const refreshPromotions = async () => {
                   <td>{sale.date || 'Fecha no disponible'}</td>
                   <td>{sale.description || '—'}</td>
                   <td>
-                    <span className={`badge ${sale.status === 'EXITOSO' || sale.status === 'CONFIRMADA' ? 'bg-success' : 'bg-danger'}`}>
-                      {sale.status || 'Sin estado'}
-                    </span>
-                  </td>
+                  <span className={`badge me-2 ${sale.status === 'EXITOSO' || sale.status === 'CONFIRMADA' ? 'bg-success' : 'bg-danger'}`}>
+                    {sale.status || 'Sin estado'}
+                  </span>
+                  {user.rol === 'Administrador' && sale.status === 'PENDIENTE' && (
+                    <button
+                      className="btn btn-sm btn-outline-primary"
+                      onClick={() => confirmarCompra(sale.id)}
+                    >
+                      Confirmar compra
+                    </button>
+                  )}
+                </td>
                   <td>
                     {sale.total !== undefined
                       ? `$${sale.total.toLocaleString(undefined, { minimumFractionDigits: 2 })}`
