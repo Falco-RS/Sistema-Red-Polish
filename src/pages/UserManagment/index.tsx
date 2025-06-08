@@ -4,7 +4,6 @@ import { Eye, EyeOff } from 'lucide-react'
 import NavBar from '../../common/NavBar'
 import { useAuth } from '../../common/AuthContext'
 import MostrarCitas from '../../components/MostrarCitas'
-import Cancelacion from '../../components/Cancelaciones'
 
 const UserManagement = () => {
   const navigate = useNavigate()
@@ -17,7 +16,7 @@ const UserManagement = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas' | 'cancelar'>('info')
+  const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas' >('info')
 
 
 
@@ -350,9 +349,6 @@ const refreshPromotions = async () => {
               <button className={`btn btn-sm w-100 text-start ${activeSection === 'citas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('citas')}>{user?.rol === 'Administrador' ? 'Citas' : 'Mis citas'}</button>
             </li>
             <li className="nav-item mb-2">
-              <button className={`btn btn-sm w-100 text-start ${activeSection === 'cancelar' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('cancelar')}>{user?.rol === 'Administrador' ? 'Cancelaciones' : 'Mis cancelaciones'}</button>
-            </li>
-            <li className="nav-item mb-2">
               <button className={`btn btn-sm w-100 text-start ${activeSection === 'gestion' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('gestion')}>Gestión de usuario</button>
             </li>
             {user?.rol === 'Administrador' && (
@@ -376,8 +372,7 @@ const refreshPromotions = async () => {
           )}
 
         {activeSection === 'citas' && <MostrarCitas />}
-        {activeSection === 'cancelar' && <Cancelacion />}
-
+        
           {activeSection === 'gestion' && (
             <div className="bg-light p-4 rounded-4 shadow" style={{ border: '2px solid #ccc', maxWidth: '600px' }}>
               <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Gestión de Usuario</h2>
