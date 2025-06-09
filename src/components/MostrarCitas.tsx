@@ -101,6 +101,10 @@ const Appoiment = () => {
           cita.id === updated.id ? { ...cita, state: updated.state } : cita
         )
       );
+
+    if (user.rol !== 'Administrador') {
+      alert('Su cancelación está pendiente. Por favor contacte al administrador al +506 8358 2929 para la devolución y tener una cancelación exitosa.');
+    }
     } catch (err) {
       console.error(err);
       setError('Error de red al cancelar la cita.' );

@@ -169,9 +169,6 @@ const PayService = () => {
               </div>
             </div>
           )}
-          <div className="alert alert-warning text-center fw-bold">
-            ⚠️ Las citas no tienen devoluciones. Asegúrate de estar seguro antes de confirmar.
-          </div>
           <div className="text-center">
             <button className="btn btn-primary" onClick={handleConfirmacion}>
               Confirmar cita
