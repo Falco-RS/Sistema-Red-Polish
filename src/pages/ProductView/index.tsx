@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import { useAuth } from '../../common/AuthContext'
 import image from '../../assets/pulido.png'
+import { useTranslation } from 'react-i18next';
 
 const ProductView = () => {
   const { user, token } = useAuth()
@@ -15,6 +16,7 @@ const ProductView = () => {
   const navigate = useNavigate()
   const apiUrl = import.meta.env.VITE_IP_API
   const userEmail = user?.email
+  const { t } = useTranslation('global');
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
@@ -134,7 +136,7 @@ const ProductView = () => {
     <NavBar />
     <div className="container mt-5">
       <button className="btn btn-outline-dark mb-4" onClick={() => navigate(-1)}>
-        ⬅ Volver
+        ⬅ {t('back')}
       </button>
 
       <div className="row align-items-center">
@@ -152,7 +154,7 @@ const ProductView = () => {
           <h4 className="fw-bold text-dark mb-3">${product.price.toLocaleString()}</h4>
 
           <div className="mb-3">
-  <label className="fw-bold text-dark mb-3">Cantidad:</label>
+  <label className="fw-bold text-dark mb-3">{t('quantity')}:</label>
   <input
     type="number"
     min="1"
@@ -167,11 +169,11 @@ const ProductView = () => {
             style={{ maxWidth: '300px' }}
             onClick={handleAddToCart}
           >
-            Añadir al carrito
+            {t('add_to_cart')}
           </button>
         ) : (
           <div className="alert alert-warning text-center mt-2" style={{ maxWidth: '300px' }}>
-            ⚠ Debes iniciar sesión para poder comprar productos.
+            ⚠ {t('login_required_p')}
           </div>
         )}
       </div>
@@ -183,14 +185,14 @@ const ProductView = () => {
               style={{ maxWidth: '300px' }}
               onClick={() => navigate(`/edit-product/${product.id}`)}
             >
-              ✏ Editar Producto
+              ✏ {t('edit_p')}
             </button>
             <button
               className="btn btn-danger fw-bold py-2 w-100"
               style={{ maxWidth: '300px' }}
               onClick={() => setShowConfirmModal(true)}
             >
-              🗑 Eliminar Producto
+              🗑 {t('delete_p')}
             </button>
           </div>
         )}
@@ -199,7 +201,7 @@ const ProductView = () => {
 
       {relatedProducts.length > 0 && (
         <div className="mt-5">
-          <h4 className="fw-bold mb-4 text-dark">Productos Relacionados</h4>
+          <h4 className="fw-bold mb-4 text-dark">{t('related_products')}</h4>
           <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5 g-3">
             {relatedProducts.map((prod) => (
               <div key={prod.id} className="col">
@@ -237,19 +239,19 @@ const ProductView = () => {
           <div className="modal-dialog" role="document">
             <div className="modal-content shadow-lg">
               <div className="modal-header bg-danger text-white">
-                <h5 className="modal-title">Confirmar eliminación</h5>
+                <h5 className="modal-title">{t('confirm_delete_title')}</h5>
                 <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
               </div>
               <div className="modal-body">
-                <p>¿Estás seguro de que deseas eliminar este producto?</p>
-                <p className="fw-bold text-danger">Esta acción no se puede deshacer.</p>
+                <p>{t('confirm_delete_message')}</p>
+                <p className="fw-bold text-danger">{t('confirm_delete_warning')}</p>
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
-                  Cancelar
+                  {t('cancel')}
                 </button>
                 <button className="btn btn-danger" onClick={handleDelete}>
-                  Eliminar
+                  {t('delete')}
                 </button>
               </div>
             </div>

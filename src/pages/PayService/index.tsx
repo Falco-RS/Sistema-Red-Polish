@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import NavBar from '../../common/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../common/AuthContext'
+import { useTranslation } from 'react-i18next';
 
 const PayService = () => {
   const location = useLocation();
@@ -13,7 +14,7 @@ const PayService = () => {
   const [correoUsuario, setCorreoUsuario] = useState(''); 
   const { user ,token, setIdTrans } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
-
+  const { t } = useTranslation('global');
 
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
 
@@ -98,7 +99,6 @@ const PayService = () => {
         }
 
         if (!result.exito) {
-          alert(`No se pudo agendar la cita: ${result.mensaje}`);
           return;
         }
       }
@@ -112,7 +112,7 @@ const PayService = () => {
     return (
       <>
         <NavBar />
-        <div className="container mt-5">No hay datos suficientes para continuar.</div>
+        <div className="container mt-5">{t('missing_data')}</div>
       </>
     );
   }
@@ -122,56 +122,56 @@ const PayService = () => {
       <NavBar />
       <div className="container mt-5">
         <div className="card p-4 shadow-lg">
-          <h2 className="text-dark mb-4 text-center">Confirmación de cita</h2>
+          <h2 className="text-dark mb-4 text-center">{t('confirm_title_s')}</h2>
 
-          <p><strong>Servicio:</strong> {servicio.nombre}</p>
-          <p><strong>Descripción:</strong> {servicio.descripcion}</p>
-          <p><strong>Fecha:</strong> {fechaSeleccionada.toLocaleDateString()}</p>
-          <p><strong>Hora:</strong> {fechaSeleccionada.toLocaleTimeString()}</p>
+          <p><strong>{t('service')}:</strong> {servicio.nombre}</p>
+          <p><strong>{t('description')}:</strong> {servicio.descripcion}</p>
+          <p><strong>{t('date')}:</strong> {fechaSeleccionada.toLocaleDateString()}</p>
+          <p><strong>{t('hour')}:</strong> {fechaSeleccionada.toLocaleTimeString()}</p>
 
           <hr />
 
           {/* Pago */}
           <div className="mb-3 mt-4">
-            <label className="form-label fw-bold">Método de pago</label>
+            <label className="form-label fw-bold">{t('payment_method')}</label>
             <div className="form-check">
               <input type="radio" className="form-check-input" name="metodoPago" id="transferencia" onChange={() => setMetodoPago('transferencia')} />
-              <label className="form-check-label" htmlFor="transferencia">Transferencia con tarjeta</label>
+              <label className="form-check-label" htmlFor="transferencia">{t('paypal')}</label>
             </div>
             <div className="form-check">
               <input type="radio" className="form-check-input" name="metodoPago" id="sinpe" onChange={() => setMetodoPago('sinpe')} />
-              <label className="form-check-label" htmlFor="sinpe">SINPE Móvil</label>
+              <label className="form-check-label" htmlFor="sinpe">{t('sinpe')}</label>
             </div>
           </div>
 
           {metodoPago === 'transferencia' && (
             <div className="alert alert-primary">
-              Al confirmar tu cita, serás redirigido automáticamente a <strong>PayPal</strong> para realizar el pago de forma segura.
+              {t('paypal_notice')} <strong>PayPal</strong> {t('paypal_notice2')}
             </div>
           )}
 
           {metodoPago === 'sinpe' && (
             <div className="border p-3 mb-3">
-              <h5 className="text-primary">Pago por SINPE</h5>
+              <h5 className="text-primary">{t('sinpe_title')} </h5>
               <div className="bg-white text-dark p-4 rounded">
                 <p className="fw-bold">
-                  Para finalizar la compra debes mandarle un mensaje a nuestro administrador Cristian Rojas al siguiente número:
+                  {t('sinpe_instruction')}
                 </p>
                 <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
                   +506  83582929
                 </div>
                 <p>
-                  Con él podrás hacer el pago por un SINPE. Tienes 2 días para realizarlo después de seleccionar finalizar compra, por ese tiempo tendrás tu cita apartada.
-                  Antes de acabar los dos días, Cristian podrá actualizar el estado de tu pago a exitoso o cancelado.
-                  Podrás ver este estado en el apartado de <strong>“Mis Citas”</strong> en tu usuario.
-                  ¡Gracias por preferirnos!
+                  {t('sinpe_description_s')}
+                  {t('sinpe_description2')}
+                  {t('sinpe_description3')}<strong>{t('sinpe_description4_s')}</strong> {t('sinpe_description5')}
+                  {t('sinpe_description6')}
                 </p>
               </div>
             </div>
           )}
           <div className="text-center">
             <button className="btn btn-primary" onClick={handleConfirmacion}>
-              Confirmar cita
+              {t('confirm_button_s')}
             </button>
           </div>
         </div>

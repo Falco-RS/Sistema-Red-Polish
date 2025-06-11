@@ -4,6 +4,7 @@ import NavBar from '../../common/NavBar';
 import { useAuth } from '../../common/AuthContext'
 import { useNavigate } from 'react-router-dom';
 
+import { useTranslation } from 'react-i18next';
 
 
 const ShoppingCart: React.FC = () => {
@@ -14,6 +15,8 @@ const ShoppingCart: React.FC = () => {
   const userEmail = user?.email
   const userId = user?.id
   const navigate = useNavigate();
+  const { t } = useTranslation('global');
+
 
 
   const actualizarProductoEnCarrito = async (cartItemId: number, nuevaCantidad: number) => {
@@ -165,7 +168,7 @@ const ShoppingCart: React.FC = () => {
     <>
       <NavBar />
       <div className="container mt-5">
-        <h2 className="mb-4 text-center text-dark">🛒 Carrito de Compras</h2>
+        <h2 className="mb-4 text-center text-dark">🛒 {t('shopping')}</h2>
 
         <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           {productos.map((producto) => {
@@ -203,7 +206,7 @@ const ShoppingCart: React.FC = () => {
                         className="btn btn-outline-danger btn-sm"
                         onClick={() => eliminarProductoDelCarrito(producto.cartItemId)}
                       >
-                        Eliminar producto
+                        {t('delete_p')}
                       </button>
 
                       <button
@@ -211,7 +214,7 @@ const ShoppingCart: React.FC = () => {
                         onClick={() => actualizarProductoEnCarrito(producto.cartItemId, seleccionados[producto.id])}
                         disabled={seleccionados[producto.id] === producto.quantity}
                       >
-                        Guardar cambios
+                        {t('save_changes')}
                       </button>
                     </div>
                   </div>
@@ -222,7 +225,7 @@ const ShoppingCart: React.FC = () => {
         </div>
 
         <div className="text-end fw-bold fs-5 mt-4 text-dark">
-          Total: ${totalSeleccionados.toFixed(2)}
+          {t('total')}: ${totalSeleccionados.toFixed(2)}
         </div>
 
         <div className="text-center mt-4 d-flex justify-content-center gap-3">
@@ -231,7 +234,7 @@ const ShoppingCart: React.FC = () => {
             onClick={vaciarCarrito}
             disabled={Object.keys(seleccionados).length === 0}
           >
-            Vaciar carrito
+            {t('clear')}
           </button>
          <button
         className="btn btn-success"
@@ -251,7 +254,7 @@ const ShoppingCart: React.FC = () => {
           })
         }
       >
-        Finalizar Compra
+        {t('checkout')}
       </button>
         </div>
       </div>

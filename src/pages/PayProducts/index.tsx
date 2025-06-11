@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import NavBar from '../../common/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../common/AuthContext';
+import { useTranslation } from 'react-i18next';
 
 const PayProduct = () => {
   const location = useLocation();
@@ -11,6 +12,7 @@ const PayProduct = () => {
   const { token, user, setIdTrans, setIsCompra } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
 
+  const { t } = useTranslation('global');
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
 
   useEffect(() => {
@@ -94,7 +96,7 @@ const PayProduct = () => {
     return (
       <>
         <NavBar />
-        <div className="container mt-5">No hay productos para procesar.</div>
+        <div className="container mt-5">{t('no_products')}</div>
       </>
     );
   }
@@ -104,9 +106,9 @@ const PayProduct = () => {
       <NavBar />
       <div className="container mt-5">
         <div className="card p-4 shadow-lg">
-          <h2 className="text-dark mb-4 text-center">Confirmación de compra</h2>
+          <h2 className="text-dark mb-4 text-center">{t('confirm_title')}</h2>
 
-          <h5 className="mb-3">Productos seleccionados</h5>
+          <h5 className="mb-3">{t('selected_products')}</h5>
           <ul className="list-group mb-3">
             {productosSeleccionados.map((prod: any, index: number) => (
               <li key={index} className="list-group-item d-flex justify-content-between">
@@ -115,7 +117,7 @@ const PayProduct = () => {
               </li>
             ))}
             <li className="list-group-item d-flex justify-content-between fw-bold">
-              <span>Total</span>
+              <span>{t('total')}</span>
               <span>₡{total.toLocaleString()}</span>
             </li>
           </ul>
@@ -124,38 +126,38 @@ const PayProduct = () => {
 
           {/* Pago */}
           <div className="mb-3 mt-4">
-            <label className="form-label fw-bold">Método de pago</label>
+            <label className="form-label fw-bold">{t('payment_method')}</label>
             <div className="form-check">
               <input type="radio" className="form-check-input" name="metodoPago" id="transferencia" onChange={() => setMetodoPago('transferencia')} />
-              <label className="form-check-label" htmlFor="transferencia">Transferencia con tarjeta (PayPal)</label>
+              <label className="form-check-label" htmlFor="transferencia">{t('paypal')}</label>
             </div>
             <div className="form-check">
               <input type="radio" className="form-check-input" name="metodoPago" id="sinpe" onChange={() => setMetodoPago('sinpe')} />
-              <label className="form-check-label" htmlFor="sinpe">SINPE Móvil</label>
+              <label className="form-check-label" htmlFor="sinpe">{t('sinpe')}</label>
             </div>
           </div>
 
           {metodoPago === 'transferencia' && (
             <div className="alert alert-primary">
-              Al confirmar tu compra, serás redirigido automáticamente a <strong>PayPal</strong> para realizar el pago de forma segura.
+              {t('paypal_notice')} <strong>PayPal</strong> {t('paypal_notice2')}
             </div>
           )}
 
           {metodoPago === 'sinpe' && (
             <div className="border p-3 mb-3">
-              <h5 className="text-danger">Pago por SINPE</h5>
+              <h5 className="text-danger">{t('sinpe_title')}</h5>
               <div className="bg-white text-dark p-4 rounded">
                 <p className="fw-bold">
-                  Para finalizar la compra debes mandarle un mensaje a nuestro administrador Cristian Rojas al siguiente número:
+                  {t('sinpe_instruction')}
                 </p>
                 <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
                   +506  83582929
                 </div>
                 <p>
-                  Con él podrás hacer el pago por un SINPE. Tienes 2 días para realizarlo después de seleccionar “Finalizar compra”, por ese tiempo tendrás tu pedido reservado.
-                  Antes de acabar los dos días, Cristian podrá actualizar el estado de tu pago a exitoso o cancelado.
-                  Podrás ver este estado en el apartado de <strong>“Mis Compras”</strong> en tu usuario.
-                  ¡Gracias por preferirnos!
+                  {t('sinpe_description')}
+                  {t('sinpe_description2')}
+                  {t('sinpe_description3')}<strong>{t('sinpe_description4')}</strong> {t('sinpe_description5')}
+                  {t('sinpe_description6')}
                 </p>
               </div>
             </div>
@@ -163,7 +165,7 @@ const PayProduct = () => {
 
           <div className="text-center mt-4">
             <button className="btn btn-success" onClick={handleConfirmacion}>
-              Confirmar compra
+              {t('confirm_button')}
             </button>
           </div>
         </div>

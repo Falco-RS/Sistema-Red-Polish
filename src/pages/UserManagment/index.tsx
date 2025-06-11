@@ -404,23 +404,28 @@ const confirmarCompra = async (idCompra: number) => {
       <NavBar />
       <div className="container-fluid d-flex" style={{ minHeight: '100vh' }}>
         <div className="p-4" style={{ width: '250px', minHeight: '100%', backgroundColor: '#f1f1f1' }}>
-          <h4 className="fw-bold mb-4 text-dark">Mi perfil</h4>
+          <h4 className="fw-bold mb-4 text-dark">{t('profile')}</h4>
             <li className="nav-item mb-2">
-              <button className={`btn btn-sm w-100 text-start ${activeSection === 'info' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('info')}>Información</button>
+              <button className={`btn btn-sm w-100 text-start ${activeSection === 'info' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('info')}>{t('info')}</button>
             </li>
             <li className="nav-item mb-2">
-              <button className={`btn btn-sm w-100 text-start ${activeSection === 'citas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('citas')}>{user?.rol === 'Administrador' ? 'Citas' : 'Mis citas'}</button>
+              <button
+                className={`btn btn-sm w-100 text-start ${activeSection === 'citas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`}
+                onClick={() => setActiveSection('citas')}
+              >
+                {user?.rol === 'Administrador' ? t('appointments') : t('my_appointments')}
+              </button>
             </li>
             <li className="nav-item mb-2">
               <button className={`btn btn-sm w-100 text-start ${activeSection === 'gestion' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('gestion')}>{t('user_management')}</button>
             </li>
             {user?.rol === 'Administrador' && (
               <li className="nav-item mb-2">
-                <button className={`btn btn-sm w-100 text-start ${activeSection === 'promos' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('promos')}>Promociones</button>
+                <button className={`btn btn-sm w-100 text-start ${activeSection === 'promos' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('promos')}>{t('promotions')}</button>
               </li>
             )}
             <li className="nav-item mb-2">
-              <button className={`btn btn-sm w-100 text-start ${activeSection === 'ventas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('ventas')}>{user?.rol === 'Administrador' ? 'Historial Compras' : 'Mi Historial de Compras'}</button>
+              <button className={`btn btn-sm w-100 text-start ${activeSection === 'ventas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('ventas')}>{user?.rol === 'Administrador' ? t('purchase_history') : t('my_purchase_history')}</button>
             </li>
             {user?.rol !== 'Administrador' && (
             <li className="nav-item mb-2">
@@ -428,7 +433,7 @@ const confirmarCompra = async (idCompra: number) => {
                 className={`btn btn-sm w-100 text-start ${activeSection === 'promosActivas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`}
                 onClick={() => setActiveSection('promosActivas')}
               >
-                Promociones Activas
+                {t('active_promotions')}
               </button>
             </li>
           )}
@@ -441,8 +446,8 @@ const confirmarCompra = async (idCompra: number) => {
                 setTieneNotificacion(false);
               }}
             >
-              Notificaciones
-              {tieneNotificacion && <span className="badge bg-danger ms-2">¡NUEVA!</span>}
+              {t('notifications')}
+              {tieneNotificacion && <span className="badge bg-danger ms-2">{t('new_notification')}</span>}
             </button>
           </li>
         )}
@@ -451,10 +456,10 @@ const confirmarCompra = async (idCompra: number) => {
         <div className="flex-grow-1 p-5">
           {activeSection === 'info' && (
             <>
-              <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Información del Usuario</h2>
-              <div className="fw-bold mb-4" style={{ color: '#333' }}>Nombre:{user?.name}</div>
-              <div className="fw-bold mb-4" style={{ color: '#333' }}>Apellidos:{user?.last_name}</div>
-              <div className="fw-bold mb-4" style={{ color: '#333' }}>Correo:{user?.email}</div>
+              <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('user_info_title')}</h2>
+              <div className="fw-bold mb-4" style={{ color: '#333' }}>{t('user_name')}{user?.name}</div>
+              <div className="fw-bold mb-4" style={{ color: '#333' }}>{t('user_last_name')}{user?.last_name}</div>
+              <div className="fw-bold mb-4" style={{ color: '#333' }}>{t('user_email')}{user?.email}</div>
             </>
           )}
 
@@ -478,7 +483,7 @@ const confirmarCompra = async (idCompra: number) => {
                 <div className="mb-4">
                   <label className="form-label text-dark fw-semibold">{t('new_password')}</label>
                   <div className="input-group">
-                    <input type={showPassword ? 'text' : 'password'} className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Cree una nueva contraseña" />
+                    <input type={showPassword ? 'text' : 'password'} className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('new_password2')}/>
                     <button type="button" className="btn btn-outline-secondary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
@@ -489,8 +494,20 @@ const confirmarCompra = async (idCompra: number) => {
               <div className="mb-3">
                 <label className="form-label text-dark fw-semibold">{t('language')}</label>
                 <div className="d-flex gap-2">
-                  <button onClick={() => setLanguage('es')}>{t('spanish')}</button>
-                  <button onClick={() => setLanguage('en')}>{t('english')}</button>
+                  <button
+                    type="button"
+                    className="btn btn-primary fw-bold px-3"
+                    onClick={() => setLanguage('es')}
+                  >
+                    {t('spanish')}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-primary fw-bold px-3"
+                    onClick={() => setLanguage('en')}
+                  >
+                    {t('english')}
+                  </button>
                 </div>
               </div>
             </div>
@@ -498,17 +515,17 @@ const confirmarCompra = async (idCompra: number) => {
 
         {activeSection === 'promos' && (
           <div>
-            <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Gestion de Promociones</h2>
+            <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('promo_management')}</h2>
             <div className="table-responsive">
               <table className="table table-bordered align-middle">
                 <thead className="table-light">
                   <tr>
                     <th>{t('name')}</th>
-                    <th>Inicio</th>
-                    <th>Fin</th>
-                    <th>Descuento</th>
-                    <th>Activa</th>
-                    <th>Acciones</th>
+                    <th>{t('start')}</th>
+                    <th>{t('end')}</th>
+                    <th>{t('discount')}</th>
+                    <th>{t('active')}</th>
+                    <th>{t('actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -532,15 +549,15 @@ const confirmarCompra = async (idCompra: number) => {
                         <button className="btn btn-sm btn-outline-primary" onClick={() => {
                           setEditingPromoId(promo.id)
                           setNewPromo({ ...promo})
-                        }}>Editar</button>
+                        }}>{t('edit')}</button>
                         <button className="btn btn-sm btn-outline-warning" onClick={() => togglePromoActive(promo.id)}>
-                          {promo.active ? 'Desactivar' : 'Activar'}
+                          {promo.active ? t('deactivate') : t('activate')}
                         </button>
                         <button
                           className="btn btn-sm btn-outline-danger"
                           onClick={() => deletePromo(promo.id)}
                         >
-                          Eliminar
+                          {t('delete')}
                         </button>
                       </td>
                     </tr>
@@ -550,10 +567,10 @@ const confirmarCompra = async (idCompra: number) => {
             </div>
 
             <div className="mt-4">
-              <h5>{editingPromoId ? 'Editar Promoción' : 'Nueva Promoción'}</h5>
+              <h5>{editingPromoId ? t('edit_promo') : t('new_promo')}</h5>
               <div className="row g-3">
                 <div className="col-md-4">
-                  <input type="text" className="form-control" placeholder="Nombre"
+                  <input type="text" className="form-control" placeholder={t('name')}
                     value={newPromo.title} onChange={(e) => setNewPromo({ ...newPromo, title: e.target.value })} />
                 </div>
                 <div className="col-md-2">
@@ -577,7 +594,7 @@ const confirmarCompra = async (idCompra: number) => {
                 </div>
                 <div className="col-md-2">
                   <button className="btn btn-primary w-100 fw-bold"onClick={handlePromoSubmit}>
-                    {editingPromoId ? 'Guardar' : 'Crear'}
+                    {editingPromoId ? t('save'): t('create')}
                   </button>
                 </div>
                 {editingPromoId && (
@@ -586,7 +603,7 @@ const confirmarCompra = async (idCompra: number) => {
                     className="btn btn-outline-danger w-100"
                     onClick={() => setShowAssignPanel(true)}
                   >
-                    Asignar Productos
+                    {t('assign_products')}
                   </button>
                 </div>
               )}
@@ -603,29 +620,29 @@ const confirmarCompra = async (idCompra: number) => {
             <table className="table table-bordered align-middle">
               <thead className="table-light">
               <tr>
-                <th>Nombre del Cliente</th>
-                <th>Fecha de Compra</th>
-                <th>Descripción</th>
-                <th>Estado</th>
-                <th>Total</th>
+                <th>{t('client_name')}</th>
+                <th>{t('purchase_date')}</th>
+                <th>{t('description')}</th>
+                <th>{t('status')}</th>
+                <th>{t('total')}</th>
               </tr>
             </thead>
             <tbody>
               {salesHistory.map((sale, index) => (
                 <tr key={sale.id ?? `sale-${index}`}>
-                  <td>{sale.client || 'Desconocido'}</td>
-                  <td>{sale.date || 'Fecha no disponible'}</td>
+                  <td>{sale.client || t('unknown')}</td>
+                  <td>{sale.date || t('no_date')}</td>
                   <td>{sale.description || '—'}</td>
                   <td>
                   <span className={`badge me-2 ${sale.status === 'EXITOSO' || sale.status === 'CONFIRMADA' ? 'bg-success' : 'bg-danger'}`}>
-                    {sale.status || 'Sin estado'}
+                    {sale.status || t('no_status')}
                   </span>
                   {user.rol === 'Administrador' && sale.status === 'PENDIENTE' && (
                     <button
                       className="btn btn-sm btn-outline-primary"
                       onClick={() => confirmarCompra(sale.id)}
                     >
-                      Confirmar compra
+                      {t('confirm_purchase')}
                     </button>
                   )}
                 </td>
@@ -643,18 +660,18 @@ const confirmarCompra = async (idCompra: number) => {
       )}
       {activeSection === 'promosActivas' && (
   <div>
-    <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Promociones Activas</h2>
+    <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('active_promotions')}</h2>
     {promocionesActivas.length === 0 ? (
-      <p>No hay promociones activas en este momento.</p>
+      <p>{t('no_active_promos')}</p>
     ) : (
       <div className="table-responsive">
         <table className="table table-bordered align-middle">
           <thead className="table-light">
             <tr>
-              <th>Nombre</th>
-              <th>Inicio</th>
-              <th>Fin</th>
-              <th>Descuento</th>
+              <th>{t('name')}</th>
+              <th>{t('start')}</th>
+              <th>{t('end')}</th>
+              <th>{t('discount')}</th>
             </tr>
           </thead>
           <tbody>
@@ -674,11 +691,11 @@ const confirmarCompra = async (idCompra: number) => {
       )}
       {activeSection === 'notificaciones' && (
       <div>
-        <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Notificaciones</h2>
+        <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('notifications')}</h2>
         {(() => {
           const notifs = JSON.parse(localStorage.getItem(`notificaciones-${user?.email}`) || '[]');
           return notifs.length === 0 ? (
-            <p>No tienes notificaciones nuevas.</p>
+            <p>{t('no_notifications')}.</p>
           ) : (
             <ul className="list-group">
               {notifs.map((n: any) => (

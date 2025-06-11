@@ -28,15 +28,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   })
 
   const [language, setLanguageState] = useState<string>(() => {
-    return localStorage.getItem('language') || 'es'
+    const userStr = localStorage.getItem('user')
+    const user = userStr ? JSON.parse(userStr) : null
+    const key = user?.email ? `language-${user.email}` : 'language-default'
+    return localStorage.getItem(key) || 'es'
   })
 
   const setLanguage = (lang: string) => {
     setLanguageState(lang)
-    localStorage.setItem('language', lang)
-    i18next.changeLanguage(lang) 
+    const currentUser = JSON.parse(localStorage.getItem('user') || 'null')
+    const key = currentUser?.email ? `language-${currentUser.email}` : 'language-default'
+    localStorage.setItem(key, lang)
+    i18next.changeLanguage(lang)
   }
-
 
   const [idTrans, setIdTransState] = useState<number | null>(() => {
     const stored = localStorage.getItem('idTrans')
@@ -71,13 +75,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(token)
     localStorage.setItem('user', JSON.stringify(userData))
     localStorage.setItem('token', token)
+
+    const savedLanguage = localStorage.getItem(`language-${userData.email}`) || 'es'
+    setLanguageState(savedLanguage)
+    i18next.changeLanguage(savedLanguage)
   }
+
 
   const logout = () => {
     setUser(null)
     setToken(null)
     localStorage.removeItem('user')
     localStorage.removeItem('token')
+
+    const defaultLang = 'es'
+    setLanguageState(defaultLang)
+    i18next.changeLanguage(defaultLang)
   }
 
   return (

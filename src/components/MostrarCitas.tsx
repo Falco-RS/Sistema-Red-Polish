@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../common/AuthContext'
+import { useTranslation } from 'react-i18next';
 
 
 const Appoiment = () => {
@@ -7,6 +8,8 @@ const Appoiment = () => {
   const [appointments, setAppointments] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
   const apiUrl = import.meta.env.VITE_IP_API;
+  const { t } = useTranslation('global');
+
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
@@ -113,18 +116,18 @@ const Appoiment = () => {
 
   return (
     <div className="container mt-4">
-      <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Mis Citas</h2>
+      <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('my_appointments')}</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       <table className="table table-bordered table-hover mt-3">
         <thead className="thead-dark">
           <tr>
-            {user.rol === 'Administrador' && <th>Cliente</th>}
-            <th>Servicio</th>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Estado</th>
-            <th>Total</th>
-            <th>Acción</th>
+            {user.rol === 'Administrador' && <th>{t('client')}</th>}
+            <th>{t('service')}</th>
+            <th>{t('date')}</th>
+            <th>{t('hour')}</th>
+            <th>{t('status')}</th>
+            <th>{t('total')}</th>
+            <th>{t('action')}</th>
           </tr>
         </thead>
         <tbody>
@@ -147,7 +150,7 @@ const Appoiment = () => {
                       await handleConfirm(cita.id);
                     }}
                   >
-                    Confirmar pago
+                    {t('confirm_payment')}
                   </button>
                 )}
 
@@ -157,7 +160,7 @@ const Appoiment = () => {
                     className="btn btn-danger btn-sm"
                     onClick={() => handleCancel(cita.id)}
                   >
-                    Cancelar
+                    {t('cancel')}
                   </button>
                 )}
 
@@ -167,7 +170,7 @@ const Appoiment = () => {
                     className="btn btn-warning btn-sm"
                     onClick={() => handleCancel(cita.id)}
                   >
-                    Confirmar cancelación
+                    {t('confirm_cancellation')}
                   </button>
                 )}
               </td>

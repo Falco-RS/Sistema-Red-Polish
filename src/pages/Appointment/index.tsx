@@ -6,6 +6,7 @@ import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { isWeekend } from 'date-fns'
 import SelectorHoras from '../../components/HorasDisponibles'
+import { useTranslation } from 'react-i18next';
 
 const Appointment = () => {
   const location = useLocation()
@@ -15,6 +16,7 @@ const Appointment = () => {
   const [horaSeleccionada, setHoraSeleccionada] = useState<Date | null>(null)
   const [confirmado, setConfirmado] = useState(false)
   const [fechaConfirmada] = useState(false)
+  const { t } = useTranslation('global');
 
   const esDiaValido = (date: Date) => !isWeekend(date)
 
@@ -47,7 +49,7 @@ const Appointment = () => {
               boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
             }}
           >
-            Volver
+            {t('back')}
           </button>
 
           <h2 className="fw-bold mb-4 text-center text-primary">{servicio.nombre}</h2>
@@ -61,10 +63,10 @@ const Appointment = () => {
             />
           )}
 
-          <p><strong>Descripción:</strong> {servicio.descripcion}</p>
-          <p><strong>Duración:</strong> {servicio.duracion} minutos</p>
+          <p><strong>{t('description')}:</strong> {servicio.descripcion}</p>
+          <p><strong>{t('duration')}</strong> {servicio.duracion} {t('minutes')}</p>
           <p>
-            <strong>Precio:</strong>{' '}
+            <strong>{t('price')}:</strong>{' '}
             {servicio.precioFinal ? (
               <>
                 ${servicio.precioFinal}{' '}
@@ -77,7 +79,7 @@ const Appointment = () => {
           </p>
 
           <div className="mt-4">
-            <h4>Selecciona la fecha</h4>
+            <h4>{t('select_date')}</h4>
             <DatePicker
               selected={fechaSeleccionada}
               onChange={(date) => {
@@ -100,7 +102,7 @@ const Appointment = () => {
 
           {fechaSeleccionada && (
             <div className="mt-4">
-              <h4>Selecciona una hora</h4>
+              <h4>{t('select_time')}</h4>
               <SelectorHoras
                 servicio={servicio}
                 fechaSeleccionada={fechaSeleccionada}
@@ -113,13 +115,13 @@ const Appointment = () => {
           <div className="mt-4 text-center">
             {horaSeleccionada && confirmado ? (
               <>
-                <h5 className="text-primary">Fecha y hora seleccionadas:</h5>
+                <h5 className="text-primary">{t('confirmed_selection')}</h5>
                 <p>{horaSeleccionada.toLocaleString()}</p>
                 <button
                   className="btn btn-outline-secondary mb-3"
                   onClick={() => setConfirmado(false)}
                 >
-                  Cambiar fecha y hora
+                  {t('change_selection')}
                 </button>
                 <br />
                 <button
@@ -133,7 +135,7 @@ const Appointment = () => {
                     })
                   }
                 >
-                  Ir a pagar
+                  {t('go_to_pay')}
                 </button>
               </>
             ) : (
@@ -143,12 +145,12 @@ const Appointment = () => {
                   if (horaSeleccionada) {
                     setConfirmado(true)
                   } else {
-                    alert('Selecciona una hora válida.')
+                    alert(t('invalid_time_alert'))
                   }
                 }}
                 disabled={!horaSeleccionada}
               >
-                Confirmar selección de fecha y hora
+                {t('confirm_selection')}
               </button>
             )}
           </div>

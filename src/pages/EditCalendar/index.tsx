@@ -1,14 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import NavBar from '../../common/NavBar'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next';
 
 const EditCalendar = () => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [selectedHours, setSelectedHours] = useState<number[]>([])
   const [saved, setSaved] = useState(false)
   const navigate = useNavigate()
+  const { t } = useTranslation('global');
 
   const hours = Array.from({ length: 10 }, (_, i) => i + 8) // Horas de 8 a 17
 
@@ -23,9 +25,13 @@ const EditCalendar = () => {
     )
   }
 
+  useEffect(() => {
+    document.body.style.backgroundColor = '#ffffff'
+  }, [])
+
   const handleSave = () => {
     if (!selectedDate || selectedHours.length === 0) {
-      alert('Selecciona una fecha y al menos una hora')
+      alert(t('alert_missing'))
       return
     }
 
@@ -45,12 +51,12 @@ const EditCalendar = () => {
       <NavBar />
       <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
         <div className="bg-white rounded-4 shadow-lg p-5 w-100" style={{ maxWidth: '500px' }}>
-          <h2 className="text-center mb-4 text-dark fw-bold">Modificar Calendario</h2>
+          <h2 className="text-center mb-4 text-dark fw-bold">{t('title_calendar')}</h2>
 
-          {saved && <div className="alert alert-success">Disponibilidad actualizada correctamente.</div>}
+          {saved && <div className="alert alert-success">{t('saved')}</div>}
 
           <div className="mb-3">
-            <label className="text-primary fw-bold">Selecciona una fecha</label>
+            <label className="text-primary fw-bold">{t('select_date_c')}</label>
             <DatePicker
               selected={selectedDate}
               onChange={date => {
@@ -66,7 +72,7 @@ const EditCalendar = () => {
 
           {selectedDate && (
             <div className="mb-4">
-              <label className="text-dark ">Horas disponibles: las que marques dejaran de estar disponible para los usuarios</label>
+              <label className="text-dark ">{t('available_hours')}</label>
               <div className="d-flex flex-wrap gap-2 mt-2">
                 {hours
                 .filter(hour => {
@@ -89,12 +95,12 @@ const EditCalendar = () => {
           )}
 
           <button onClick={handleSave} className="btn btn-primary w-100 fw-bold mb-3">
-            Guardar disponibilidad
+            {t('save_c')}
           </button>
 
           <div className="text-center">
             <button className="btn btn-outline-dark btn-sm" onClick={() => navigate('/services')}>
-              Cancelar y volver
+              {t('cancel_add')}
             </button>
           </div>
         </div>

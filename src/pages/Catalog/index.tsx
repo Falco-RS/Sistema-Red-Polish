@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import { useAuth } from '../../common/AuthContext'
 import image from '../../assets/pulido.png'
+import { useTranslation } from 'react-i18next';
 
 const Catalog = () => {
   const { user } = useAuth()
@@ -12,6 +13,7 @@ const Catalog = () => {
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([])
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [promotions, setPromotions] = useState<any[]>([])
+  const { t } = useTranslation('global');
 
   const navigate = useNavigate()
   const apiUrl = import.meta.env.VITE_IP_API
@@ -99,11 +101,11 @@ const Catalog = () => {
             data-bs-toggle="dropdown"
             aria-expanded="false"
           >
-            Filtrar / Ordenar
+            {t('filter_sort')}
           </button>
           <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
             <div className="dropdown-divider"></div>
-            <button className="dropdown-item" onClick={clearFilter}>Todas las categorías</button>
+            <button className="dropdown-item" onClick={clearFilter}>{t('all_categories')}</button>
             {categories.map(cat => (
               <button
                 key={cat.id}
@@ -118,13 +120,13 @@ const Catalog = () => {
 
         {isAdmin && (
           <button className="btn btn-primary ms-auto" onClick={() => navigate('/add-product')}>
-            Agregar Producto
+            {t('add_product')}
           </button>
         )}
       </div>
 
       {filteredProducts.length === 0 ? (
-        <p className="text-center text-muted">No hay productos para esta categoría.</p>
+        <p className="text-center text-muted">{t('no_products')}</p>
       ) : (
         <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5 g-4">
           {filteredProducts.map((product) => {

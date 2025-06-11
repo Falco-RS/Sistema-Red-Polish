@@ -5,6 +5,7 @@ import { Dropdown } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom'
 import { Servicio, ServicioConPrecio } from '../../common/interfaces'
 import { useAuth } from '../../common/AuthContext' 
+import { useTranslation } from 'react-i18next';
 
 type Promotion = {
   id: number
@@ -21,6 +22,7 @@ const Services = () => {
   const [promotions, setPromotions] = useState<Promotion[]>([])
   const navigate = useNavigate()
   const apiUrl = import.meta.env.VITE_IP_API;
+  const { t } = useTranslation('global');
 
   const fetchCategories = async () => {
     try {
@@ -122,13 +124,13 @@ const Services = () => {
     <NavBar />
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap">
-        <h4 className="fw-bold text-dark mb-2">Catálogo de Servicios</h4>
+        <h4 className="fw-bold text-dark mb-2">{t('title_service')}</h4>
         <Dropdown className="mb-2">
           <Dropdown.Toggle variant="outline-secondary" id="dropdown-basic" className="text-dark">
-            Sort by
+            {t('filter_sort')}
           </Dropdown.Toggle>
           <Dropdown.Menu>
-            <Dropdown.Item onClick={() => setCategoriaSeleccionada(null)}>Todas</Dropdown.Item>
+            <Dropdown.Item onClick={() => setCategoriaSeleccionada(null)}>{t('all_categories')}</Dropdown.Item>
             {categories.map(cat => (
               <Dropdown.Item key={cat.id} onClick={() => setCategoriaSeleccionada(cat.id)}>
                 {cat.name}
@@ -140,17 +142,17 @@ const Services = () => {
         {isAdmin && (
           <div className="d-flex flex-wrap gap-2 ms-auto mb-2">
             <button className="btn btn-primary" onClick={() => navigate('/add-service')}>
-              Agregar Servicio
+              {t('add_service')}
             </button>
             <button className="btn btn-primary" onClick={() => navigate('/edit-calendar')}>
-              Modificar Calendario
+              {t('edit_calendar')}
             </button>
           </div>
         )}
       </div>
 
       {serviciosFiltrados.length === 0 ? (
-        <p className="text-center text-muted">No hay servicios para esta categoría.</p>
+        <p className="text-center text-muted">{t('no_services')}</p>
       ) : (
         <div className="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
           {serviciosFiltrados.map(servicio => {
@@ -162,7 +164,7 @@ const Services = () => {
                   className="card shadow-sm position-relative h-100"
                   onClick={() => {
                     if (!user) {
-                      alert('Debes iniciar sesión para agendar una cita.');
+                      alert(t('login_required'));
                       return;
                     }
 
@@ -197,7 +199,7 @@ const Services = () => {
                   <div className="card-body">
                     <h6 className="card-title fw-bold">{servicio.nombre}</h6>
                     <p className="card-text text-muted mb-1">{servicio.descripcion}</p>
-                    <p className="card-text mb-1"><strong>Duración:</strong> {servicio.duracion} min</p>
+                    <p className="card-text mb-1"><strong>{t('duration')}:</strong> {servicio.duracion} min</p>
 
                     {servicio.id_promocion && servicio.porcentajeDescuento ? (
                       <div>

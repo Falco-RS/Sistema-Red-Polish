@@ -3,12 +3,15 @@ import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import image from '../../assets/pulido.png'
 import { FaFacebook, FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa'
+import { useTranslation } from 'react-i18next';
 
 function Homepage() {
   const [products, setProducts] = useState<any[]>([])
   const [startIndex, setStartIndex] = useState(0)
   const navigate = useNavigate()
   const apiUrl = import.meta.env.VITE_IP_API
+
+  const { t } = useTranslation('global');
 
   // Obtenemos productos reales
   useEffect(() => {
@@ -73,7 +76,7 @@ function Homepage() {
         <div className="position-relative text-center px-3">
           <h1 className="display-4 fw-light text-uppercase mb-3">RED POLISH</h1>
           <p className="fs-5 fst-italic lh-lg" style={{ maxWidth: '800px', margin: '0 auto' }}>
-            Servicio profesional de detallado automotriz. Calidad, dedicación y brillo para tu vehículo.
+            {t('slogan')}
           </p>
         </div>
       </div>
@@ -81,19 +84,16 @@ function Homepage() {
       <div className="container my-5">
         <div className="text-center mb-5">
           <p className="fs-5 text-dark lh-lg">
-            Nos especializamos en el cuidado y embellecimiento de tu vehículo. Ofrecemos un servicio profesional
-            de abrillantado y detallado automotriz, asegurando que tu auto luzca impecable en todo momento.
-            Además, contamos con una amplia selección de productos de alta calidad para el mantenimiento y
-            protección de tu automóvil.
+            {t('description_home')}
             <br /><br />
-            Explora nuestra web para conocer más sobre nuestros servicios, productos y promociones.
-            ¡Déjanos ayudarte a mantener tu auto en su mejor estado!
-          </p>
+            {t('des')}
+            {t('des2')}
+            </p>
         </div>
 
         {/* Carrusel real */}
         <div className="mb-5">
-          <h3 className="fw-semibold text-center mb-4 text-capitalize text-dark">Productos Recomendados</h3>
+          <h3 className="fw-semibold text-center mb-4 text-capitalize text-dark">{t('recommended_products')}</h3>
           <div className="d-flex align-items-center justify-content-between">
             <button className="btn btn-outline-dark me-2" onClick={prevSlide}>&lt;</button>
             <div className="d-flex overflow-hidden" style={{ gap: '1rem', flex: 1 }}>
@@ -131,26 +131,26 @@ function Homepage() {
       {/* Footer */}
       <div className="bg-dark text-white py-5">
         <div className="container">
-          <h3 className="text-center fw-bold mb-4">Contáctenos</h3>
+          <h3 className="text-center fw-bold mb-4">{t('contact_us')}</h3>
           <div className="row row-cols-1 row-cols-md-2 g-4">
             <div className="d-flex align-items-start gap-3">
               <FaMapMarkerAlt className="fs-3 text-danger" />
               <div>
-                <p className="mb-1 fw-semibold">Ubicación</p>
+                <p className="mb-1 fw-semibold">{t('location')}</p>
                 <p>Quesada, San Carlos, Costa Rica</p>
               </div>
             </div>
             <div className="d-flex align-items-start gap-3">
               <FaPhone className="fs-3 text-success" />
               <div>
-                <p className="mb-1 fw-semibold">Teléfono</p>
+                <p className="mb-1 fw-semibold">{t('phone')}</p>
                 <p>8358 2929</p>
               </div>
             </div>
             <div className="d-flex align-items-start gap-3">
               <FaEnvelope className="fs-3 text-primary" />
               <div>
-                <p className="mb-1 fw-semibold">Correo</p>
+                <p className="mb-1 fw-semibold">{t('email')}</p>
                 <a href="mailto:agenda@redpolishcr.com" className="text-white">agenda@redpolishcr.com</a>
               </div>
             </div>

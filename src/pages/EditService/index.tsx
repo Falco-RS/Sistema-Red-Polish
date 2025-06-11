@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../common/AuthContext'
+import { useTranslation } from 'react-i18next';
 
 const EditService = () => {
   const { user, token } = useAuth()
@@ -24,12 +25,13 @@ const EditService = () => {
   const apiUrl = import.meta.env.VITE_IP_API
   const navigate = useNavigate()
   const userEmail = user?.email
+  const { t } = useTranslation('global');
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
 
     if (!servicio) {
-      setError('No se encontró información del servicio.')
+      setError(t('error_service_info'))
       return
     }
     console.log(servicio)
@@ -48,7 +50,7 @@ const EditService = () => {
         const data = await res.json()
         setCategories(data)
       } catch (err) {
-        setError('No se pudieron cargar las categorías.')
+        setError(t('error_category_fetch'))
       }
     }
 
@@ -64,7 +66,7 @@ const EditService = () => {
       setPromotions(data)
     } catch (err) {
       console.error(err)
-      setError('No se pudieron cargar las promociones.')
+      setError(t('error_promotions_fetch'))
     }
   }
 
@@ -78,7 +80,7 @@ const EditService = () => {
     e.preventDefault()
 
     if (!name || !description || !duration || !price || !categoryId || !imageUrl) {
-      setError('Todos los campos son obligatorios.')
+      setError(t('error'))
       return
     }
 
@@ -105,7 +107,7 @@ const EditService = () => {
       setSuccess(true)
       setTimeout(() => navigate('/services'), 3000)
     } catch (err) {
-      setError('Error al editar el servicio.')
+      setError(t('error_editing_service'))
     }
   }
 
@@ -141,11 +143,11 @@ const EditService = () => {
 
       if (!res.ok) throw new Error('Error al eliminar el servicio')
 
-      alert('Servicio eliminado correctamente.')
+      alert(t('success_delete_service'))
       navigate('/services')
     } catch (err) {
       console.error('❌ Error eliminando el servicio:', err)
-      alert('Hubo un error al eliminar el servicio.')
+      alert(t('error_delete_service'))
     }
   }
 
@@ -154,7 +156,7 @@ const EditService = () => {
       <>
         <NavBar />
         <div className="container text-center mt-5">
-          <p className="text-muted">Cargando servicio...</p>
+          <p className="text-muted">{t('loading_service')}</p>
         </div>
       </>
     )
@@ -165,34 +167,34 @@ const EditService = () => {
       <NavBar />
       <div className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-dark bg-opacity-50" style={{ zIndex: 1000 }}>
         <div className="bg-white rounded-4 shadow-lg p-5 w-100" style={{ maxWidth: '500px' }}>
-          <h2 className="text-center mb-4 text-dark  fw-bold">Editar Servicio</h2>
+          <h2 className="text-center mb-4 text-dark  fw-bold">{t('edit_service')}o</h2>
 
           {error && <div className="alert alert-dark py-2 mb-4">{error}</div>}
-          {success && <div className="alert alert-success py-2 mb-4">Servicio editado correctamente. Redirigiendo...</div>}
+          {success && <div className="alert alert-success py-2 mb-4">{t('success_service_edit')}</div>}
 
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
-              <label className="text-dark fw-bold">Nombre</label>
+              <label className="text-dark fw-bold">{t('name')}</label>
               <input type="text" className="form-control" value={name} onChange={(e) => setName(e.target.value)} required />
             </div>
 
             <div className="mb-3">
-              <label className="text-dark fw-bold">Descripción</label>
+              <label className="text-dark fw-bold">{t('description')}</label>
               <input type="text" className="form-control" value={description} onChange={(e) => setDescription(e.target.value)} required />
             </div>
 
             <div className="mb-3">
-              <label className="text-dark fw-bold">Duración</label>
+              <label className="text-dark fw-bold">{t('duration')}</label>
               <input type="text" className="form-control" value={duration} onChange={(e) => setDuration(e.target.value)} required />
             </div>
 
             <div className="mb-3">
-              <label className="text-dark fw-bold">Precio</label>
+              <label className="text-dark fw-bold">{t('price')}</label>
               <input type="number" className="form-control" value={price} onChange={(e) => setPrice(e.target.value)} required />
             </div>
 
             <div className="mb-3">
-              <label className="text-dark fw-bold d-block">Categoría</label>
+              <label className="text-dark fw-bold d-block">{t('category')}</label>
               <div className="d-flex gap-2">
                 <select
                   className="form-select"
@@ -201,7 +203,7 @@ const EditService = () => {
                   onChange={(e) => setCategoryId(e.target.value)}
                   required
                 >
-                  <option value="">Seleccione una categoría</option>
+                  <option value="">{t('selectCategory')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>{cat.name}</option>
                   ))}
@@ -211,18 +213,18 @@ const EditService = () => {
                   className="btn btn-primary btn-sm"
                   onClick={() => setShowNewCategory(!showNewCategory)}
                 >
-                  Agregar categoría
+                  {t('addCategory')}
                 </button>
               </div>
 
               <div className="mb-3">
-              <label className="text-dark fw-bold d-block">Asignar promoción</label>
+              <label className="text-dark fw-bold d-block">{t('promotion')}</label>
               <select
                 className="form-select"
                 value={promotionId}
                 onChange={(e) => setPromotionId(e.target.value)}
               >
-                <option value="">Sin promoción</option>
+                <option value="">{t('no_promotion')}</option>
                 {promotions.map((promo) => (
                   <option key={promo.id} value={promo.id}>
                     {promo.title}
@@ -245,14 +247,14 @@ const EditService = () => {
                     className="btn btn-outline-dark"
                     onClick={handleAddCategory}
                   >
-                    Guardar
+                    {t('save')}
                   </button>
                 </div>
               )}
             </div>
 
             <div className="mb-4">
-              <label className="text-dark fw-bold">URL de Imagen</label>
+              <label className="text-dark fw-bold">{t('imageUrl')}</label>
               <input
                 type="text"
                 className="form-control"
@@ -263,12 +265,12 @@ const EditService = () => {
               />
             </div>
 
-            <button type="submit" className="btn btn-primary w-100 fw-bold">Guardar Cambios</button>
+            <button type="submit" className="btn btn-primary w-100 fw-bold">{t('save_changes')}</button>
           </form>
 
           <div className="mt-3 text-center d-flex justify-content-center gap-3">
-            <button className="btn btn-outline-dark btn-sm" onClick={() => navigate('/services')}>Cancelar y volver</button>
-            <button className="btn btn-outline-danger btn-sm" onClick={handleDeleteService}>Eliminar Servicio</button>
+            <button className="btn btn-outline-dark btn-sm" onClick={() => navigate('/services')}>{t('cancel_add')}</button>
+            <button className="btn btn-outline-danger btn-sm" onClick={handleDeleteService}>{t('delete_service')}</button>
         </div>
         </div>
       </div>

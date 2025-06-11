@@ -3,11 +3,13 @@ import { useAuth } from '../common/AuthContext';
 import logo from '../assets/logo.png';
 import carritoIcon from '../assets/carrito-de-compras.png';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const NavBar = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const { t } = useTranslation('global');
 
   const handleLogout = () => {
     logout();
@@ -45,10 +47,10 @@ const NavBar = () => {
         <div className={`collapse navbar-collapse ${!isCollapsed ? 'show' : ''}`} id="navbarNav">
           <ul className="navbar-nav me-auto">
             <li className="nav-item">
-              <Link to="/catalog" className="nav-link">Productos</Link>
+              <Link to="/catalog" className="nav-link">{t('products')}</Link>
             </li>
             <li className="nav-item">
-              <Link to="/services" className="nav-link">Servicios</Link>
+              <Link to="/services" className="nav-link">{t('services')}</Link>
             </li>
           </ul>
 
@@ -69,19 +71,19 @@ const NavBar = () => {
             {!user ? (
               <>
                 <li className="nav-item">
-                  <Link to="/login" className="nav-link">Login</Link>
+                  <Link to="/login" className="nav-link">{t('login')}</Link>
                 </li>
                 <li className="nav-item">
-                  <Link to="/register" className="nav-link">Register</Link>
+                  <Link to="/register" className="nav-link">{t('register')}</Link>
                 </li>
               </>
             ) : (
               <>
                 <li className="nav-item">
-                  <Link to="/user" className="nav-link">Usuario</Link>
+                  <Link to="/user" className="nav-link">{t('user')}</Link>
                 </li>
                 <li className="nav-item">
-                  <button className="nav-link btn" onClick={handleLogout}>Cerrar sesión</button>
+                  <button className="nav-link btn" onClick={handleLogout}>{t('sign_out')}</button>
                 </li>
               </>
             )}

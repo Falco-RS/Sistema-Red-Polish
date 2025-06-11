@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { Props, CitaOcupada } from '../common//interfaces' // ajusta la ruta según tu proyecto
+import { useTranslation } from 'react-i18next';
 
 const HorasDisponibles: React.FC<Props> = ({
   servicio,
@@ -8,8 +9,7 @@ const HorasDisponibles: React.FC<Props> = ({
   setHoraSeleccionada,
 }) => {
   const [rangosNoDisponibles, setRangosNoDisponibles] = useState<[Date, Date][]>([])
-
-  
+  const { t } = useTranslation('global');
   const apiUrl = import.meta.env.VITE_IP_API;
   
   useEffect(() => {
@@ -83,7 +83,7 @@ const HorasDisponibles: React.FC<Props> = ({
 
   return (
     <div>
-      <h5 className="mt-3">Horas disponibles</h5>
+      <h5 className="mt-3">{t('title_hour')}</h5>
       <div className="d-flex flex-wrap gap-2">
         {horasDisponibles.map((hora, index) => {
           const horaFormateada = hora.toLocaleTimeString([], {
@@ -112,7 +112,7 @@ const HorasDisponibles: React.FC<Props> = ({
       </div>
 
       {horasDisponibles.every((hora) => !estaDisponible(hora)) && (
-        <p className="text-muted mt-2">No hay horas disponibles para esta fecha.</p>
+        <p className="text-muted mt-2">{t('no_availability')}</p>
       )}
     </div>
   )
