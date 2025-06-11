@@ -1,0 +1,11 @@
+{
+  "user_management": "User Management",
+  "update_success": "✅ Data updated! Redirecting...",
+  "save_changes": "Save Changes",
+  "name": "First Name",
+  "last_name": "Last Name",
+  "new_password": "New password (optional)",
+  "language": "Language",
+  "spanish": "Spanish",
+  "english": "English"
+}

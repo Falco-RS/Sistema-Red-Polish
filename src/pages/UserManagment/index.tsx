@@ -4,6 +4,7 @@ import { Eye, EyeOff } from 'lucide-react'
 import NavBar from '../../common/NavBar'
 import { useAuth } from '../../common/AuthContext'
 import MostrarCitas from '../../components/MostrarCitas'
+import { useTranslation } from 'react-i18next';
 
 const UserManagement = () => {
   const navigate = useNavigate()
@@ -17,6 +18,9 @@ const UserManagement = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas' >('info')
+  const { setLanguage } = useAuth();
+
+  const { t, i18n } = useTranslation('global');
 
 
 
@@ -398,7 +402,7 @@ const confirmarCompra = async (idCompra: number) => {
               <button className={`btn btn-sm w-100 text-start ${activeSection === 'citas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('citas')}>{user?.rol === 'Administrador' ? 'Citas' : 'Mis citas'}</button>
             </li>
             <li className="nav-item mb-2">
-              <button className={`btn btn-sm w-100 text-start ${activeSection === 'gestion' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('gestion')}>Gestión de usuario</button>
+              <button className={`btn btn-sm w-100 text-start ${activeSection === 'gestion' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('gestion')}>{t('user_management')}</button>
             </li>
             {user?.rol === 'Administrador' && (
               <li className="nav-item mb-2">
@@ -424,21 +428,21 @@ const confirmarCompra = async (idCompra: number) => {
         
           {activeSection === 'gestion' && (
             <div className="bg-light p-4 rounded-4 shadow" style={{ border: '2px solid #ccc', maxWidth: '600px' }}>
-              <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Gestión de Usuario</h2>
+              <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('user_management')}</h2>
               {error && <div className="alert alert-danger">{error}</div>}
-              {success && <div className="alert alert-success">✅ ¡Datos actualizados! Redirigiendo al inicio...</div>}
+              {success && <div className="alert alert-success">{t('update_success')}</div>}
 
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                  <label className="form-label text-dark fw-semibold">Nombre</label>
+                  <label className="form-label text-dark fw-semibold">{t('name')}</label>
                   <input type="text" className="form-control" value={firstName} onChange={(e) => setFirstName(e.target.value)} />
                 </div>
                 <div className="mb-3">
-                  <label className="form-label text-dark fw-semibold">Apellidos</label>
+                  <label className="form-label text-dark fw-semibold">{t('last_name')}</label>
                   <input type="text" className="form-control" value={lastName} onChange={(e) => setLastName(e.target.value)} />
                 </div>
                 <div className="mb-4">
-                  <label className="form-label text-dark fw-semibold">Nueva contraseña (opcional)</label>
+                  <label className="form-label text-dark fw-semibold">{t('new_password')}</label>
                   <div className="input-group">
                     <input type={showPassword ? 'text' : 'password'} className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Cree una nueva contraseña" />
                     <button type="button" className="btn btn-outline-secondary" onClick={() => setShowPassword(!showPassword)} tabIndex={-1}>
@@ -446,8 +450,15 @@ const confirmarCompra = async (idCompra: number) => {
                     </button>
                   </div>
                 </div>
-                <button type="submit" className="btn btn-primary w-100 fw-bold">Guardar Cambios</button>
+                <button type="submit" className="btn btn-primary w-100 fw-bold">{t('save_changes')}</button>
               </form>
+              <div className="mb-3">
+                <label className="form-label text-dark fw-semibold">{t('language')}</label>
+                <div className="d-flex gap-2">
+                  <button onClick={() => setLanguage('es')}>{t('spanish')}</button>
+                  <button onClick={() => setLanguage('en')}>{t('english')}</button>
+                </div>
+              </div>
             </div>
           )}
 
@@ -458,7 +469,7 @@ const confirmarCompra = async (idCompra: number) => {
               <table className="table table-bordered align-middle">
                 <thead className="table-light">
                   <tr>
-                    <th>Nombre</th>
+                    <th>{t('name')}</th>
                     <th>Inicio</th>
                     <th>Fin</th>
                     <th>Descuento</th>

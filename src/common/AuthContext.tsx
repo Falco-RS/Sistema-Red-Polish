@@ -1,5 +1,6 @@
 // src/context/AuthContext.tsx
 import { createContext, useContext, useState } from 'react'
+import i18next from 'i18next';
 
 interface AuthContextType {
   user: any
@@ -10,6 +11,8 @@ interface AuthContextType {
   setIdTrans: (id: number | null) => void
   isCompra: boolean | null
   setIsCompra: (value: boolean | null) => void
+  language: string
+  setLanguage: (lang: string) => void
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -23,6 +26,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem('token')
   })
+
+  const [language, setLanguageState] = useState<string>(() => {
+    return localStorage.getItem('language') || 'es'
+  })
+
+  const setLanguage = (lang: string) => {
+    setLanguageState(lang)
+    localStorage.setItem('language', lang)
+    i18next.changeLanguage(lang) 
+  }
+
 
   const [idTrans, setIdTransState] = useState<number | null>(() => {
     const stored = localStorage.getItem('idTrans')
@@ -77,6 +91,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setIdTrans,
         isCompra,
         setIsCompra,
+        language,
+        setLanguage,
       }}
     >
       {children}

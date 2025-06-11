@@ -1,0 +1,11 @@
+{
+  "user_management": "Gestión de Usuario",
+  "update_success": "✅ ¡Datos actualizados! Redirigiendo al inicio...",
+  "save_changes": "Guardar Cambios",
+  "name": "Nombre",
+  "last_name": "Apellidos",
+  "new_password": "Nueva contraseña (opcional)",
+  "language": "Idioma",
+  "spanish": "Español",
+  "english": "Inglés"
+}

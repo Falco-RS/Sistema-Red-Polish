@@ -13,11 +13,13 @@
     "@popperjs/core": "^2.11.8",
     "boostrap": "^2.0.0",
     "bootstrap": "^5.3.6",
+    "i18next": "^25.2.1",
     "lucide-react": "^0.507.0",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
     "react-datepicker": "^8.3.0",
     "react-dom": "^19.0.0",
+    "react-i18next": "^15.5.2",
     "react-icons": "^5.5.0",
     "react-router-dom": "^6.30.0"
   },
