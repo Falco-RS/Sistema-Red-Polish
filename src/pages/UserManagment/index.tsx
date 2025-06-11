@@ -684,13 +684,6 @@ const confirmarCompra = async (idCompra: number) => {
               {notifs.map((n: any) => (
                 <li key={n.id} className="list-group-item d-flex justify-content-between align-items-center">
                   {n.mensaje}
-                  <button className="btn btn-sm btn-outline-danger" onClick={() => {
-                    const nuevas = notifs.filter((x: any) => x.id !== n.id);
-                    localStorage.setItem(`notificaciones-${user.email}`, JSON.stringify(nuevas));
-                    setTieneNotificacion(false);
-                  }}>
-                    Eliminar
-                  </button>
                 </li>
               ))}
             </ul>
