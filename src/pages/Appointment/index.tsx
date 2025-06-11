@@ -40,13 +40,13 @@ const Appointment = () => {
         >
           <button
             onClick={() => navigate('/services')}
-            className="btn btn-light position-absolute top-0 end-0 m-3"
+            className="btn position-absolute top-0 end-0 m-3"
             style={{
-              backgroundColor: '#007bff',
-              color: '#fff',
-              borderRadius: '50%',
-              padding: '10px 15px',
-              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              border: '1px solid black',
+              backgroundColor: 'transparent',
+              color: 'black',
+              borderRadius: '8px',
+              padding: '6px 12px',
             }}
           >
             {t('back')}
