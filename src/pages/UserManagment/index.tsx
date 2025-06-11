@@ -17,12 +17,11 @@ const UserManagement = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas' >('info')
+  const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas' | 'promosActivas' | 'notificaciones'>('info');
+
   const { setLanguage } = useAuth();
 
   const { t, i18n } = useTranslation('global');
-
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -91,6 +90,8 @@ const UserManagement = () => {
   }, [success, navigate])
 
   const [promotions, setPromotions] = useState<any[]>([])
+  const [tieneNotificacion, setTieneNotificacion] = useState(false);
+
 
 useEffect(() => {
   const fetchPromotions = async () => {
@@ -112,6 +113,32 @@ useEffect(() => {
       const data = await res.json()
       console.log('Promotions fetched:', data)
       setPromotions(data)
+      if (user?.rol !== 'Administrador') {
+        const notificacionesGuardadas = JSON.parse(localStorage.getItem(`notificaciones-${user.email}`) || '[]');
+        const nuevasNotificaciones = [];
+
+        const hoy = new Date();
+
+        for (const promo of data) {
+          const inicio = new Date(promo.start_date);
+          const fin = new Date(promo.end_date);
+          const yaExiste = notificacionesGuardadas.some((n: any) => n.id === promo.id);
+
+          if (hoy >= inicio && hoy <= fin && !yaExiste) {
+            nuevasNotificaciones.push({
+              id: promo.id,
+              mensaje: `🎉 ¡Aprovecha la nueva promoción "${promo.title}"! Vigente desde el ${promo.start_date.split('T')[0]} hasta el ${promo.end_date.split('T')[0]}. ¡No te la pierdas!`
+            });
+          }
+        }
+
+        if (nuevasNotificaciones.length > 0) {
+          const todas = [...notificacionesGuardadas, ...nuevasNotificaciones];
+          localStorage.setItem(`notificaciones-${user.email}`, JSON.stringify(todas));
+          setTieneNotificacion(true);
+        }
+      }
+
     } catch (error) {
       console.error('❌ Error al obtener promociones:', error)
     }
@@ -119,7 +146,15 @@ useEffect(() => {
 
   fetchPromotions()
 }, [apiUrl, token])
- 
+
+  const promocionesActivas = promotions.filter(promo => {
+    const hoy = new Date()
+    const inicio = new Date(promo.start_date)
+    const fin = new Date(promo.end_date)
+
+    return hoy >= inicio && hoy <= fin
+  })
+  
 
   const [newPromo, setNewPromo] = useState<{
     title: string;
@@ -210,31 +245,6 @@ useEffect(() => {
     console.error('Error en la petición DELETE:', error);
   }
 };
-
-  const assignPromoToProduct = async (promoId: number) => {
-    setAssigningPromoId(promoId)
-    setShowAssignPanel(true)
-    try {
-      const res = await fetch(`${apiUrl}/api/products/get_all`)
-      const data = await res.json()
-      setAvailableProducts(data.filter((p: any) => p.stock > 0))
-    } catch (err) {
-      console.error('❌ Error al obtener productos:', err)
-    }
-  }
-
-  const confirmAssignProducts = () => {
-    alert(`Promoción asignada a productos: ${selectedProducts.join(', ')}`)
-    setShowAssignPanel(false)
-    setSelectedProducts([])
-    setAssigningPromoId(null)
-  }
-
-  const toggleSelectProduct = (id: number) => {
-    setSelectedProducts(prev =>
-      prev.includes(id) ? prev.filter(pid => pid !== id) : [...prev, id]
-    )
-  }
 
   const editPromo = async (promoId: number) => {
   try {
@@ -412,6 +422,30 @@ const confirmarCompra = async (idCompra: number) => {
             <li className="nav-item mb-2">
               <button className={`btn btn-sm w-100 text-start ${activeSection === 'ventas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`} onClick={() => setActiveSection('ventas')}>{user?.rol === 'Administrador' ? 'Historial Compras' : 'Mi Historial de Compras'}</button>
             </li>
+            {user?.rol !== 'Administrador' && (
+            <li className="nav-item mb-2">
+              <button
+                className={`btn btn-sm w-100 text-start ${activeSection === 'promosActivas' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`}
+                onClick={() => setActiveSection('promosActivas')}
+              >
+                Promociones Activas
+              </button>
+            </li>
+          )}
+          {user?.rol !== 'Administrador' && (
+          <li className="nav-item mb-2">
+            <button
+              className={`btn btn-sm w-100 text-start ${activeSection === 'notificaciones' ? 'btn-light text-dark fw-bold' : 'btn-outline-secondary text-dark'}`}
+              onClick={() => {
+                setActiveSection('notificaciones');
+                setTieneNotificacion(false);
+              }}
+            >
+              Notificaciones
+              {tieneNotificacion && <span className="badge bg-danger ms-2">¡NUEVA!</span>}
+            </button>
+          </li>
+        )}
         </div>
 
         <div className="flex-grow-1 p-5">
@@ -607,6 +641,63 @@ const confirmarCompra = async (idCompra: number) => {
           </div>
         </div>
       )}
+      {activeSection === 'promosActivas' && (
+  <div>
+    <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Promociones Activas</h2>
+    {promocionesActivas.length === 0 ? (
+      <p>No hay promociones activas en este momento.</p>
+    ) : (
+      <div className="table-responsive">
+        <table className="table table-bordered align-middle">
+          <thead className="table-light">
+            <tr>
+              <th>Nombre</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              <th>Descuento</th>
+            </tr>
+          </thead>
+          <tbody>
+            {promocionesActivas.map(promo => (
+              <tr key={promo.id}>
+                <td>{promo.title}</td>
+                <td>{promo.start_date.split('T')[0]}</td>
+                <td>{promo.end_date.split('T')[0]}</td>
+                <td>{promo.porcentage}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+          )}
+        </div>
+      )}
+      {activeSection === 'notificaciones' && (
+      <div>
+        <h2 className="fw-bold mb-4" style={{ color: '#333' }}>Notificaciones</h2>
+        {(() => {
+          const notifs = JSON.parse(localStorage.getItem(`notificaciones-${user?.email}`) || '[]');
+          return notifs.length === 0 ? (
+            <p>No tienes notificaciones nuevas.</p>
+          ) : (
+            <ul className="list-group">
+              {notifs.map((n: any) => (
+                <li key={n.id} className="list-group-item d-flex justify-content-between align-items-center">
+                  {n.mensaje}
+                  <button className="btn btn-sm btn-outline-danger" onClick={() => {
+                    const nuevas = notifs.filter((x: any) => x.id !== n.id);
+                    localStorage.setItem(`notificaciones-${user.email}`, JSON.stringify(nuevas));
+                    setTieneNotificacion(false);
+                  }}>
+                    Eliminar
+                  </button>
+                </li>
+              ))}
+            </ul>
+          );
+        })()}
+      </div>
+    )}
       </div>
     </div>
   </>
