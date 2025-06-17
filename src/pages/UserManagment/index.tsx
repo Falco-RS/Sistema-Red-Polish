@@ -347,6 +347,31 @@ const refreshPromotions = async () => {
   console.log(salesHistory);
 }, [user, token, apiUrl]);
 
+const enviarCorreoPromo = async (promoId: number) => {
+  try {
+    const res = await fetch(`${apiUrl}/api/promotions/send/${promoId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error(`❌ Error al enviar correo: ${errorText}`);
+      alert('❌ No se pudo enviar el correo.');
+      return;
+    }
+
+    alert('✅ Correo promocional enviado correctamente.');
+  } catch (error) {
+    console.error('❌ Error al hacer la petición de envío de correo:', error);
+    alert('Error de conexión al enviar el correo.');
+  }
+};
+
+
 const confirmarCompra = async (idCompra: number) => {
   if (!user?.email || !token) return;
 
@@ -397,6 +422,7 @@ const confirmarCompra = async (idCompra: number) => {
     console.error('❌ Error al hacer PUT:', error);
     alert('Error de conexión.');
   }
+
 };
 
    return (
@@ -524,7 +550,6 @@ const confirmarCompra = async (idCompra: number) => {
                     <th>{t('start')}</th>
                     <th>{t('end')}</th>
                     <th>{t('discount')}</th>
-                    <th>{t('active')}</th>
                     <th>{t('actions')}</th>
                   </tr>
                 </thead>
@@ -535,30 +560,22 @@ const confirmarCompra = async (idCompra: number) => {
                       <td>{promo.start_date.split('T')[0]}</td>
                       <td>{promo.end_date.split('T')[0]}</td>
                       <td>{promo.porcentage !== undefined && promo.porcentage !== null ? `${promo.porcentage}%` : '—'}</td>
-                      <td className="text-center">
-                      <span
-                        className={`d-inline-block rounded-circle`}
-                        style={{
-                          width: '12px',
-                          height: '12px',
-                          backgroundColor: promo.active ? 'green' : 'red',
-                        }}
-                      />
-                    </td>
                       <td className="d-flex gap-1">
                         <button className="btn btn-sm btn-outline-primary" onClick={() => {
                           setEditingPromoId(promo.id)
                           setNewPromo({ ...promo})
                         }}>{t('edit')}</button>
-                        <button className="btn btn-sm btn-outline-warning" onClick={() => togglePromoActive(promo.id)}>
-                          {promo.active ? t('deactivate') : t('activate')}
-                        </button>
                         <button
                           className="btn btn-sm btn-outline-danger"
                           onClick={() => deletePromo(promo.id)}
                         >
                           {t('delete')}
                         </button>
+                        {user?.rol === 'Administrador' && (
+                        <button className="btn btn-sm btn-outline-primary" onClick={() => enviarCorreoPromo(promo.id)}>
+                          {t('Enviar Correo')}
+                        </button>
+                      )}
                       </td>
                     </tr>
                   ))}
