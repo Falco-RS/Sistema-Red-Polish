@@ -12,6 +12,7 @@ const UserManagement = () => {
   const apiUrl = import.meta.env.VITE_IP_API;
 
   const [firstName, setFirstName] = useState(user?.name || '')
+  const [correoPromoStatus, setCorreoPromoStatus] = useState<'success' | 'error' | null>(null)
   const [lastName, setLastName] = useState(user?.last_name || '')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -360,11 +361,13 @@ const enviarCorreoPromo = async (promoId: number) => {
     if (!res.ok) {
       const errorText = await res.text();
       console.error(`❌ Error al enviar correo: ${errorText}`);
-      alert('❌ No se pudo enviar el correo.');
+      setCorreoPromoStatus('error');
+      setTimeout(() => setCorreoPromoStatus(null), 2000);
       return;
     }
 
-    alert('✅ Correo promocional enviado correctamente.');
+    setCorreoPromoStatus('success');
+    setTimeout(() => setCorreoPromoStatus(null), 2000);
   } catch (error) {
     console.error('❌ Error al hacer la petición de envío de correo:', error);
     alert('Error de conexión al enviar el correo.');
@@ -541,6 +544,19 @@ const confirmarCompra = async (idCompra: number) => {
 
         {activeSection === 'promos' && (
           <div>
+          {correoPromoStatus && (
+          <div
+            className={`alert ${correoPromoStatus === 'success' ? 'alert-success' : 'alert-danger'} d-flex align-items-center`}
+            role="alert"
+          >
+            <span className="me-2">
+              {correoPromoStatus === 'success' ? '✅' : '❌'}
+            </span>
+            {correoPromoStatus === 'success'
+              ? 'Correo promocional enviado correctamente.'
+              : 'No se pudo enviar el correo promocional.'}
+          </div>
+            )}
             <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('promo_management')}</h2>
             <div className="table-responsive">
               <table className="table table-bordered align-middle">
