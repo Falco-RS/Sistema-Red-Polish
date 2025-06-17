@@ -85,6 +85,7 @@ const EditCalendar = () => {
     let successCount = 0
 
     try {
+      console.log(selectedHours)
       for (const hour of selectedHours) {
         const hourStr = `${hour.toString().padStart(2, '0')}:00`
 
