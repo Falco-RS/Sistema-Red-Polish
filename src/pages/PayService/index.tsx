@@ -15,6 +15,7 @@ const PayService = () => {
   const { user ,token, setIdTrans } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
   const { t } = useTranslation('global');
+  
 
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
 
