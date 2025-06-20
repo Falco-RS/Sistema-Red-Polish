@@ -4,6 +4,7 @@ import NavBar from '../../common/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../common/AuthContext';
 import { useTranslation } from 'react-i18next';
+import PopUpWindow from '../Pop-up_Window';
 
 const PayProduct = () => {
   const location = useLocation();
@@ -14,10 +15,48 @@ const PayProduct = () => {
 
   const { t } = useTranslation('global');
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
+  const [showSinpeModal, setShowSinpeModal] = useState(false);
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff';
   }, []);
+
+  const procesarPagoSinpe = async () => {
+    if (!token || !user?.email) return;
+
+    try {
+      const bodySinpe = {
+        descripcion: 'Compra desde el carrito',
+        fechaCompra: new Date().toISOString().split('T')[0],
+        estadoPago: 'PENDIENTE',
+        usuarioEmail: user.email
+      };
+
+      const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/compra/${user.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(bodySinpe),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'No se pudo registrar el pago por SINPE.');
+      }
+
+      const mensaje = `Hola, deseo pagar por SINPE móvil los productos que compré en la página. Mi correo es: ${user.email}`;
+      const mensajeCodificado = encodeURIComponent(mensaje);
+      const whatsappUrl = `https://wa.me/50683582929?text=${mensajeCodificado}`;
+      window.location.href = whatsappUrl;
+      navigate('/catalog');
+
+    } catch (error) {
+      console.error('Error al registrar pago por SINPE:', error);
+      alert('Ocurrió un error al registrar el pago por SINPE.');
+    }
+  };
 
   const handleConfirmacion = async () => {
     if (!token || !user?.email) {
@@ -30,61 +69,34 @@ const PayProduct = () => {
       return;
     }
 
+    if (metodoPago === 'sinpe') {
+      setShowSinpeModal(true);
+      return;
+    }
+
     try {
-      if (metodoPago === 'sinpe') {
-        const bodySinpe = {
+      const response = await fetch(`${apiUrl}/api/payments/pay/${user.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
           descripcion: 'Compra desde el carrito',
           fechaCompra: new Date().toISOString().split('T')[0],
           estadoPago: 'PENDIENTE',
           usuarioEmail: user.email
-        };
+        })
+      });
 
-        const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/compra/${user.email}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-          body: JSON.stringify(bodySinpe),
-        });
+      const result = await response.json();
+      setIdTrans(result.id_compra);
+      setIsCompra(true);
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'No se pudo registrar el pago por SINPE.');
-        }
-
-        alert('Tu compra ha sido registrada exitosamente. Tienes 2 días para realizar el pago por SINPE.');
-        navigate('/catalog');
-        return;
-      }
-
-      if (metodoPago === 'transferencia') {
-        const response = await fetch(`${apiUrl}/api/payments/pay/${user.email}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({
-            descripcion: 'Compra desde el carrito',
-            fechaCompra: new Date().toISOString().split('T')[0],
-            estadoPago: 'PENDIENTE',
-            usuarioEmail: user.email
-          })
-        });
-
-        const result = await response.json();
-        console.log(result);
-        setIdTrans(result.id_compra);
-        setIsCompra(true);
-
-        if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
-          window.location.href = result.sessionUrl;
-        } else {
-          alert("URL inválida para redirección a PayPal.");
-        }
-
-        return;
+      if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
+        window.location.href = result.sessionUrl;
+      } else {
+        alert("URL inválida para redirección a PayPal.");
       }
     } catch (error) {
       console.error('Error al procesar la compra:', error);
@@ -124,7 +136,6 @@ const PayProduct = () => {
 
           <hr />
 
-          {/* Pago */}
           <div className="mb-3 mt-4">
             <label className="form-label fw-bold">{t('payment_method')}</label>
             <div className="form-check">
@@ -144,22 +155,8 @@ const PayProduct = () => {
           )}
 
           {metodoPago === 'sinpe' && (
-            <div className="border p-3 mb-3">
-              <h5 className="text-danger">{t('sinpe_title')}</h5>
-              <div className="bg-white text-dark p-4 rounded">
-                <p className="fw-bold">
-                  {t('sinpe_instruction')}
-                </p>
-                <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
-                  +506  83582929
-                </div>
-                <p>
-                  {t('sinpe_description')}
-                  {t('sinpe_description2')}
-                  {t('sinpe_description3')}<strong>{t('sinpe_description4')}</strong> {t('sinpe_description5')}
-                  {t('sinpe_description6')}
-                </p>
-              </div>
+            <div className="alert alert-warning mt-4">
+              <strong>Nota:</strong> Al presionar <strong>Confirmar compra</strong> se abrirá una ventana emergente con los pasos necesarios para continuar con su pago por SINPE móvil.
             </div>
           )}
 
@@ -170,8 +167,37 @@ const PayProduct = () => {
           </div>
         </div>
       </div>
+
+      <PopUpWindow
+        show={showSinpeModal}
+        title="Pago de Compra por Sinpe"
+        onClose={() => setShowSinpeModal(false)}
+        onConfirm={() => {
+          setShowSinpeModal(false);
+          procesarPagoSinpe();
+        }}
+      >
+        <div className="bg-white text-dark p-2 rounded">
+          <p className="fw-bold">
+            Debe realizar una transferencia al número SINPE móvil:
+          </p>
+          <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
+            <p
+              className="text-black pt-3"
+              rel="noopener noreferrer"
+            >
+              +506 83582929
+            </p>
+          </div>
+          <p>
+            Una vez realizado el pago, envíe el comprobante a través de WhatsApp. <br />
+            El pedido quedará en estado <strong>PENDIENTE</strong> hasta confirmar el pago.
+          </p>
+        </div>
+      </PopUpWindow>
     </>
   );
 };
 
 export default PayProduct;
+

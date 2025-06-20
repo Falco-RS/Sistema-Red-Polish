@@ -19,6 +19,7 @@ import PayService from './pages/PayService'
 import ShoppingCart from './pages/ShoppingCart'
 import PayProduct from './pages/PayProducts'
 import PaymentSuccess from './pages/PaymentSuccess'
+import PopUpWindow from './pages/Pop-up_Window'
 
 
 
@@ -45,6 +46,11 @@ function App() {
       <Route path="/shopping-cart" element={<ShoppingCart />} />
       <Route path="/pay-products" element={<PayProduct />} />
       <Route path="/payment-success" element={<PaymentSuccess />} />
+      <Route path="/popupwindow" element={<PopUpWindow show={false} title={''} children={undefined} onClose={function (): void {
+        throw new Error('Function not implemented.')
+      } } onConfirm={function (): void {
+        throw new Error('Function not implemented.')
+      } } />} />
     </Routes>
   )
 }

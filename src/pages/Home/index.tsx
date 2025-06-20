@@ -143,7 +143,7 @@ function Homepage() {
             <div className="d-flex align-items-start gap-3">
               <FaWhatsapp className="fs-3 text-success" />
               <div>
-                <p className="mb-1 fw-semibold">{t('whatsapp')}</p>
+                <p className="mb-1 fw-semibold">{t('Whatsapp')}</p>
                 <a href="https://wa.me/50683582929" className="text-white">WhatsApp</a>
               </div>
             </div>
