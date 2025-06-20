@@ -123,6 +123,7 @@ const PayService = () => {
           <h2 className="text-dark mb-4 text-center">{t('confirm_title_s')}</h2>
 
           <p><strong>{t('service')}:</strong> {servicio.nombre}</p>
+          <p><strong>{t('price')}:</strong> ${servicio.precio.toLocaleString()}</p>
           <p><strong>{t('description')}:</strong> {servicio.descripcion}</p>
           <p><strong>{t('date')}:</strong> {fechaSeleccionada.toLocaleDateString()}</p>
           <p><strong>{t('hour')}:</strong> {fechaSeleccionada.toLocaleTimeString()}</p>
