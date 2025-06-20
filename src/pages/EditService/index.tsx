@@ -4,6 +4,7 @@ import NavBar from '../../common/NavBar'
 import { useLocation } from 'react-router-dom'
 import { useAuth } from '../../common/AuthContext'
 import { useTranslation } from 'react-i18next';
+import PopUpWindow from '../Pop-up_Window'; 
 
 const EditService = () => {
   const { user, token } = useAuth()
@@ -26,6 +27,16 @@ const EditService = () => {
   const navigate = useNavigate()
   const userEmail = user?.email
   const { t } = useTranslation('global');
+
+  const [modalInfo, setModalInfo] = useState<{ show: boolean; title: string; content: string; onConfirm?: () => void }>({
+    show: false,
+    title: '',
+    content: '',
+  });
+
+  const showAlert = (title: string, content: string, onConfirm?: () => void) => {
+    setModalInfo({ show: true, title, content, onConfirm });
+  };
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
@@ -80,7 +91,7 @@ const EditService = () => {
     e.preventDefault()
 
     if (!name || !description || !duration || !price || !categoryId || !imageUrl) {
-      setError(t('error'))
+      showAlert(t('error'), t('error'))
       return
     }
 
@@ -93,8 +104,6 @@ const EditService = () => {
       imageUrl: imageUrl,   
       promotionId: promotionId ? parseInt(promotionId) : null, 
     }
-    console.log('🔧 Editando servicio:', serviceData)
-
     try {
       const res = await fetch(`${apiUrl}/api/services/update/${servicio.id}/${userEmail}`, {
         method: 'PUT',
@@ -125,7 +134,7 @@ const EditService = () => {
       setNewCategory('')
       setShowNewCategory(false)
     } catch {
-      setError('Error al crear la categoría.')
+      showAlert(t('error'), 'Error al crear la categoría.')
     }
   }
 
@@ -143,11 +152,11 @@ const EditService = () => {
 
       if (!res.ok) throw new Error('Error al eliminar el servicio')
 
-      alert(t('success_delete_service'))
+      showAlert(t('success'), t('success_delete_service'));
       navigate('/services')
     } catch (err) {
       console.error('❌ Error eliminando el servicio:', err)
-      alert(t('error_delete_service'))
+      showAlert(t('error'), t('error_delete_service'));
     }
   }
 
@@ -273,6 +282,19 @@ const EditService = () => {
             <button className="btn btn-outline-danger btn-sm" onClick={handleDeleteService}>{t('delete_service')}</button>
         </div>
         </div>
+        {modalInfo.show && (
+          <PopUpWindow
+            show={modalInfo.show}
+            title={modalInfo.title}
+            onClose={() => setModalInfo({ ...modalInfo, show: false })}
+            onConfirm={() => {
+              setModalInfo({ ...modalInfo, show: false });
+              if (modalInfo.onConfirm) modalInfo.onConfirm();
+            }}
+          >
+            <p>{modalInfo.content}</p>
+          </PopUpWindow>
+        )}
       </div>
     </>
   )

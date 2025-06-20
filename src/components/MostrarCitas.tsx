@@ -1,15 +1,24 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../common/AuthContext'
 import { useTranslation } from 'react-i18next';
-
+import PopUpWindow from '../pages/Pop-up_Window';
 
 const Appoiment = () => {
   const { user, token } = useAuth();
   const [appointments, setAppointments] = useState<any[]>([]);
-  const [error, setError] = useState<string | null>(null);
   const apiUrl = import.meta.env.VITE_IP_API;
   const { t } = useTranslation('global');
 
+  const [modalInfo, setModalInfo] = useState<{ show: boolean; title: string; content: string; onConfirm?: () => void }>({
+    show: false,
+    title: '',
+    content: '',
+  });
+
+
+  const showAlert = (title: string, content: string, onConfirm?: () => void) => {
+    setModalInfo({ show: true, title, content, onConfirm });
+  };
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
@@ -29,8 +38,7 @@ const Appoiment = () => {
         });
 
         if (!response.ok) {
-          const errorData = await response.json();
-          setError(errorData.message || 'Error al obtener las citas.');
+          showAlert('Error', 'Error al obtener las citas.');
           return;
         }
 
@@ -38,7 +46,7 @@ const Appoiment = () => {
         setAppointments(data);
       } catch (err) {
         console.error(err);
-        setError('Error de red al obtener las citas.');
+        showAlert('Error', 'Error de red al obtener las citas.');
       }
     };
 
@@ -59,8 +67,7 @@ const Appoiment = () => {
     });
 
     if (!response.ok) {
-        const err = await response.json();
-        setError(err.message || 'Error al confirmar la cita.');
+        showAlert('Error', 'Error al confirmar la cita.');
         return;
       }
 
@@ -73,7 +80,7 @@ const Appoiment = () => {
 
   } catch (err) {
     console.error(err);
-    setError('Error de red al confirmar el pago.');
+    showAlert('Error', 'Error de red al confirmar el pago.');
   }
 };
 
@@ -93,8 +100,7 @@ const Appoiment = () => {
       });
 
       if (!response.ok) {
-        const err = await response.json();
-        setError(err.message || 'Error al cancelar la cita.');
+        showAlert('Error', 'Error al cancelar la cita.');
         return;
       }
 
@@ -106,18 +112,20 @@ const Appoiment = () => {
       );
 
     if (user.rol !== 'Administrador') {
-      alert('Su cancelación está pendiente. Por favor contacte al administrador al +506 8358 2929 para la devolución y tener una cancelación exitosa.');
-    }
+      showAlert(
+          'Cancelación Pendiente',
+          'Su cancelación está pendiente. Por favor contacte al administrador al +506 8358 2929 para la devolución y tener una cancelación exitosa.'
+        );    
+      }
     } catch (err) {
       console.error(err);
-      setError('Error de red al cancelar la cita.' );
+      showAlert('Error', 'Error de red al cancelar la cita.');
     }
   };
 
   return (
     <div className="container mt-4">
       <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('my_appointments')}</h2>
-      {error && <div className="alert alert-danger">{error}</div>}
       <table className="table table-bordered table-hover mt-3">
         <thead className="thead-dark">
           <tr>
@@ -178,8 +186,21 @@ const Appoiment = () => {
           ))}
         </tbody>
       </table>
+      {modalInfo.show && (
+      <PopUpWindow
+        show={modalInfo.show}
+        title={modalInfo.title}
+        onClose={() => setModalInfo({ ...modalInfo, show: false })}
+        onConfirm={() => {
+          setModalInfo({ ...modalInfo, show: false });
+          if (modalInfo.onConfirm) modalInfo.onConfirm();
+        }}
+      >
+        <p>{modalInfo.content}</p>
+      </PopUpWindow>
+    )}
     </div>
-  );
+    );
 };
 
 export default Appoiment;

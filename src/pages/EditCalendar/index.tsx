@@ -5,7 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../common/AuthContext'
-
+import PopUpWindow from '../Pop-up_Window'; 
 
 interface CitaOcupada {
   fecha: string
@@ -25,6 +25,17 @@ const EditCalendar = () => {
   const apiUrl = import.meta.env.VITE_IP_API
 
   const hours = Array.from({ length: 10 }, (_, i) => i + 8) // 8 a 17
+
+  const [modalInfo, setModalInfo] = useState<{ show: boolean; title: string; content: string; onConfirm?: () => void }>({
+    show: false,
+    title: '',
+    content: '',
+  });
+
+  const showAlert = (title: string, content: string, onConfirm?: () => void) => {
+    setModalInfo({ show: true, title, content, onConfirm });
+  };
+
 
   const handleHourToggle = (hour: number) => {
     setSelectedHours(prev =>
@@ -76,7 +87,7 @@ const EditCalendar = () => {
 
   const handleSave = async () => {
     if (!selectedDate || selectedHours.length === 0) {
-      alert(t('alert_missing'))
+      showAlert('Datos faltantes', t('alert_missing'));
       return
     }
 
@@ -103,9 +114,9 @@ const EditCalendar = () => {
       }
 
       if (successCount === selectedHours.length) {
-        alert('✅ Todas las horas fueron ocupadas con éxito')
+        showAlert('Éxito', '✅ Todas las horas fueron ocupadas con éxito');
       } else {
-        alert('⚠️ Algunas horas no pudieron ocuparse')
+        showAlert('Advertencia', '⚠️ Algunas horas no pudieron ocuparse');
       }
 
       setSaved(true)
@@ -116,7 +127,7 @@ const EditCalendar = () => {
 
     } catch (error) {
       console.error('❌ Error al bloquear horas:', error)
-      alert('Hubo un error al guardar la disponibilidad.')
+      showAlert('Error', 'Hubo un error al guardar la disponibilidad.');
     }
   }
 
@@ -177,6 +188,19 @@ const EditCalendar = () => {
             </button>
           </div>
         </div>
+        {modalInfo.show && (
+        <PopUpWindow
+          show={modalInfo.show}
+          title={modalInfo.title}
+          onClose={() => setModalInfo({ ...modalInfo, show: false })}
+          onConfirm={() => {
+            setModalInfo({ ...modalInfo, show: false });
+            if (modalInfo.onConfirm) modalInfo.onConfirm();
+          }}
+        >
+          <p>{modalInfo.content}</p>
+        </PopUpWindow>
+      )}
       </div>
     </>
   )

@@ -1,14 +1,25 @@
 import { useState,useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../common/AuthContext'
+import PopUpWindow from '../Pop-up_Window';
 
 const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [error, setError] = useState('')
   const navigate = useNavigate()
   const { login } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
+
+  const [modalInfo, setModalInfo] = useState<{ show: boolean; title: string; content: string; onConfirm?: () => void }>({
+    show: false,
+    title: '',
+    content: '',
+  });
+
+  const showAlert = (title: string, content: string, onConfirm?: () => void) => {
+    setModalInfo({ show: true, title, content, onConfirm });
+  };
+
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
@@ -18,7 +29,7 @@ const Login = () => {
     e.preventDefault();
 
     if (!email.trim() || !password.trim()) {
-      setError('Todos los campos son obligatorios.');
+      showAlert('Error', 'Todos los campos son obligatorios.');
       return;
     }
 
@@ -33,18 +44,17 @@ const Login = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        setError(errorData.message || 'Error al iniciar sesión.');
+        showAlert('Error', errorData.message || 'Error al iniciar sesión.');
         return;
       }
 
       const data = await response.json();
       login(data.user, data.token);
       navigate('/');
-      setError('');
       setEmail('');
       setPassword('');
     } catch (err) {
-      setError('Contraseña o usuario incorrecto.');
+      showAlert('Error', 'Contraseña o usuario incorrecto.');
     }
   };
 
@@ -78,12 +88,6 @@ const Login = () => {
               style={{ borderRadius: '20px', padding: '12px 16px', fontSize: '1rem', boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)', transition: 'all 0.3s' }}
             />
           </div>
-
-          {error && (
-            <div className="alert alert-primary py-2 mb-4">
-              {error}
-            </div>
-          )}
 
           <button type="submit" className="btn btn-gradient w-100 py-3 fw-bold" style={{
             background: 'linear-gradient(to right, #007bff 0%, #3399ff 100%)',
@@ -134,6 +138,19 @@ const Login = () => {
           </p>
         </div>
       </div>
+      {modalInfo.show && (
+        <PopUpWindow
+          show={modalInfo.show}
+          title={modalInfo.title}
+          onClose={() => setModalInfo({ ...modalInfo, show: false })}
+          onConfirm={() => {
+            setModalInfo({ ...modalInfo, show: false });
+            if (modalInfo.onConfirm) modalInfo.onConfirm();
+          }}
+        >
+          <p>{modalInfo.content}</p>
+        </PopUpWindow>
+      )}
     </div>
   )
 }
