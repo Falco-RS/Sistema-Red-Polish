@@ -9,7 +9,6 @@ function Authenticate_mail() {
   const navigate = useNavigate()
   const location = useLocation()
   const apiUrl = import.meta.env.VITE_IP_API;
-  const [success, setSuccess] = useState<string>('')
 
 
   const email = location.state?.email
@@ -76,7 +75,6 @@ function Authenticate_mail() {
         setResendTimer(120)
         throw new Error('Algo ocurrió mal, no se pudo reenviar el codigo')
       } else {
-        setSuccess('Código reenviado con éxito')
         setError('') 
         setResendTimer(120)
       }

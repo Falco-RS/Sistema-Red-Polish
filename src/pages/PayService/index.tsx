@@ -9,9 +9,6 @@ const PayService = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { servicio, fechaSeleccionada } = location.state || {};
-  const [metodoNotificacion, setMetodoNotificacion] = useState<'email' | 'sms' | null>(null);
-  const [numeroTelefono, setNumeroTelefono] = useState('');
-  const [correoUsuario, setCorreoUsuario] = useState(''); 
   const { user ,token, setIdTrans } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
   const { t } = useTranslation('global');

@@ -10,7 +10,6 @@ const Register = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false)
   const apiUrl = import.meta.env.VITE_IP_API;
   const { login } = useAuth();
 
@@ -23,7 +22,6 @@ const Register = () => {
 
     if (!firstName.trim() || !lastName.trim() || !email.trim() || !password.trim()) {
       setError('Todos los campos son obligatorios.')
-      setSuccess(false)
       return
     }
 
@@ -48,12 +46,10 @@ const Register = () => {
       if (!response.ok) {
         const errorData = await response.json()
         setError(errorData.message || 'Error al registrar el usuario.')
-        setSuccess(false)
         return
       }
 
       setError('')
-      setSuccess(true)
 
       const loginData = {
         email,
@@ -84,7 +80,6 @@ const Register = () => {
       }, 3000)
     } catch (err) {
       setError('Error de conexión con el servidor.')
-      setSuccess(false)
     }
   }
 

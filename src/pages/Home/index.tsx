@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import image from '../../assets/pulido.png'
-import { FaFacebook, FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa'
+import {FaFacebook, FaMapMarkerAlt, FaEnvelope, FaWhatsapp} from 'react-icons/fa'
 import { useTranslation } from 'react-i18next';
 
 function Homepage() {
@@ -141,10 +141,10 @@ function Homepage() {
               </div>
             </div>
             <div className="d-flex align-items-start gap-3">
-              <FaPhone className="fs-3 text-success" />
+              <FaWhatsapp className="fs-3 text-success" />
               <div>
-                <p className="mb-1 fw-semibold">{t('phone')}</p>
-                <p>8358 2929</p>
+                <p className="mb-1 fw-semibold">{t('whatsapp')}</p>
+                <a href="https://wa.me/50683582929" className="text-white">WhatsApp</a>
               </div>
             </div>
             <div className="d-flex align-items-start gap-3">

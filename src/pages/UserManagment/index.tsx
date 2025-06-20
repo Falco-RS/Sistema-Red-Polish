@@ -22,7 +22,7 @@ const UserManagement = () => {
 
   const { setLanguage } = useAuth();
 
-  const { t, i18n } = useTranslation('global');
+  const { t } = useTranslation('global');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -169,11 +169,7 @@ useEffect(() => {
     porcentage: '',
   });
   const [editingPromoId, setEditingPromoId] = useState<number | null>(null)
-  const [showAssignPanel, setShowAssignPanel] = useState(false)
-  const [assigningPromoId, setAssigningPromoId] = useState<number | null>(null)
-  const [availableProducts, setAvailableProducts] = useState<any[]>([])
-  const [selectedProducts, setSelectedProducts] = useState<number[]>([])
-  const userToken = user?.token
+
 
   const handlePromoSubmit = async () => {
   if (!newPromo.title || !newPromo.start_date || !newPromo.end_date || !newPromo.porcentage) {
@@ -222,9 +218,6 @@ useEffect(() => {
   }
 }
 
-  const togglePromoActive = (id: number) => {
-    setPromotions(promotions.map(p => p.id === id ? { ...p, active: !p.active } : p))
-  }
 
   const deletePromo = async (id: number) => {
   try {
@@ -247,36 +240,6 @@ useEffect(() => {
   }
 };
 
-  const editPromo = async (promoId: number) => {
-  try {
-    const res = await fetch(`${apiUrl}/api/promotions/${promoId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-    })
-
-    if (!res.ok) {
-      const errorText = await res.text()
-      console.error(`❌ Error al obtener promoción ${promoId}:`, errorText)
-      alert(`Error al obtener datos de la promoción.`)
-      return
-    }
-
-    const promo = await res.json()
-    setNewPromo({
-      title: promo.title,
-      start_date: promo.start_date,
-      end_date: promo.end_date,
-      porcentage: promo.porcentage
-    })
-    setEditingPromoId(promoId)
-  } catch (err) {
-    console.error('❌ Error al cargar promoción para edición:', err)
-    alert('Error al cargar la promoción.')
-  }
-}
 
 const refreshPromotions = async () => {
   try {
@@ -634,7 +597,6 @@ const confirmarCompra = async (idCompra: number) => {
                 <div className="col-md-2">
                   <button
                     className="btn btn-outline-danger w-100"
-                    onClick={() => setShowAssignPanel(true)}
                   >
                     {t('assign_products')}
                   </button>

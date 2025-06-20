@@ -11,7 +11,6 @@ const Catalog = () => {
   const [products, setProducts] = useState<any[]>([])
   const [filteredProducts, setFilteredProducts] = useState<any[]>([])
   const [categories, setCategories] = useState<{ id: number; name: string }[]>([])
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [promotions, setPromotions] = useState<any[]>([])
   const { t } = useTranslation('global');
 
@@ -70,23 +69,14 @@ const Catalog = () => {
   })
 
   const handleCategoryFilter = (id: number) => {
-    setSelectedCategory(id)
     const filtered = products.filter(p => p.categoryId === id)
     setFilteredProducts(filtered)
   }
 
   const clearFilter = () => {
-    setSelectedCategory(null)
     setFilteredProducts(products)
   }
 
-  const sortProducts = (type: string) => {
-    const sorted = [...filteredProducts]
-    if (type === 'price') sorted.sort((a, b) => a.price - b.price)
-    if (type === 'name') sorted.sort((a, b) => a.name.localeCompare(b.name))
-    if (type === 'newest') sorted.sort((a, b) => b.id - a.id)
-    setFilteredProducts(sorted)
-  }
 
   return (
   <>
