@@ -163,5 +163,6 @@
   "available_hours": "Available hours: the ones you select will become unavailable to users",
   "save_c": "Save availability",
   "saved": "Availability updated successfully.",
-  "alert_missing": "Please select a date and at least one hour"
+  "alert_missing": "Please select a date and at least one hour",
+  "email": "Email"
 }

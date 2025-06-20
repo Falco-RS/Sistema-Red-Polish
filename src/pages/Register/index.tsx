@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {useAuth} from "../../common/AuthContext.tsx";
 import { Eye, EyeOff } from 'lucide-react';
+import { useLoader } from '../../common/LoaderContext';
 
 const Register = () => {
   const navigate = useNavigate()
@@ -16,6 +17,8 @@ const Register = () => {
   const [error, setError] = useState('')
   const apiUrl = import.meta.env.VITE_IP_API;
   const { login } = useAuth();
+  const { showLoader, hideLoader } = useLoader();
+
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
@@ -49,6 +52,7 @@ const Register = () => {
     console.log('Datos listos para enviar al backend:', JSON.stringify(userData, null, 2))
 
     try {
+      showLoader(); // ✅ Mostrar loader
       const response = await fetch(`${apiUrl}/api/users/register`, {
         method: 'POST',
         headers: {
@@ -95,6 +99,9 @@ const Register = () => {
     } catch (err) {
       setError('Error de conexión con el servidor.')
     }
+    finally {
+    hideLoader(); // ✅ Ocultar loader
+  }
   }
 
   return (

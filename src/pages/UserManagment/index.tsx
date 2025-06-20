@@ -301,6 +301,7 @@ const refreshPromotions = async () => {
       const mappedData = data.map((compra: any, index: number) => ({
         id: compra.idCompra || index,
         client: compra.cliente?.name || 'Desconocido',
+        email: compra.cliente?.email || '—', 
         date: compra.fechaCompra || 'Fecha no disponible',
         description: compra.descripcion || '—',
         status: compra.estadoPago || 'Sin estado',
@@ -382,6 +383,7 @@ const confirmarCompra = async (idCompra: number) => {
       const mappedData = data.map((compra: any, index: number) => ({
         id: compra.idCompra || index,
         client: compra.cliente?.name || 'Desconocido',
+        email: compra.cliente?.email || '—',  // 🔥 AÑADIDO
         date: compra.fechaCompra || 'Fecha no disponible',
         description: compra.descripcion || '—',
         status: compra.estadoPago || 'Sin estado',
@@ -624,6 +626,7 @@ const confirmarCompra = async (idCompra: number) => {
               <thead className="table-light">
               <tr>
                 <th>{t('client_name')}</th>
+                <th>{t('email')}</th> {/* 🔥 AÑADIDO */}
                 <th>{t('purchase_date')}</th>
                 <th>{t('description')}</th>
                 <th>{t('status')}</th>
@@ -634,6 +637,7 @@ const confirmarCompra = async (idCompra: number) => {
               {salesHistory.map((sale, index) => (
                 <tr key={sale.id ?? `sale-${index}`}>
                   <td>{sale.client || t('unknown')}</td>
+                  <td>{sale.email || '—'}</td> {/* 🔥 AÑADIDO */}
                   <td>{sale.date || t('no_date')}</td>
                   <td>{sale.description || '—'}</td>
                   <td>
@@ -665,7 +669,7 @@ const confirmarCompra = async (idCompra: number) => {
   <div>
     <h2 className="fw-bold mb-4" style={{ color: '#333' }}>{t('active_promotions')}</h2>
     {promocionesActivas.length === 0 ? (
-      <p>{t('no_active_promos')}</p>
+      <p style={{ color: '#333' }}> {t('no_active_promos')}</p>
     ) : (
       <div className="table-responsive">
         <table className="table table-bordered align-middle">
@@ -698,7 +702,7 @@ const confirmarCompra = async (idCompra: number) => {
         {(() => {
           const notifs = JSON.parse(localStorage.getItem(`notificaciones-${user?.email}`) || '[]');
           return notifs.length === 0 ? (
-            <p>{t('no_notifications')}.</p>
+            <p style={{ color: '#333' }}> {t('no_notifications')}.</p>
           ) : (
             <ul className="list-group">
               {notifs.map((n: any) => (

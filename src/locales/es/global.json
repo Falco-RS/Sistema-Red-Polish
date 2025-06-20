@@ -163,5 +163,6 @@
   "available_hours": "Horas disponibles: las que marques dejarán de estar disponibles para los usuarios",
   "save_c": "Guardar disponibilidad",
   "saved": "Disponibilidad actualizada correctamente.",
-  "alert_missing": "Selecciona una fecha y al menos una hora"
+  "alert_missing": "Selecciona una fecha y al menos una hora",
+  "email": "Correo"
 }
