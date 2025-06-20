@@ -169,7 +169,7 @@ const ProductView = () => {
                 onChange={(e) => setQuantity(Number(e.target.value))}
               />
 
-              {user ? (
+              {user && user.rol !== 'Administrador' ? (
                 <button
                   className="btn btn-primary fw-bold py-2 w-100 mb-2"
                   style={{ maxWidth: '300px' }}

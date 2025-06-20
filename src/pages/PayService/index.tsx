@@ -1,20 +1,70 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import NavBar from '../../common/NavBar';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { useAuth } from '../../common/AuthContext'
 import { useTranslation } from 'react-i18next';
+import PopUpWindow from '../Pop-up_Window'; 
 
 const PayService = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const { servicio, fechaSeleccionada } = location.state || {};
   const { user ,token, setIdTrans } = useAuth();
   const apiUrl = import.meta.env.VITE_IP_API;
   const { t } = useTranslation('global');
-  
 
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
+
+  const [showSinpeModal, setShowSinpeModal] = useState(false); 
+  const [modalInfo, setModalInfo] = useState<{ show: boolean; title: string; content: string; onConfirm?: () => void }>({
+    show: false,
+    title: '',
+    content: '',
+  });
+
+  const showAlert = (title: string, content: string, onConfirm?: () => void) => {
+    setModalInfo({ show: true, title, content, onConfirm });
+  };
+
+  const procesarPagoSinpe = async () => {
+    if (!token || !user?.email) return;
+
+    const fecha = fechaSeleccionada.toISOString().split('T')[0];
+    const hora = fechaSeleccionada.toTimeString().slice(0, 5);
+
+    try {
+      const bodySinpe = {
+          date: fecha,
+          hour: hora,
+          serviceId: servicio.id,
+        };
+
+      console.log('Datos que se van a enviar:', bodySinpe);
+      console.log('Token:', token);
+
+      const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/cita/${user.email}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(bodySinpe)
+        });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'No se pudo registrar la cita por SINPE');
+      }
+
+      const mensaje = `Hola, deseo pagar por SINPE móvil el servicio que reservé. Mi correo es: ${user.email}, Monto a pagar: ${servicio.precio} dólares.`;
+      const mensajeCodificado = encodeURIComponent(mensaje);
+      const whatsappUrl = `https://wa.me/50683582929?text=${mensajeCodificado}`;
+      window.location.href = whatsappUrl;
+    } catch (error) {
+      console.error('Error al registrar pago por SINPE:', error);
+      showAlert('Error', 'Ocurrió un error al registrar el pago por SINPE.');
+    }
+  };
 
 
   useEffect(() => {
@@ -33,77 +83,51 @@ const PayService = () => {
       return;
     }
 
+    if (metodoPago === 'sinpe') {
+      setShowSinpeModal(true);
+      return;
+    }
+
     const fecha = fechaSeleccionada.toISOString().split('T')[0];
     const hora = fechaSeleccionada.toTimeString().slice(0, 5);
 
+    if (!servicio || !fechaSeleccionada) {
+      showAlert('Error', 'Faltan datos del servicio o fecha.');
+      return;
+    }
+
     try {
-      if (metodoPago === 'sinpe') {
-        const bodySinpe = {
-          date: fecha,
-          hour: hora,
-          serviceId: servicio.id,
-        };
-
-        const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/cita/${user.email}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(bodySinpe)
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || 'No se pudo registrar la cita por SINPE');
-        }
-
-        alert('Tu cita ha sido registrada exitosamente. Tienes 2 días para realizar el pago por SINPE.');
-        navigate('/services');
-        return;
-      }
-
-      if (metodoPago === 'transferencia') {
-        const bodyTransferencia = {
+      const response = await fetch(`${apiUrl}/api/payments/pay/appointment/${user.email}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
           date: fecha,
           hour: hora,
           state: 'PENDIENTE',
           userId: user.id,
           serviceId: servicio.id,
-        };
-        console.log(`${apiUrl}/api/payments/pay/appointment/${user.email}`)
+        })
+      });
 
-        const response = await fetch(`${apiUrl}/api/payments/pay/appointment/${user.email}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(bodyTransferencia)
-        });
+      const result = await response.json();
 
-        const result = await response.json();
-        console.log(result)
-
-        console.log("Redirigiendo a:", result.sessionUrl);
-        console.log("Tipo:", typeof result.sessionUrl);
-        console.log("Contiene https?:", result.sessionUrl.includes("https://"));
-
-        if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
-          setIdTrans(result.id_compra)
-          window.location.href = result.sessionUrl;
-        } else {
-          alert("URL inválida para redirección");
-        }
-
-        if (!result.exito) {
-          return;
-        }
+      if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
+        setIdTrans(result.id_compra)
+        window.location.href = result.sessionUrl;
+      } else {
+        alert("URL inválida para redirección");
       }
-    } catch (error) {
-      console.error('Error al confirmar cita:', error);
-      alert('Ocurrió un error al procesar la cita. Inténtalo más tarde.');
-    }
+
+      if (!result.exito) {
+        return;
+      }
+  } catch (error) {
+    console.error('Error al confirmar cita:', error);
+    alert('Ocurrió un error al procesar la cita. Inténtalo más tarde.');
+  }
   };
 
   if (!servicio || !fechaSeleccionada) {
@@ -150,24 +174,11 @@ const PayService = () => {
           )}
 
           {metodoPago === 'sinpe' && (
-            <div className="border p-3 mb-3">
-              <h5 className="text-primary">{t('sinpe_title')} </h5>
-              <div className="bg-white text-dark p-4 rounded">
-                <p className="fw-bold">
-                  {t('sinpe_instruction')}
-                </p>
-                <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
-                  +506  83582929
-                </div>
-                <p>
-                  {t('sinpe_description_s')}
-                  {t('sinpe_description2')}
-                  {t('sinpe_description3')}<strong>{t('sinpe_description4_s')}</strong> {t('sinpe_description5')}
-                  {t('sinpe_description6')}
-                </p>
-              </div>
+            <div className="alert alert-warning mt-4">
+              <strong>Nota:</strong> Al presionar <strong>Confirmar compra</strong> se abrirá una ventana emergente con los pasos necesarios para continuar con su pago por SINPE móvil.
             </div>
           )}
+
           <div className="text-center">
             <button className="btn btn-primary" onClick={handleConfirmacion}>
               {t('confirm_button_s')}
@@ -175,6 +186,42 @@ const PayService = () => {
           </div>
         </div>
       </div>
+      <PopUpWindow
+        show={showSinpeModal}
+        title="Pago de Compra por Sinpe"
+        onClose={() => setShowSinpeModal(false)}
+        onConfirm={() => {
+          setShowSinpeModal(false);
+          procesarPagoSinpe();
+        }}
+      >
+        <div className="bg-white text-dark p-2 rounded">
+          <p className="fw-bold">
+            Debe realizar una transferencia al número SINPE móvil:
+          </p>
+          <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
+            <p className="text-black pt-3">+506 83582929</p>
+          </div>
+          <p>
+            Una vez realizado el pago, envíe el comprobante a través de WhatsApp. <br />
+            El pedido quedará en estado <strong>PENDIENTE</strong> hasta confirmar el pago.
+          </p>
+        </div>
+      </PopUpWindow>
+
+      {modalInfo.show && (
+        <PopUpWindow
+          show={modalInfo.show}
+          title={modalInfo.title}
+          onClose={() => setModalInfo({ ...modalInfo, show: false })}
+          onConfirm={() => {
+            setModalInfo({ ...modalInfo, show: false });
+            if (modalInfo.onConfirm) modalInfo.onConfirm();
+          }}
+        >
+          <p>{modalInfo.content}</p>
+        </PopUpWindow>
+      )}
     </>
   );
 };
