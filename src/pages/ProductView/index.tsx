@@ -3,7 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import NavBar from '../../common/NavBar'
 import { useAuth } from '../../common/AuthContext'
 import image from '../../assets/pulido.png'
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next'
+import PopUpWindow from '../Pop-up_Window'
 
 const ProductView = () => {
   const { user, token } = useAuth()
@@ -11,16 +12,17 @@ const ProductView = () => {
   const [relatedProducts, setRelatedProducts] = useState<any[]>([])
   const [isAdmin, setIsAdmin] = useState(false)
   const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
+  const [popupData, setPopupData] = useState<{ title: string; message: string; onConfirm?: () => void }>({ title: '', message: '' })
   const [quantity, setQuantity] = useState(1)
   const { id } = useParams()
   const navigate = useNavigate()
   const apiUrl = import.meta.env.VITE_IP_API
   const userEmail = user?.email
-  const { t } = useTranslation('global');
+  const { t } = useTranslation('global')
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
-
     if (user?.rol === 'Administrador') {
       setIsAdmin(true)
     }
@@ -46,15 +48,20 @@ const ProductView = () => {
     fetchProduct()
   }, [id, user])
 
+  const showAlert = (title: string, message: string, onConfirm?: () => void) => {
+    setPopupData({ title, message, onConfirm })
+    setShowPopup(true)
+  }
+
   const handleAddToCart = async () => {
     const qty = Number(quantity)
     if (!qty || qty < 1) {
-      alert("Por favor ingrese una cantidad válida (mayor a 0).")
+      showAlert('Cantidad inválida', 'Por favor ingrese una cantidad válida (mayor a 0).')
       return
     }
 
     if (!userEmail || !token || !user?.id) {
-      alert("Debe iniciar sesión para añadir al carrito.")
+      showAlert('Inicio de sesión requerido', 'Debe iniciar sesión para añadir al carrito.')
       return
     }
 
@@ -74,10 +81,10 @@ const ProductView = () => {
 
       if (!res.ok) throw new Error('Error al añadir al carrito')
 
-      alert("Producto añadido al carrito exitosamente")
+      showAlert('Éxito', 'Producto añadido al carrito exitosamente')
     } catch (err) {
       console.error("❌ Error al añadir al carrito:", err)
-      alert("Ocurrió un error al añadir al carrito.")
+      showAlert('Error', 'Ocurrió un error al añadir al carrito.')
     }
   }
 
@@ -112,11 +119,10 @@ const ProductView = () => {
 
       if (!res.ok) throw new Error('Error al eliminar producto')
 
-      alert('Producto eliminado correctamente.')
-      navigate('/catalog')
+      showAlert('Eliminado', 'Producto eliminado correctamente.', () => navigate('/catalog'))
     } catch (err) {
       console.error('❌ Error eliminando producto:', err)
-      alert('Hubo un error al eliminar el producto.')
+      showAlert('Error', 'Hubo un error al eliminar el producto.')
     }
   }
 
@@ -132,134 +138,151 @@ const ProductView = () => {
   }
 
   return (
-  <>
-    <NavBar />
-    <div className="container mt-5">
-      <button className="btn btn-outline-dark mb-4" onClick={() => navigate(-1)}>
-        ⬅ {t('back')}
-      </button>
+    <>
+      <NavBar />
+      <div className="container mt-5">
+        <button className="btn btn-outline-dark mb-4" onClick={() => navigate(-1)}>
+          ⬅ {t('back')}
+        </button>
 
-      <div className="row align-items-center">
-        <div className="col-md-6 mb-4 mb-md-0 text-center">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="img-fluid rounded shadow"
-            style={{ maxHeight: '400px', objectFit: 'contain' }}
-          />
-        </div>
-        <div className="col-md-6">
-          <h2 className="fw-bold text-dark mb-3">{product.name}</h2>
-          <p className="text-muted mb-3">{product.description}</p>
-          <h4 className="fw-bold text-dark mb-3">${product.price.toLocaleString()}</h4>
-
-          <div className="mb-3">
-  <label className="fw-bold text-dark mb-3">{t('quantity')}:</label>
-  <input
-    type="number"
-    min="1"
-    className="form-control mb-2"
-    value={quantity}
-    onChange={(e) => setQuantity(Number(e.target.value))}
-  />
-
-        {user ? (
-          <button
-            className="btn btn-primary fw-bold py-2 w-100 mb-2"
-            style={{ maxWidth: '300px' }}
-            onClick={handleAddToCart}
-          >
-            {t('add_to_cart')}
-          </button>
-        ) : (
-          <div className="alert alert-warning text-center mt-2" style={{ maxWidth: '300px' }}>
-            ⚠ {t('login_required_p')}
+        <div className="row align-items-center">
+          <div className="col-md-6 mb-4 mb-md-0 text-center">
+            <img
+              src={product.image}
+              alt={product.name}
+              className="img-fluid rounded shadow"
+              style={{ maxHeight: '400px', objectFit: 'contain' }}
+            />
           </div>
-        )}
-      </div>
+          <div className="col-md-6">
+            <h2 className="fw-bold text-dark mb-3">{product.name}</h2>
+            <p className="text-muted mb-3">{product.description}</p>
+            <h4 className="fw-bold text-dark mb-3">${product.price.toLocaleString()}</h4>
 
-        {isAdmin && (
-          <div className="d-flex flex-column gap-2">
-            <button
-              className="btn btn-primary fw-bold py-2 w-100 mb-2"
-              style={{ maxWidth: '300px' }}
-              onClick={() => navigate(`/edit-product/${product.id}`)}
-            >
-              ✏ {t('edit_p')}
-            </button>
-            <button
-              className="btn btn-danger fw-bold py-2 w-100"
-              style={{ maxWidth: '300px' }}
-              onClick={() => setShowConfirmModal(true)}
-            >
-              🗑 {t('delete_p')}
-            </button>
-          </div>
-        )}
-        </div>
-      </div>
+            <div className="mb-3">
+              <label className="fw-bold text-dark mb-3">{t('quantity')}:</label>
+              <input
+                type="number"
+                min="1"
+                className="form-control mb-2"
+                value={quantity}
+                onChange={(e) => setQuantity(Number(e.target.value))}
+              />
 
-      {relatedProducts.length > 0 && (
-        <div className="mt-5">
-          <h4 className="fw-bold mb-4 text-dark">{t('related_products')}</h4>
-          <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5 g-3">
-            {relatedProducts.map((prod) => (
-              <div key={prod.id} className="col">
-                <div
-                  className="card shadow-sm h-100"
-                  style={{ cursor: 'pointer', minHeight: '320px' }}
-                  onClick={() => navigate(`/product/${prod.id}`)}
+              {user ? (
+                <button
+                  className="btn btn-primary fw-bold py-2 w-100 mb-2"
+                  style={{ maxWidth: '300px' }}
+                  onClick={handleAddToCart}
                 >
+                  {t('add_to_cart')}
+                </button>
+              ) : (
+                <div className="alert alert-warning text-center mt-2" style={{ maxWidth: '300px' }}>
+                  ⚠ {t('login_required_p')}
+                </div>
+              )}
+            </div>
+
+            {isAdmin && (
+              <div className="d-flex flex-column gap-2">
+                <button
+                  className="btn btn-primary fw-bold py-2 w-100 mb-2"
+                  style={{ maxWidth: '300px' }}
+                  onClick={() => navigate(`/edit-product/${product.id}`)}
+                >
+                  ✏ {t('edit_p')}
+                </button>
+                <button
+                  className="btn btn-danger fw-bold py-2 w-100"
+                  style={{ maxWidth: '300px' }}
+                  onClick={() => setShowConfirmModal(true)}
+                >
+                  🗑 {t('delete_p')}
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {relatedProducts.length > 0 && (
+          <div className="mt-5">
+            <h4 className="fw-bold mb-4 text-dark">{t('related_products')}</h4>
+            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-xl-5 g-3">
+              {relatedProducts.map((prod) => (
+                <div key={prod.id} className="col">
                   <div
-                    className="card-img-top bg-light d-flex justify-content-center align-items-center"
-                    style={{ height: '150px' }}
+                    className="card shadow-sm h-100"
+                    style={{ cursor: 'pointer', minHeight: '320px' }}
+                    onClick={() => navigate(`/product/${prod.id}`)}
                   >
-                    <img
-                      src={prod.image}
-                      alt={prod.name}
-                      className="img-fluid"
-                      style={{ maxHeight: '100%' }}
-                    />
-                  </div>
-                  <div className="card-body">
-                    <h6 className="card-title fw-bold">{prod.name}</h6>
-                    <p className="card-text text-muted mb-1">{prod.description}</p>
-                    <p className="mb-0 fw-bold">${prod.price.toLocaleString()}</p>
+                    <div
+                      className="card-img-top bg-light d-flex justify-content-center align-items-center"
+                      style={{ height: '150px' }}
+                    >
+                      <img
+                        src={prod.image}
+                        alt={prod.name}
+                        className="img-fluid"
+                        style={{ maxHeight: '100%' }}
+                      />
+                    </div>
+                    <div className="card-body">
+                      <h6 className="card-title fw-bold">{prod.name}</h6>
+                      <p className="card-text text-muted mb-1">{prod.description}</p>
+                      <p className="mb-0 fw-bold">${prod.price.toLocaleString()}</p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* 🔴 Modal de confirmación */}
-      {showConfirmModal && (
-        <div className="modal fade show d-block" tabIndex={-1} role="dialog">
-          <div className="modal-dialog" role="document">
-            <div className="modal-content shadow-lg">
-              <div className="modal-header bg-danger text-white">
-                <h5 className="modal-title">{t('confirm_delete_title')}</h5>
-                <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                <p>{t('confirm_delete_message')}</p>
-                <p className="fw-bold text-danger">{t('confirm_delete_warning')}</p>
-              </div>
-              <div className="modal-footer">
-                <button className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
-                  {t('cancel')}
-                </button>
-                <button className="btn btn-danger" onClick={handleDelete}>
-                  {t('delete')}
-                </button>
+        {/* Modal de confirmación de eliminación */}
+        {showConfirmModal && (
+          <div className="modal fade show d-block" tabIndex={-1} role="dialog">
+            <div className="modal-dialog" role="document">
+              <div className="modal-content shadow-lg">
+                <div className="modal-header bg-danger text-white">
+                  <h5 className="modal-title">{t('confirm_delete_title')}</h5>
+                  <button type="button" className="btn-close" onClick={() => setShowConfirmModal(false)}></button>
+                </div>
+                <div className="modal-body">
+                  <p>{t('confirm_delete_message')}</p>
+                  <p className="fw-bold text-danger">{t('confirm_delete_warning')}</p>
+                </div>
+                <div className="modal-footer">
+                  <button className="btn btn-secondary" onClick={() => setShowConfirmModal(false)}>
+                    {t('cancel')}
+                  </button>
+                  <button className="btn btn-danger" onClick={handleDelete}>
+                    {t('delete')}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  </>
-)
+        )}
+
+        {/* Ventana emergente de alerta */}
+        <PopUpWindow
+          show={showPopup}
+          title={popupData.title}
+          onClose={() => {
+            setShowPopup(false)
+            popupData.onConfirm?.()
+          }}
+          onConfirm={() => {
+            setShowPopup(false)
+            popupData.onConfirm?.()
+          }}
+        >
+          <p>{popupData.message}</p>
+        </PopUpWindow>
+      </div>
+    </>
+  )
 }
+
 export default ProductView

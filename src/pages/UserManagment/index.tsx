@@ -5,6 +5,7 @@ import NavBar from '../../common/NavBar'
 import { useAuth } from '../../common/AuthContext'
 import MostrarCitas from '../../components/MostrarCitas'
 import { useTranslation } from 'react-i18next';
+import PopUpWindow from '../Pop-up_Window'
 
 const UserManagement = () => {
   const navigate = useNavigate()
@@ -18,11 +19,18 @@ const UserManagement = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [showConfirmModal, setShowConfirmModal] = useState(false)
+  const [showPopup, setShowPopup] = useState(false)
+  const [popupData, setPopupData] = useState<{ title: string; message: string; onConfirm?: () => void }>({ title: '', message: '' })
   const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas' | 'promosActivas' | 'notificaciones'>('info');
 
   const { setLanguage } = useAuth();
 
   const { t } = useTranslation('global');
+  const showAlert = (title: string, message: string, onConfirm?: () => void) => {
+    setPopupData({ title, message, onConfirm })
+    setShowPopup(true)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -49,7 +57,7 @@ const UserManagement = () => {
       password: password || user?.password,
       rol: user?.rol,
     }
- 
+
     try {
       const response = await fetch(`${apiUrl}/api/users/update/${userEmail}`, {
         method: 'POST',
@@ -173,7 +181,7 @@ useEffect(() => {
 
   const handlePromoSubmit = async () => {
   if (!newPromo.title || !newPromo.start_date || !newPromo.end_date || !newPromo.porcentage) {
-    alert('Por favor, completa todos los campos.')
+    showAlert('Error', 'Por favor, completa todos los campos');
     return
   }
 
@@ -203,18 +211,18 @@ useEffect(() => {
     if (!res.ok) {
       const text = await res.text()
       console.error(`❌ Error ${res.status}:`, text)
-      alert(`❌ Error ${res.status}: ${text}`)
+      showAlert('Error', 'Hubo un error creando/editando la promocion');
       return
     }
 
-    alert('✅ Promoción guardada correctamente.')
+    showAlert('Exito', 'Promocion Guardada Correctamente');
     setNewPromo({ title: '', start_date: '', end_date: '', porcentage: '' })
     setEditingPromoId(null)
 
     await refreshPromotions()
   } catch (error) {
     console.error('❌ Error al guardar promoción:', error)
-    alert('Error de conexión con el servidor.')
+    showAlert('Error', 'La promocion no pudo ser guardada, intentalo de nuevo');
   }
 }
 
@@ -333,7 +341,7 @@ const enviarCorreoPromo = async (promoId: number) => {
     setTimeout(() => setCorreoPromoStatus(null), 2000);
   } catch (error) {
     console.error('❌ Error al hacer la petición de envío de correo:', error);
-    alert('Error de conexión al enviar el correo.');
+    showAlert('Error', 'Error de conexion al enviar el correo');
   }
 };
 
@@ -355,11 +363,11 @@ const confirmarCompra = async (idCompra: number) => {
     if (!res.ok) {
       const errorText = await res.text();
       console.error('❌ Error al confirmar la compra:', errorText);
-      alert('No se pudo confirmar la compra.');
+      showAlert('Error', 'No se pudo confirmar la compra');
       return;
     }
 
-    alert('✅ Compra confirmada exitosamente.');
+    showAlert('Exito', 'La compra fue confirmada de manera exitosa');
     const fetchSalesHistory = async () => {
       const endpoint = user.rol === 'Administrador'
         ? `${apiUrl}/api/compras/admin`
@@ -386,7 +394,7 @@ const confirmarCompra = async (idCompra: number) => {
 
   } catch (error) {
     console.error('❌ Error al hacer PUT:', error);
-    alert('Error de conexión.');
+    showAlert('Error', 'No se logro obtener el historial de compras');
   }
 
 };
@@ -703,6 +711,21 @@ const confirmarCompra = async (idCompra: number) => {
         })()}
       </div>
     )}
+    {/* Ventana emergente de alerta */}
+        <PopUpWindow
+          show={showPopup}
+          title={popupData.title}
+          onClose={() => {
+            setShowPopup(false)
+            popupData.onConfirm?.()
+          }}
+          onConfirm={() => {
+            setShowPopup(false)
+            popupData.onConfirm?.()
+          }}
+        >
+          <p>{popupData.message}</p>
+        </PopUpWindow>
       </div>
     </div>
   </>

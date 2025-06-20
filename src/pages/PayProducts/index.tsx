@@ -16,10 +16,19 @@ const PayProduct = () => {
   const { t } = useTranslation('global');
   const [metodoPago, setMetodoPago] = useState<'transferencia' | 'sinpe' | null>(null);
   const [showSinpeModal, setShowSinpeModal] = useState(false);
+  const [modalInfo, setModalInfo] = useState<{ show: boolean; title: string; content: string; onConfirm?: () => void }>({
+    show: false,
+    title: '',
+    content: '',
+  });
 
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff';
   }, []);
+
+  const showAlert = (title: string, content: string, onConfirm?: () => void) => {
+    setModalInfo({ show: true, title, content, onConfirm });
+  };
 
   const procesarPagoSinpe = async () => {
     if (!token || !user?.email) return;
@@ -43,10 +52,11 @@ const PayProduct = () => {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || 'No se pudo registrar el pago por SINPE.');
+        showAlert('Error', errorData.message || 'No se pudo registrar el pago por SINPE.');
+        return;
       }
 
-      const mensaje = `Hola, deseo pagar por SINPE móvil los productos que compré en la página. Mi correo es: ${user.email}`;
+      const mensaje = `Hola, deseo pagar por SINPE móvil los productos que compré en la página. Mi correo es: ${user.email}, Monto a Pagar es: ${total} dolares`;
       const mensajeCodificado = encodeURIComponent(mensaje);
       const whatsappUrl = `https://wa.me/50683582929?text=${mensajeCodificado}`;
       window.location.href = whatsappUrl;
@@ -54,18 +64,18 @@ const PayProduct = () => {
 
     } catch (error) {
       console.error('Error al registrar pago por SINPE:', error);
-      alert('Ocurrió un error al registrar el pago por SINPE.');
+      showAlert('Error', 'Ocurrió un error al registrar el pago por SINPE.');
     }
   };
 
   const handleConfirmacion = async () => {
     if (!token || !user?.email) {
-      alert('No se ha encontrado el token de autenticación o el correo del usuario.');
+      showAlert('Error de Autenticación', 'No se ha encontrado el token de autenticación o el correo del usuario.');
       return;
     }
 
     if (!metodoPago) {
-      alert('Selecciona un método de pago.');
+      showAlert('Método de Pago', 'Selecciona un método de pago.');
       return;
     }
 
@@ -96,11 +106,11 @@ const PayProduct = () => {
       if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
         window.location.href = result.sessionUrl;
       } else {
-        alert("URL inválida para redirección a PayPal.");
+        showAlert('Error', 'URL inválida para redirección a PayPal.');
       }
     } catch (error) {
       console.error('Error al procesar la compra:', error);
-      alert('Ocurrió un error al procesar la compra. Inténtalo más tarde.');
+      showAlert('Error', 'Ocurrió un error al procesar la compra. Inténtalo más tarde.');
     }
   };
 
@@ -182,12 +192,7 @@ const PayProduct = () => {
             Debe realizar una transferencia al número SINPE móvil:
           </p>
           <div className="border border-dark p-3 my-3 text-center fs-5 fw-bold">
-            <p
-              className="text-black pt-3"
-              rel="noopener noreferrer"
-            >
-              +506 83582929
-            </p>
+            <p className="text-black pt-3">+506 83582929</p>
           </div>
           <p>
             Una vez realizado el pago, envíe el comprobante a través de WhatsApp. <br />
@@ -195,6 +200,20 @@ const PayProduct = () => {
           </p>
         </div>
       </PopUpWindow>
+
+      {modalInfo.show && (
+        <PopUpWindow
+          show={modalInfo.show}
+          title={modalInfo.title}
+          onClose={() => setModalInfo({ ...modalInfo, show: false })}
+          onConfirm={() => {
+            setModalInfo({ ...modalInfo, show: false });
+            if (modalInfo.onConfirm) modalInfo.onConfirm();
+          }}
+        >
+          <p>{modalInfo.content}</p>
+        </PopUpWindow>
+      )}
     </>
   );
 };
