@@ -159,7 +159,7 @@ const ProductView = () => {
             <p className="text-muted mb-3">{product.description}</p>
             <h4 className="fw-bold text-dark mb-3">${product.price.toLocaleString()}</h4>
 
-            {user && user.rol !== 'Administrador' ? (
+            {!isAdmin && (
               <div className="mb-3">
                 <label className="fw-bold text-dark mb-3">{t('quantity')}:</label>
                 <input
@@ -169,20 +169,22 @@ const ProductView = () => {
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
                 />
-                <button
-                  className="btn btn-primary fw-bold py-2 w-100 mb-2"
-                  style={{ maxWidth: '300px' }}
-                  onClick={handleAddToCart}
-                >
-                  {t('add_to_cart')}
-                </button>
-              </div> 
-            ) : (
-                <div className="alert alert-warning text-center mt-2" style={{ maxWidth: '300px' }}>
-                  ⚠ {t('login_required_p')}
-                </div>
-              )}
-            </div>
+
+                {user ? (
+                  <button
+                    className="btn btn-primary fw-bold py-2 w-100 mb-2"
+                    style={{ maxWidth: '300px' }}
+                    onClick={handleAddToCart}
+                  >
+                    {t('add_to_cart')}
+                  </button>
+                ) : (
+                  <div className="alert alert-warning text-center mt-2" style={{ maxWidth: '300px' }}>
+                    ⚠ {t('login_required_p')}
+                  </div>
+                )}
+              </div>
+            )}
 
             {isAdmin && (
               <div className="d-flex flex-column gap-2">
@@ -202,6 +204,7 @@ const ProductView = () => {
                 </button>
               </div>
             )}
+          </div>
         </div>
 
         {relatedProducts.length > 0 && (

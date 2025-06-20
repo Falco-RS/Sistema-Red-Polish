@@ -39,10 +39,7 @@ const PayService = () => {
           serviceId: servicio.id,
         };
 
-      console.log('Datos que se van a enviar:', bodySinpe);
-      console.log('Token:', token);
-
-      const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/cita/${user.email}`, {
+        const response = await fetch(`${apiUrl}/api/payments/sinpe/pay/cita/${user.email}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -51,19 +48,28 @@ const PayService = () => {
           body: JSON.stringify(bodySinpe)
         });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'No se pudo registrar la cita por SINPE');
-      }
+        console.log(bodySinpe)
+        if (!response.ok) {
+          const json = await response.json();
+          console.error('❌ Error JSON:', json);
+          throw new Error(json.message || 'Error desconocido');
+        }
 
       const mensaje = `Hola, deseo pagar por SINPE móvil el servicio que reservé. Mi correo es: ${user.email}, Monto a pagar: ${servicio.precio} dólares.`;
       const mensajeCodificado = encodeURIComponent(mensaje);
       const whatsappUrl = `https://wa.me/50683582929?text=${mensajeCodificado}`;
       window.location.href = whatsappUrl;
-    } catch (error) {
-      console.error('Error al registrar pago por SINPE:', error);
-      showAlert('Error', 'Ocurrió un error al registrar el pago por SINPE.');
-    }
+    } catch (error: any) {
+  console.error('❌ Error al registrar pago por SINPE:', error);
+
+  // Intenta extraer mensaje si es un Error de tipo Response o JSON fallido
+  if (error instanceof Error) {
+    showAlert('Error', error.message || 'Ocurrió un error al registrar el pago por SINPE.');
+  } else {
+    showAlert('Error', 'Ocurrió un error desconocido al registrar el pago por SINPE.');
+  }
+}
+
   };
 
 
@@ -115,7 +121,7 @@ const PayService = () => {
       const result = await response.json();
 
       if (typeof result.sessionUrl === 'string' && result.sessionUrl.startsWith("https://")) {
-        setIdTrans(result.id_compra)
+        setIdTrans(result.service.id)
         window.location.href = result.sessionUrl;
       } else {
         alert("URL inválida para redirección");
@@ -175,7 +181,7 @@ const PayService = () => {
 
           {metodoPago === 'sinpe' && (
             <div className="alert alert-warning mt-4">
-              <strong>Nota:</strong> Al presionar <strong>Confirmar compra</strong> se abrirá una ventana emergente con los pasos necesarios para continuar con su pago por SINPE móvil.
+              <strong>Nota:</strong> Al presionar <strong>Confirmar cita</strong> se abrirá una ventana emergente con los pasos necesarios para continuar con su pago por SINPE móvil.
             </div>
           )}
 
@@ -188,7 +194,7 @@ const PayService = () => {
       </div>
       <PopUpWindow
         show={showSinpeModal}
-        title="Pago de Compra por Sinpe"
+        title="Pago de Cita por Sinpe"
         onClose={() => setShowSinpeModal(false)}
         onConfirm={() => {
           setShowSinpeModal(false);
