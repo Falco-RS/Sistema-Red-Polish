@@ -19,7 +19,6 @@ const UserManagement = () => {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
-  const [showConfirmModal, setShowConfirmModal] = useState(false)
   const [showPopup, setShowPopup] = useState(false)
   const [popupData, setPopupData] = useState<{ title: string; message: string; onConfirm?: () => void }>({ title: '', message: '' })
   const [activeSection, setActiveSection] = useState<'info' | 'citas' | 'gestion' | 'promos' | 'ventas' | 'promosActivas' | 'notificaciones'>('info');
