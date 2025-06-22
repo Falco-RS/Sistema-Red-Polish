@@ -45,7 +45,6 @@ const EditProduct = () => {
         });
         const data = await res.json();
         setPromotions(data);
-        console.log('Promociones cargadas:', data);
       } catch {
         setPromotions([]);
       }
@@ -59,21 +58,17 @@ const EditProduct = () => {
       try {
         const res = await fetch(`${apiUrl}/api/products/get/${id}`);
         const data = await res.json();
-        console.log('Producto recibido:', data);
 
         setName(data.name);
         setDescription(data.description);
 
         const promotion = promotions.find(p => p.id === data.promotionId);
         if (promotion?.porcentage) {
-          console.log('Promo detectada por ID:', promotion);
           const precioOriginal = Math.round(data.price / (1 - promotion.porcentage / 100));
-          console.log('Precio original calculado:', precioOriginal);
           setOriginalPrice(precioOriginal);
           setPrice(precioOriginal.toString());
           setPromotionId(promotion.id.toString());
         } else {
-          console.log('Sin promoción');
           setOriginalPrice(data.price);
           setPrice(data.price.toString());
         }
@@ -125,7 +120,6 @@ const EditProduct = () => {
     }
 
     const userEmail = user?.email
-    console.log(productData)
 
     try {
       const res = await fetch(`${apiUrl}/api/products/update/${id}/${userEmail}`, {
@@ -284,4 +278,3 @@ const EditProduct = () => {
 }
 
 export default EditProduct
-
