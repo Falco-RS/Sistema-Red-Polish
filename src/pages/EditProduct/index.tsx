@@ -15,7 +15,9 @@ const EditProduct = () => {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [categories, setCategories] = useState<{ id: number, name: string }[]>([])
-  const [promotions, setPromotions] = useState<{ id: number, title: string }[]>([]) // NUEVO
+  const [promotions, setPromotions] = useState<{
+    porcentage: number;
+    id: number, title: string }[]>([]) // NUEVO
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const { user, token } = useAuth()
@@ -29,30 +31,6 @@ const EditProduct = () => {
   useEffect(() => {
     document.body.style.backgroundColor = '#ffffff'
 
-    fetch(`${apiUrl}/api/products/get/${id}`)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data)
-        setName(data.name)
-        setDescription(data.description)
-        setOriginalPrice(data.price);
-        setPrice(data.price.toString())
-        setQuantity(data.stock.toString())
-        setCategoryId(data.categoryId.toString())
-        setImageUrl(data.image)
-        if (data.promotion?.id) {
-        setPromotionId(data.promotion.id.toString())
-      }
-      })
-      .catch(() => setError(t('error_loading_product')))
-
-    // Obtener categorías
-    fetch(`${apiUrl}/api/categories/get_categories`)
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(() => setCategories([]))
-
-    // Obtener promociones
     const fetchPromotions = async () => {
       try {
         const res = await fetch(`${apiUrl}/api/promotions`, {
@@ -64,6 +42,7 @@ const EditProduct = () => {
         })
         const data = await res.json()
         setPromotions(data)
+        console.log(data)
       } catch {
         setPromotions([])
       }
@@ -71,6 +50,42 @@ const EditProduct = () => {
     fetchPromotions()
   }, [apiUrl, id, token])
 
+    fetch(`${apiUrl}/api/products/get/${id}`)
+      .then(res => res.json())
+        .then(data => {
+          console.log('Producto recibido:', data);
+
+          setName(data.name);
+          setDescription(data.description);
+
+          const promotion = promotions.find(p => p.id === data.promotionId);
+          if (promotion?.porcentage) {
+            console.log('Promo detectada por ID:', promotion);
+            const precioOriginal = Math.round(data.price / (1 - promotion.porcentage / 100));
+            console.log('Precio original calculado:', precioOriginal);
+            setOriginalPrice(precioOriginal);
+            setPrice(precioOriginal.toString());
+            setPromotionId(promotion.id.toString());
+          } else {
+            console.log('Sin promoción');
+            setOriginalPrice(data.price);
+            setPrice(data.price.toString());
+          }
+
+          setQuantity(data.stock.toString());
+          setCategoryId(data.categoryId.toString());
+          setImageUrl(data.image);
+        })
+
+
+        .catch(() => setError(t('error_loading_product')))
+
+    // Obtener categorías
+    fetch(`${apiUrl}/api/categories/get_categories`)
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(() => setCategories([]))
+    
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
