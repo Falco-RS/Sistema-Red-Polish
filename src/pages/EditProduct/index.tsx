@@ -19,6 +19,7 @@ const EditProduct = () => {
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const { user, token } = useAuth()
+  const [originalPrice, setOriginalPrice] = useState<number | null>(null);
   const { t } = useTranslation('global');
 
   const apiUrl = import.meta.env.VITE_IP_API
@@ -34,6 +35,7 @@ const EditProduct = () => {
         console.log(data)
         setName(data.name)
         setDescription(data.description)
+        setOriginalPrice(data.price);
         setPrice(data.price.toString())
         setQuantity(data.stock.toString())
         setCategoryId(data.categoryId.toString())
@@ -84,7 +86,7 @@ const EditProduct = () => {
       stock: parseInt(quantity),
       image: imageUrl,
       categoryId: parseInt(categoryId),
-      promotionId: promotionId
+      promotionId: promotionId ? parseInt(promotionId) : null
     }
 
     const userEmail = user?.email
@@ -147,16 +149,25 @@ const EditProduct = () => {
 
           <div className="mb-3">
             <label className="text-dark fw-bold">{t('price')}</label>
-            <input type="number" className="form-control" value={price} onChange={(e) => setPrice(e.target.value)} required />
+            <input
+              type="number"
+              className="form-control"
+              placeholder={originalPrice !== null ? originalPrice.toString() : ''}
+              value={price}
+              onChange={e => setPrice(e.target.value)}
+              required
+            />
           </div>
+
 
           <div className="mb-3">
             <label className="text-dark fw-bold">{t('quantity')}</label>
-            <input type="number" className="form-control" value={quantity} onChange={(e) => setQuantity(e.target.value)} required />
+            <input type="number" className="form-control" value={quantity} onChange={(e) => setQuantity(e.target.value)}
+                   required/>
           </div>
 
           <div className="mb-3">
-            <label className="text-dark fw-bold d-block">{t('category')}</label>
+          <label className="text-dark fw-bold d-block">{t('category')}</label>
             <div className="d-flex gap-2">
               <select
                 className="form-select"
