@@ -56,40 +56,36 @@ const Appoiment = () => {
   }, [user]);
 
 
-  const handleConfirm = async (citaId: number) => {
-  try {
-    const response = await fetch(`${apiUrl}/api/citas/update-state/${citaId}/${user.email}/CONFIRMADA`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      }
-    });
+  const handleConfirm = async (citaId: number): Promise<boolean> => {
+    try {
+      const response = await fetch(`${apiUrl}/api/citas/update-state/${citaId}/${user.email}/CONFIRMADA`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-    if (!response.ok) {
-        showAlert('Error', 'Error al confirmar la cita.');
-        return;
-      }
+      if (!response.ok) return false;
 
-    const updated = await response.json();
-    setAppointments(prev =>
-      prev.map(cita =>
-        cita.id === updated.id ? { ...cita, state: updated.state } : cita
-      )
-    );
+      const updated = await response.json();
+      setAppointments(prev =>
+          prev.map(cita =>
+              cita.id === updated.id ? { ...cita, state: updated.state } : cita
+          )
+      );
+      return true;
+    } catch (err) {
+      console.error(err);
+      return false;
+    }
+  };
 
-  } catch (err) {
-    console.error(err);
-    showAlert('Error', 'Error de red al confirmar el pago.');
-  }
-};
-
-
-  const handleCancel = async (citaId: number) => {
+  const handleCancel = async (citaId: number): Promise<boolean> => {
     try {
       const endpoint = user.rol === 'Administrador'
-        ? `${apiUrl}/api/citas/cancel_admin/${citaId}/${user.email}`
-        : `${apiUrl}/api/citas/cancel/${citaId}/${user.email}`;
+          ? `${apiUrl}/api/citas/cancel_admin/${citaId}/${user.email}`
+          : `${apiUrl}/api/citas/cancel/${citaId}/${user.email}`;
 
       const response = await fetch(endpoint, {
         method: 'PUT',
@@ -99,27 +95,19 @@ const Appoiment = () => {
         }
       });
 
-      if (!response.ok) {
-        showAlert('Error', 'Error al cancelar la cita.');
-        return;
-      }
+      if (!response.ok) return false;
 
-    const updated = await response.json();
+      const updated = await response.json();
       setAppointments(prev =>
-        prev.map(cita =>
-          cita.id === updated.id ? { ...cita, state: updated.state } : cita
-        )
+          prev.map(cita =>
+              cita.id === updated.id ? { ...cita, state: updated.state } : cita
+          )
       );
 
-    if (user.rol !== 'Administrador') {
-      showAlert(
-          'Cancelación Pendiente',
-          'Su cancelación está pendiente. Por favor contacte al administrador al +506 8358 2929 para la devolución y tener una cancelación exitosa.'
-        );    
-      }
+      return true;
     } catch (err) {
       console.error(err);
-      showAlert('Error', 'Error de red al cancelar la cita.');
+      return false;
     }
   };
 
@@ -152,34 +140,78 @@ const Appoiment = () => {
               <td>
                 {/* CONFIRMAR PAGO SOLO PARA ADMIN EN ESTADO PENDIENTE */}
                 {user.rol === 'Administrador' && cita.state === 'PENDIENTE' && (
-                  <button
-                    className="btn btn-success btn-sm me-2"
-                    onClick={async () => {
-                      await handleConfirm(cita.id);
-                    }}
-                  >
-                    {t('confirm_payment')}
-                  </button>
+                    <button
+                        className="btn btn-success btn-sm me-2"
+                        onClick={() =>
+                            showAlert(
+                                '¿Confirmar cita?',
+                                '¿Está seguro que desea confirmar esta cita?',
+                                async () => {
+                                  const success = await handleConfirm(cita.id);
+                                  if (success) {
+                                    showAlert('Éxito', 'La cita ha sido confirmada exitosamente.');
+                                  } else {
+                                    showAlert('Error', 'No se pudo confirmar la cita.');
+                                  }
+                                }
+                            )
+                        }
+                    >
+                      Confirmar pago
+                    </button>
                 )}
 
                 {/* CANCELAR si está PENDIENTE o CONFIRMADA */}
                 {(cita.state === 'PENDIENTE' || cita.state === 'CONFIRMADA') && (
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleCancel(cita.id)}
-                  >
-                    {t('cancel')}
-                  </button>
+                    <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() =>
+                            showAlert(
+                                '¿Cancelar cita?',
+                                '¿Está seguro que desea cancelar esta cita?',
+                                async () => {
+                                  const success = await handleCancel(cita.id);
+                                  if (success) {
+                                    if (user.rol !== 'Administrador') {
+                                      showAlert(
+                                          'Cancelación pendiente',
+                                          'Su cancelación está pendiente. Contacte al administrador al +506 8358 2929.'
+                                      );
+                                    } else {
+                                      showAlert('Éxito', 'La cita ha sido cancelada exitosamente.');
+                                    }
+                                  } else {
+                                    showAlert('Error', 'No se pudo cancelar la cita.');
+                                  }
+                                }
+                            )
+                        }
+                    >
+                      Cancelar
+                    </button>
                 )}
 
                 {/* CONFIRMAR CANCELACIÓN si es CANCELADA PENDIENTE y el admin la ve */}
                 {cita.state === 'CANCELADA PENDIENTE' && user.rol === 'Administrador' && (
-                  <button
-                    className="btn btn-warning btn-sm"
-                    onClick={() => handleCancel(cita.id)}
-                  >
-                    {t('confirm_cancellation')}
-                  </button>
+                    <button
+                        className="btn btn-warning btn-sm"
+                        onClick={() =>
+                            showAlert(
+                                '¿Confirmar cancelación?',
+                                '¿Desea confirmar la cancelación de esta cita?',
+                                async () => {
+                                  const success = await handleCancel(cita.id);
+                                  if (success) {
+                                    showAlert('Éxito', 'La cancelación fue confirmada.');
+                                  } else {
+                                    showAlert('Error', 'No se pudo confirmar la cancelación.');
+                                  }
+                                }
+                            )
+                        }
+                    >
+                      Confirmar cancelación
+                    </button>
                 )}
               </td>
             </tr>

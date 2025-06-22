@@ -56,34 +56,35 @@ const UserManagement = () => {
       password: password || user?.password,
       rol: user?.rol,
     }
+    showAlert('Confirmación', '¿Seguro que quieres cambiar tus datos?', async () => {
+      try {
+        const response = await fetch(`${apiUrl}/api/users/update/${userEmail}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+          },
+          body: JSON.stringify(updatedUser),
+        })
 
-    try {
-      const response = await fetch(`${apiUrl}/api/users/update/${userEmail}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(updatedUser),
-      })
+        if (!response.ok) {
+          const errorData = await response.json()
+          setError(errorData.message || 'Error al actualizar los datos.')
+          setSuccess(false)
+          return
+        }
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        setError(errorData.message || 'Error al actualizar los datos.')
+        login(fullUser, token!)
+        showAlert('Éxito', 'Tus cambios han sido efectuados correctamente')
+        setError('')
+        setSuccess(true)
+      } catch (err) {
+        console.error('❌ Error al hacer la petición:', err)
+        setError('Error de conexión con el servidor.')
+        showAlert('Fracaso', 'Tus cambios no han sido efectuados')
         setSuccess(false)
-        return
       }
-      login(fullUser, token!)
-
-
-
-      setError('')
-      setSuccess(true)
-    } catch (err) {
-      console.error('❌ Error al hacer la petición:', err)
-      setError('Error de conexión con el servidor.')
-      setSuccess(false)
-    }
+    })
   }
 
   useEffect(() => {
@@ -550,12 +551,17 @@ const confirmarCompra = async (idCompra: number) => {
                       <td>{promo.porcentage !== undefined && promo.porcentage !== null ? `${promo.porcentage}%` : '—'}</td>
                       <td className="d-flex gap-1">
                         <button className="btn btn-sm btn-outline-primary" onClick={() => {
-                          setEditingPromoId(promo.id)
-                          setNewPromo({ ...promo})
-                        }}>{t('edit')}</button>
+                          showAlert('Confirmación', '¿Seguro que deseas editar esta promoción?', () => {
+                            setEditingPromoId(promo.id)
+                            setNewPromo({ ...promo })
+                          });
+                        }}
+                        >{t('edit')}</button>
                         <button
                           className="btn btn-sm btn-outline-danger"
-                          onClick={() => deletePromo(promo.id)}
+                          onClick={() => {
+                            showAlert('Confirmación', '¿Estás seguro que deseas eliminar esta promoción?', () => deletePromo(promo.id));
+                          }}
                         >
                           {t('delete')}
                         </button>
@@ -646,7 +652,9 @@ const confirmarCompra = async (idCompra: number) => {
                   {user.rol === 'Administrador' && sale.status === 'PENDIENTE' && (
                     <button
                       className="btn btn-sm btn-outline-primary"
-                      onClick={() => confirmarCompra(sale.id)}
+                      onClick={() => {
+                        showAlert('Confirmación', '¿Deseas confirmar esta compra como pagada?', () => confirmarCompra(sale.id));
+                      }}
                     >
                       {t('confirm_purchase')}
                     </button>
@@ -720,7 +728,6 @@ const confirmarCompra = async (idCompra: number) => {
           title={popupData.title}
           onClose={() => {
             setShowPopup(false)
-            popupData.onConfirm?.()
           }}
           onConfirm={() => {
             setShowPopup(false)
@@ -734,6 +741,7 @@ const confirmarCompra = async (idCompra: number) => {
   </>
 )
 }
+
 export default UserManagement
 
 
