@@ -46,12 +46,6 @@ const AddProduct = () => {
   }
 
   const userEmail = user?.email
-  const userToken = token
-
-  console.log('Producto a enviar:', productData)
-  console.log("Token del Administador:", userToken)
-  console.log(token)
-  console.log(userToken)
 
   try {
     const res = await fetch(`${apiUrl}/api/products/create/${userEmail}`, {

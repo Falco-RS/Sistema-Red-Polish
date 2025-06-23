@@ -49,8 +49,6 @@ const Register = () => {
       password: password
     }
 
-    console.log('Datos listos para enviar al backend:', JSON.stringify(userData, null, 2))
-
     try {
       showLoader(); // ✅ Mostrar loader
       const response = await fetch(`${apiUrl}/api/users/register`, {
@@ -89,7 +87,6 @@ const Register = () => {
       }
 
       const data = await responselog.json();
-      console.log('Usuario autenticado:', data);
 
       login(data.user, data.token);
 

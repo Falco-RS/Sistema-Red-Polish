@@ -48,7 +48,6 @@ const PayService = () => {
           body: JSON.stringify(bodySinpe)
         });
 
-        console.log(bodySinpe)
         if (!response.ok) {
           const json = await response.json();
           console.error('❌ Error JSON:', json);

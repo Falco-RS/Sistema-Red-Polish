@@ -45,7 +45,6 @@ const EditService = () => {
       setError(t('error_service_info'))
       return
     }
-    console.log(servicio)
     setName(servicio.nombre)
     setDescription(servicio.descripcion)
     setDuration(servicio.duracion.toString())

@@ -120,7 +120,6 @@ useEffect(() => {
       }
 
       const data = await res.json()
-      console.log('Promotions fetched:', data)
       setPromotions(data)
       if (user?.rol !== 'Administrador') {
         const notificacionesGuardadas = JSON.parse(localStorage.getItem(`notificaciones-${user.email}`) || '[]');
@@ -238,7 +237,6 @@ useEffect(() => {
     });
 
     if (response.ok) {
-      console.log('Promoción eliminada correctamente');
       refreshPromotions(); 
     } else {
       console.error('Error al eliminar la promoción');
@@ -296,7 +294,6 @@ const refreshPromotions = async () => {
       }
 
       const data = await response.json();
-      console.log('🧾 Compras recibidas:', data);
 
       const mappedData = data.map((compra: any, index: number) => ({
         id: compra.idCompra || index,
@@ -307,17 +304,13 @@ const refreshPromotions = async () => {
         status: compra.estadoPago || 'Sin estado',
         total: compra.precioCompra || 0
       }));
-
       setSalesHistory(mappedData);
-      console.log(salesHistory);
-      console.log(mappedData);
     } catch (error) {
       console.error('❌ Error al cargar historial de compras:', error);
     }
   };
 
   fetchSalesHistory();
-  console.log(salesHistory);
 }, [user, token, apiUrl]);
 
 const enviarCorreoPromo = async (promoId: number) => {

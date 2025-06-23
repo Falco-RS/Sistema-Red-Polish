@@ -68,7 +68,6 @@ const EditCalendar = () => {
 
         const data: CitaOcupada[] = await response.json()
 
-        console.log(response)
         const rangos = data.map(cita => {
           const inicio = new Date(`${cita.fecha}T${cita.hora}`)
           const fin = new Date(inicio.getTime() + parseInt(cita.duracion) * 60000)
@@ -96,7 +95,6 @@ const EditCalendar = () => {
     let successCount = 0
 
     try {
-      console.log(selectedHours)
       for (const hour of selectedHours) {
         const hourStr = `${hour.toString().padStart(2, '0')}:00`
 

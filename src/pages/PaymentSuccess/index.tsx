@@ -23,9 +23,7 @@ const PaymentSuccess = () => {
     const confirmarPago = async () => {
       try {
         var response;
-        console.log(isCompra);
         if (isCompra) {
-          console.log(idTrans)
           response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/buy/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
             method: 'POST',
             headers: {
@@ -39,7 +37,6 @@ const PaymentSuccess = () => {
             return;
           }
         } else {
-          console.log(idTrans)
           response = await fetch(`${import.meta.env.VITE_IP_API}/api/payments/success/appointment/${idTrans}/${user.email}?paymentId=${paymentId}&PayerID=${payerId}`, {
             method: 'POST',
             headers: {

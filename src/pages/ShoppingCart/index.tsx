@@ -32,7 +32,6 @@ const ShoppingCart: React.FC = () => {
 
       if (!res.ok) throw new Error('Error al actualizar producto en el carrito');
 
-      console.log(`✅ Producto ${cartItemId} actualizado con cantidad ${nuevaCantidad}`);
     } catch (err) {
       console.error('❌ Error actualizando producto:', err);
     }
@@ -60,7 +59,6 @@ const ShoppingCart: React.FC = () => {
         return nuevo;
       });
 
-      console.log(`✅ Producto con ID carrito ${cartItemId} eliminado`);
     } catch (err) {
       console.error('❌ Error al eliminar producto del carrito:', err);
     }
@@ -84,7 +82,6 @@ const ShoppingCart: React.FC = () => {
       setProductos([]);
       setSeleccionados({});
 
-      console.log('✅ Carrito vaciado exitosamente');
     } catch (err) {
       console.error('❌ Error al vaciar el carrito:', err);
     }

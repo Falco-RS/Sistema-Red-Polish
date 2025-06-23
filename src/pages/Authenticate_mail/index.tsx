@@ -39,7 +39,6 @@ function Authenticate_mail() {
       })
 
       const text = await response.text()
-      console.log('Respuesta de la API:', text)
 
       if (text !== 'Clave dinamica verificada') {
         throw new Error('Código inválido o no verificado correctamente.')
@@ -70,7 +69,6 @@ function Authenticate_mail() {
       })
 
       const text = await response.text()
-      console.log('Respuesta al reenviar código:', text)
       if (text !== 'Se ha enviado el email de verifycacion') {
         setResendTimer(120)
         throw new Error('Algo ocurrió mal, no se pudo reenviar el codigo')

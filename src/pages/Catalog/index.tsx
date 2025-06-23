@@ -43,7 +43,6 @@ const Catalog = () => {
       const res = await fetch(`${apiUrl}/api/categories/get_categories`)
       const data = await res.json()
       setCategories(data)
-      console.log(data)
     } catch (err) {
       console.error(err)
     }
