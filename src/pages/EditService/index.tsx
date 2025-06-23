@@ -11,7 +11,7 @@ const EditService = () => {
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
   const [duration, setDuration] = useState('')
-  const [price, setPrice] = useState('')
+  const [originalPrice, setOriginalPrice] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [imageUrl, setImageUrl] = useState('')
   const [error, setError] = useState('')
@@ -20,7 +20,7 @@ const EditService = () => {
   const [showNewCategory, setShowNewCategory] = useState(false)
   const [newCategory, setNewCategory] = useState('')
   const [promotionId, setPromotionId] = useState('') // NUEVO
-  const [promotions, setPromotions] = useState<{ id: number, title: string }[]>([]) // NUEVO
+  const [promotions, setPromotions] = useState<{ id: number; porcentage: number; title: string }[]>([]) // NUEVO
   const location = useLocation()
   const servicio = location.state?.servicio
   const apiUrl = import.meta.env.VITE_IP_API
@@ -49,7 +49,6 @@ const EditService = () => {
     setName(servicio.nombre)
     setDescription(servicio.descripcion)
     setDuration(servicio.duracion.toString())
-    setPrice(servicio.precio.toString())
     setCategoryId(servicio.id_categoria.toString())
     setImageUrl(servicio.imagen || '')
     setPromotionId(servicio.id_promocion)
@@ -69,19 +68,45 @@ const EditService = () => {
   }, [servicio])
 
   useEffect(() => {
-  const fetchPromotions = async () => {
-    try {
-      const res = await fetch(`${apiUrl}/api/promotions`)
-      if (!res.ok) throw new Error('Error al obtener promociones')
-      const data = await res.json()
-      setPromotions(data)
-    } catch (err) {
-      console.error(err)
-      setError(t('error_promotions_fetch'))
-    }
-  }
+    const fetchPromotions = async () => {
+      try {
+        // 1. Llamas al endpoint y obtienes el JSON
+        const res = await fetch(`${apiUrl}/api/promotions`)
+        if (!res.ok) throw new Error('Error al obtener promociones')
+        const data: { id: number; porcentage: number; title: string }[] = await res.json()
 
-  if (servicio) {
+        // 2. Actualizas el estado con las promociones
+        setPromotions(data)
+
+        // 3. Si el servicio viene con una promoción asignada, la buscas en el array
+        if (servicio.id_promocion) {
+          const promo = data.find(p => p.id === servicio.id_promocion)
+
+          if (promo) {
+
+            const precioDesc = typeof servicio.precio === 'string'
+              ? parseFloat(servicio.precio)
+              : servicio.precio
+
+            const precioOriginal = Math.round(
+              precioDesc / (1 - promo.porcentage / 100)
+            )
+
+            setOriginalPrice(precioOriginal.toString());
+          }
+        }
+        else{
+          setOriginalPrice(servicio.precio.toString());
+        }
+
+      } catch (err) {
+        console.error(err)
+        setError(t('error_promotions_fetch'))
+      }
+    }
+
+
+    if (servicio) {
     fetchPromotions()
     setPromotionId(servicio.id_promocion?.toString() || '')
   }
@@ -90,7 +115,7 @@ const EditService = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!name || !description || !duration || !price || !categoryId || !imageUrl) {
+    if (!name || !description || !duration || !originalPrice || !categoryId || !imageUrl) {
       showAlert(t('error'), t('error'))
       return
     }
@@ -100,7 +125,7 @@ const EditService = () => {
       categoryId: parseInt(categoryId),
       description,
       duration,
-      price: parseFloat(price),
+      price: parseFloat(originalPrice),
       imageUrl: imageUrl,   
       promotionId: promotionId ? parseInt(promotionId) : null, 
     }
@@ -199,7 +224,7 @@ const EditService = () => {
 
             <div className="mb-3">
               <label className="text-dark fw-bold">{t('price')}</label>
-              <input type="number" className="form-control" value={price} onChange={(e) => setPrice(e.target.value)} required />
+              <input type="number" className="form-control" value={originalPrice} onChange={(e) => setOriginalPrice(e.target.value)} required />
             </div>
 
             <div className="mb-3">

@@ -32,6 +32,16 @@ const NavBar = () => {
           Red Polish
         </Link>
 
+        {user && user.rol !== 'Administrador' && (
+          <Link
+            to="/shopping-cart"
+            className="d-lg-none nav-link p-0 me-3"
+            style={{ width: '30px', height: '30px' }}
+          >
+            <img src={carritoIcon} alt="Carrito" className="img-fluid" />
+          </Link>
+        )}
+
         {/* Botón hamburguesa */}
         <button
           className="navbar-toggler"
@@ -45,7 +55,7 @@ const NavBar = () => {
         </button>
 
         <div className={`collapse navbar-collapse ${!isCollapsed ? 'show' : ''}`} id="navbarNav">
-          <ul className="navbar-nav me-auto">
+          <ul className="navbar-nav me-auto align-items-center">
             <li className="nav-item">
               <Link to="/catalog" className="nav-link">{t('products')}</Link>
             </li>
@@ -56,18 +66,16 @@ const NavBar = () => {
 
           <ul className="navbar-nav align-items-center">
             {user && user.rol !== 'Administrador' && (
-              <li className="nav-item me-3">
-                <Link to="/shopping-cart" className="nav-link">
+              <li className="nav-item me-3 d-none d-lg-block">
+                <Link to="/shopping-cart" className="nav-link p-0">
                   <img
                     src={carritoIcon}
-                    alt="Carrito de compras"
+                    alt="Carrito"
                     style={{ width: '30px', height: '30px' }}
                   />
                 </Link>
               </li>
             )}
-
-
             {!user ? (
               <>
                 <li className="nav-item">

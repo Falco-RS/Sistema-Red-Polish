@@ -50,7 +50,7 @@ function Homepage() {
   });
 
   const nextSlide = () => {
-    if (startIndex + 6 < products.length) {
+    if (startIndex + 1 < products.length) {
       setStartIndex(startIndex + 1);
     }
   };
